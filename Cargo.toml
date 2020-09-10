@@ -1,9 +1,19 @@
 [package]
 name = "const-str"
-version = "0.1.0"
+version = "0.1.0-dev"
 authors = ["Nugine <nugine@foxmail.com>"]
 edition = "2018"
+description = "compile-time string operations"
+license = "MIT"
+repository = "https://github.com/Nugine/const-str"
+keywords = ["string", "const", "proc-macro"]
+categories = ["text-processing"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+proc_macro = true
+
 [dependencies]
+syn = "1.0.40"
+quote = "1.0.7"

@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 + `verified_regex!` (requires the feature `regex`)
++ `verified_header_name!` (requires the feature `http`)
 
 ## [0.1.0] - 2020-09-10
 

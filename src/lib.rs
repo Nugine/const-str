@@ -149,3 +149,27 @@ pub fn verified_regex(input: TokenStream) -> TokenStream {
 
     src_token.into_token_stream().into()
 }
+
+/// Returns a compile-time verified header name string literal.
+///
+/// # Examples
+///
+/// ```
+/// use http::header::HeaderName;
+/// let name = const_str::verified_header_name!("content-md5");
+/// assert_eq!(HeaderName::from_static(name).as_str(), "content-md5");
+/// ```
+///
+#[cfg(feature = "http")]
+#[proc_macro]
+pub fn verified_header_name(input: TokenStream) -> TokenStream {
+    use http::header::HeaderName;
+
+    let src_token: LitStr = parse_macro_input!(input as LitStr);
+
+    if let Err(e) = HeaderName::from_lowercase(src_token.value().as_bytes()) {
+        emit_error!(src_token, format!("{}", e));
+    }
+
+    src_token.into_token_stream().into()
+}

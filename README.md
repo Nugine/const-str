@@ -24,3 +24,11 @@ assert_eq!(const_str::to_uppercase!("hello"), "HELLO");
 
 assert_eq!(const_str::replace!("this is old", "old", "new"), "this is new");
 ```
+
+feature `regex`
+
+```rust
+use regex::Regex;
+let re = const_str::verified_regex!(r"^\d{4}-\d{2}-\d{2}$");
+assert!(Regex::new(re).is_ok());
+```

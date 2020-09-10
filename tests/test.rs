@@ -15,3 +15,11 @@ fn replace() {
     let s: &'static str = const_str::replace!("a_d", "_", "-");
     assert_eq!(s, "a-d");
 }
+
+#[cfg(feature = "regex")]
+#[test]
+fn regex() {
+    use regex::Regex;
+    let re = const_str::verified_regex!(r"^\d{4}-\d{2}-\d{2}$");
+    assert!(Regex::new(re).is_ok());
+}

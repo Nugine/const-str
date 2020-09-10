@@ -120,3 +120,32 @@ pub fn replace(input: TokenStream) -> TokenStream {
     let f: Replace = parse_macro_input!(input as Replace);
     f.exec().into_token_stream().into()
 }
+
+#[allow(unused_macros)]
+macro_rules! emit_error {
+    ($token:expr, $msg: expr) => {
+        return TokenStream::from(syn::Error::new($token.span(), $msg).to_compile_error());
+    };
+}
+
+/// Returns a compile-time verified regex string literal.
+///
+/// # Examples
+///
+/// ```
+/// use regex::Regex;
+/// let re = const_str::verified_regex!(r"^\d{4}-\d{2}-\d{2}$");
+/// assert!(Regex::new(re).is_ok());
+/// ```
+///
+#[cfg(feature = "regex")]
+#[proc_macro]
+pub fn verified_regex(input: TokenStream) -> TokenStream {
+    let src_token: LitStr = parse_macro_input!(input as LitStr);
+
+    if let Err(e) = regex::Regex::new(&src_token.value()) {
+        emit_error!(src_token, format!("{}", e));
+    }
+
+    src_token.into_token_stream().into()
+}

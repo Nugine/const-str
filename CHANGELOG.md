@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [Unreleased]: https://github.com/Nugine/const-str/compare/v0.1.0...HEAD
 
+### Added
+
++ `verified_regex!` (requires the feature `regex`)
+
 ## [0.1.0] - 2020-09-10
 
 [0.1.0]: https://github.com/Nugine/const-str/tree/v0.1.0

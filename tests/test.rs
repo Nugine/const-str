@@ -16,18 +16,18 @@ fn replace() {
     assert_eq!(s, "a-d");
 }
 
-#[cfg(feature = "regex")]
+#[cfg(feature = "verify-regex")]
 #[test]
 fn regex() {
     use regex::Regex;
-    let re = const_str::verified_regex!(r"^\d{4}-\d{2}-\d{2}$");
+    let re: &'static str = const_str::verified_regex!(r"^\d{4}-\d{2}-\d{2}$");
     assert!(Regex::new(re).is_ok());
 }
 
-#[cfg(feature = "http")]
+#[cfg(feature = "verify-http")]
 #[test]
 fn http() {
     use http::header::HeaderName;
-    let name = const_str::verified_header_name!("content-md5");
+    let name: &'static str = const_str::verified_header_name!("content-md5");
     assert_eq!(HeaderName::from_static(name).as_str(), "content-md5");
 }

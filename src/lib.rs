@@ -10,7 +10,7 @@
 //! assert_eq!(const_str::replace!("this is old", "old", "new"), "this is new");
 //! ```
 //!
-//! feature `regex`
+//! feature `verify-regex`
 //!
 //! ```
 //! use regex::Regex;
@@ -18,7 +18,7 @@
 //! assert!(Regex::new(re).is_ok());
 //! ```
 //!
-//! feature `http`
+//! feature `verify-http`
 //!
 //! ```
 //! use http::header::HeaderName;

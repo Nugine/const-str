@@ -16,8 +16,8 @@ script = ["cargo fmt --all"]
 
 [tasks.check]
 script = [
-    "cargo check",
-    "cargo clippy -- -D warnings",
+    "cargo check --all-features",
+    "cargo clippy --all-features -D warnings",
 ]
 dependencies = [
     "format"

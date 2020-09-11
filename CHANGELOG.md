@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 + `regex_assert_match` (requires the feature `verify-regex`)
++ `len!`
++ `as_bytes!`
++ `from_bytes!`
 
 ## [0.1.2] - 2020-09-11
 

@@ -31,6 +31,8 @@ feature `verify-regex`
 use regex::Regex;
 let re = const_str::verified_regex!(r"^\d{4}-\d{2}-\d{2}$");
 assert!(Regex::new(re).is_ok());
+
+const_str::regex_assert_match!(r"^\d{4}-\d{2}-\d{2}$", "2014-01-01");
 ```
 
 feature `verify-http`

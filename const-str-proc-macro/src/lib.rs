@@ -122,6 +122,43 @@ pub fn verified_regex(input: TokenStream) -> TokenStream {
     src_token.into_token_stream().into()
 }
 
+/// Asserts that the string literal matches the pattern.
+#[cfg(feature = "regex")]
+#[proc_macro]
+pub fn regex_assert_match(input: TokenStream) -> TokenStream {
+    struct RegexAssertMatch {
+        re: LitStr,
+        text: LitStr,
+    }
+
+    impl Parse for RegexAssertMatch {
+        fn parse(input: ParseStream<'_>) -> Result<Self> {
+            let re = input.parse::<LitStr>()?;
+            let _ = input.parse::<Token![,]>()?;
+            let text = input.parse::<LitStr>()?;
+            Ok(Self { re, text })
+        }
+    }
+
+    use alloc::string::ToString;
+    use regex::Regex;
+
+    let f: RegexAssertMatch = parse_macro_input!(input as RegexAssertMatch);
+
+    let re: Regex = match Regex::new(&f.re.value()) {
+        Ok(re) => re,
+        Err(e) => emit_error!(f.re, e.to_string()),
+    };
+
+    let text = f.text.value();
+
+    if !re.is_match(&text) {
+        emit_error!(f.text, "the string literal does not match the pattern")
+    }
+
+    TokenStream::new()
+}
+
 /// Returns a compile-time verified header name string literal.
 #[cfg(feature = "http")]
 #[proc_macro]

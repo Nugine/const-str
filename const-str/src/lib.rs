@@ -29,6 +29,7 @@
 //! ```
 //!
 
+#![forbid(unsafe_code)]
 #![deny(
     anonymous_parameters,
     bare_trait_objects,
@@ -40,7 +41,6 @@
     trivial_casts,
     trivial_numeric_casts,
     unreachable_pub,
-    unsafe_code,
     unstable_features,
     unused_extern_crates,
     unused_import_braces,

@@ -38,6 +38,7 @@ extern crate alloc;
 
 #[allow(unused_imports)]
 use alloc::string::{String, ToString};
+use core::convert::Infallible;
 
 use proc_macro::TokenStream;
 use proc_macro2::Span;
@@ -46,7 +47,7 @@ use quote::ToTokens;
 
 use syn::{
     parse::Parser,
-    parse::{Parse, ParseStream, Result},
+    parse::{Parse, ParseStream},
     parse_macro_input, LitByteStr, LitInt, LitStr, Token,
 };
 
@@ -57,24 +58,29 @@ macro_rules! emit_error {
     };
 }
 
+fn direct_convert<E: ToString, F>(input: TokenStream, f: F) -> TokenStream
+where
+    F: FnOnce(String) -> Result<String, E>,
+{
+    let src_token: LitStr = parse_macro_input!(input as LitStr);
+    let s = match f(src_token.value()) {
+        Ok(s) => s,
+        Err(e) => emit_error!(src_token, e.to_string()),
+    };
+    let dst_token = LitStr::new(&s, src_token.span());
+    dst_token.into_token_stream().into()
+}
+
 /// Returns the lowercase equivalent of this string literal, as a new string literal.
 #[proc_macro]
 pub fn to_lowercase(input: TokenStream) -> TokenStream {
-    let src_token: LitStr = parse_macro_input!(input as LitStr);
-    let dst = src_token.value().to_lowercase();
-    LitStr::new(&dst, src_token.span())
-        .into_token_stream()
-        .into()
+    direct_convert::<Infallible, _>(input, |s| Ok(s.to_lowercase()))
 }
 
 /// Returns the uppercase equivalent of this string literal, as a new string literal.
 #[proc_macro]
 pub fn to_uppercase(input: TokenStream) -> TokenStream {
-    let src_token: LitStr = parse_macro_input!(input as LitStr);
-    let dst = src_token.value().to_uppercase();
-    LitStr::new(&dst, src_token.span())
-        .into_token_stream()
-        .into()
+    direct_convert::<Infallible, _>(input, |s| Ok(s.to_uppercase()))
 }
 
 /// Replaces all matches of a pattern with another string literal.
@@ -87,7 +93,7 @@ pub fn replace(input: TokenStream) -> TokenStream {
     }
 
     impl Parse for Replace {
-        fn parse(input: ParseStream<'_>) -> Result<Self> {
+        fn parse(input: ParseStream<'_>) -> syn::Result<Self> {
             let src = input.parse::<LitStr>()?;
             let _ = input.parse::<Token![,]>()?;
             let from = input.parse::<LitStr>()?;
@@ -137,7 +143,7 @@ pub fn from_utf8(input: TokenStream) -> TokenStream {
 /// Returns the length of the string literal
 #[proc_macro]
 pub fn len(input: TokenStream) -> TokenStream {
-    fn transform(input: ParseStream<'_>) -> Result<LitInt> {
+    fn transform(input: ParseStream<'_>) -> syn::Result<LitInt> {
         let (len, span) = if input.peek(LitStr) {
             let token = input.parse::<LitStr>()?;
             (token.value().len(), token.span())
@@ -165,14 +171,7 @@ pub fn len(input: TokenStream) -> TokenStream {
 #[proc_macro]
 pub fn verified_regex(input: TokenStream) -> TokenStream {
     use regex::Regex;
-
-    let src_token: LitStr = parse_macro_input!(input as LitStr);
-
-    if let Err(e) = Regex::new(&src_token.value()) {
-        emit_error!(src_token, e.to_string());
-    }
-
-    src_token.into_token_stream().into()
+    direct_convert(input, |s| Regex::new(&s).map(|_| s))
 }
 
 /// Asserts that the string literal matches the pattern.
@@ -185,7 +184,7 @@ pub fn regex_assert_match(input: TokenStream) -> TokenStream {
     }
 
     impl Parse for RegexAssertMatch {
-        fn parse(input: ParseStream<'_>) -> Result<Self> {
+        fn parse(input: ParseStream<'_>) -> syn::Result<Self> {
             let re = input.parse::<LitStr>()?;
             let _ = input.parse::<Token![,]>()?;
             let text = input.parse::<LitStr>()?;
@@ -217,11 +216,47 @@ pub fn regex_assert_match(input: TokenStream) -> TokenStream {
 pub fn verified_header_name(input: TokenStream) -> TokenStream {
     use http::header::HeaderName;
 
-    let src_token: LitStr = parse_macro_input!(input as LitStr);
+    direct_convert(input, |s| {
+        HeaderName::from_lowercase(s.as_bytes()).map(|_| s)
+    })
+}
 
-    if let Err(e) = HeaderName::from_lowercase(src_token.value().as_bytes()) {
-        emit_error!(src_token, e.to_string());
-    }
+/// Converts a string literal to camel case.
+#[cfg(feature = "heck")]
+#[proc_macro]
+pub fn to_camel_case(input: TokenStream) -> TokenStream {
+    use heck::CamelCase;
+    direct_convert::<Infallible, _>(input, |s| Ok(s.to_camel_case()))
+}
 
-    src_token.into_token_stream().into()
+/// Converts a string literal to kebab case.
+#[cfg(feature = "heck")]
+#[proc_macro]
+pub fn to_kebab_case(input: TokenStream) -> TokenStream {
+    use heck::KebabCase;
+    direct_convert::<Infallible, _>(input, |s| Ok(s.to_kebab_case()))
+}
+
+/// Converts a string literal to snake case.
+#[cfg(feature = "heck")]
+#[proc_macro]
+pub fn to_snake_case(input: TokenStream) -> TokenStream {
+    use heck::SnakeCase;
+    direct_convert::<Infallible, _>(input, |s| Ok(s.to_snake_case()))
+}
+
+/// Converts a string literal to shouty snake case.
+#[cfg(feature = "heck")]
+#[proc_macro]
+pub fn to_shouty_snake_case(input: TokenStream) -> TokenStream {
+    use heck::ShoutySnakeCase;
+    direct_convert::<Infallible, _>(input, |s| Ok(s.to_shouty_snake_case()))
+}
+
+/// Converts a string literal to shouty kebab case.
+#[cfg(feature = "heck")]
+#[proc_macro]
+pub fn to_shouty_kebab_case(input: TokenStream) -> TokenStream {
+    use heck::ShoutySnakeCase;
+    direct_convert::<Infallible, _>(input, |s| Ok(s.to_shouty_snake_case().replace("_", "-")))
 }

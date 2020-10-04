@@ -71,6 +71,11 @@ pub mod __imp {
 
     #[cfg(feature = "verify-http")]
     pub use const_str_proc_macro::verified_header_name;
+
+    #[cfg(feature = "case")]
+    pub use const_str_proc_macro::{
+        to_camel_case, to_kebab_case, to_shouty_kebab_case, to_shouty_snake_case, to_snake_case,
+    };
 }
 
 mod str;
@@ -80,3 +85,6 @@ mod verify_regex;
 
 #[cfg(feature = "verify-http")]
 mod verify_http;
+
+#[cfg(feature = "case")]
+mod case;

@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 + `len!`
 + `as_bytes!`
 + `from_bytes!`
++ `to_camel_case!`
++ `to_kebab_case!`
++ `to_snake_case!`
++ `to_shouty_snake_case!`
++ `to_shouty_kebab_case!`
 
 ## [0.1.2] - 2020-09-11
 

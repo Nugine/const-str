@@ -14,7 +14,8 @@ readme = "../README.md"
 default = []
 verify-regex = ["const-str-proc-macro/regex"]
 verify-http = ["const-str-proc-macro/http"]
-all = ["verify-regex", "verify-http"]
+case = ["const-str-proc-macro/heck"]
+all = ["verify-regex", "verify-http", "case"]
 
 [package.metadata.docs.rs]
 all-features = true

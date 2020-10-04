@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/Nugine/const-str/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/Nugine/const-str/compare/v0.1.3...HEAD
+
+## [0.1.3] - 2020-10-04
+
+[0.1.3]: https://github.com/Nugine/const-str/tree/v0.1.3
 
 ### Added
 

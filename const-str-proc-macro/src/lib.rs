@@ -166,6 +166,15 @@ pub fn len(input: TokenStream) -> TokenStream {
     }
 }
 
+// Converts a string literal into an array of its characters.
+// e.g. "Hello" -> ['H', 'e', 'l', 'l', 'o']
+#[proc_macro]
+pub fn explode(input: TokenStream) -> TokenStream {
+    let input_str = parse_macro_input!(input as LitStr).value();
+    let iter = input_str.chars();
+    (quote::quote! { [#(#iter),*] }).into()
+}
+
 /// Returns a compile-time verified regex string literal.
 #[cfg(feature = "regex")]
 #[proc_macro]

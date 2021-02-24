@@ -93,3 +93,18 @@ macro_rules! len {
         $crate::__imp::len!($str)
     };
 }
+
+/// Converts a string literal into an array of its characters.
+///
+/// # Examples
+/// ```
+/// let chars = to_char_array("Hello");
+/// assert_eq!(chars[..], ['H', 'e', 'l', 'l', 'o']);
+/// ```
+///
+#[macro_export]
+macro_rules! to_char_array {
+    ($str:literal) => {
+        $crate::imp::to_char_array!($str)
+    };
+}

@@ -48,7 +48,11 @@ use quote::ToTokens;
 use syn::{
     parse::Parser,
     parse::{Parse, ParseStream},
-    parse_macro_input, LitByteStr, LitInt, LitStr, Token,
+    parse_macro_input,
+    LitByteStr,
+    LitInt,
+    LitStr,
+    Token,
 };
 
 #[allow(unused_macros)]
@@ -166,10 +170,10 @@ pub fn len(input: TokenStream) -> TokenStream {
     }
 }
 
-// Converts a string literal into an array of its characters.
-// e.g. "Hello" -> ['H', 'e', 'l', 'l', 'o']
+/// Converts a string literal into an array of its characters.
+/// e.g. "Hello" -> ['H', 'e', 'l', 'l', 'o']
 #[proc_macro]
-pub fn explode(input: TokenStream) -> TokenStream {
+pub fn to_char_array(input: TokenStream) -> TokenStream {
     let input_str = parse_macro_input!(input as LitStr).value();
     let iter = input_str.chars();
     (quote::quote! { [#(#iter),*] }).into()

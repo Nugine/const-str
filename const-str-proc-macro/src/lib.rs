@@ -171,7 +171,7 @@ pub fn len(input: TokenStream) -> TokenStream {
 }
 
 /// Converts a string literal into an array of its characters.
-/// e.g. "Hello" -> ['H', 'e', 'l', 'l', 'o']
+#[allow(clippy::integer_arithmetic)]
 #[proc_macro]
 pub fn to_char_array(input: TokenStream) -> TokenStream {
     let input_str = parse_macro_input!(input as LitStr).value();

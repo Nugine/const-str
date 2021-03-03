@@ -98,13 +98,13 @@ macro_rules! len {
 ///
 /// # Examples
 /// ```
-/// let chars = to_char_array("Hello");
+/// let chars = const_str::to_char_array!("Hello");
 /// assert_eq!(chars[..], ['H', 'e', 'l', 'l', 'o']);
 /// ```
 ///
 #[macro_export]
 macro_rules! to_char_array {
     ($str:literal) => {
-        $crate::imp::to_char_array!($str)
+        $crate::__imp::to_char_array!($str)
     };
 }

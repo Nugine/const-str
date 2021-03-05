@@ -21,7 +21,6 @@
     missing_debug_implementations,
     missing_docs,
     clippy::all,
-    clippy::restriction,
     clippy::pedantic,
     clippy::nursery,
     clippy::cargo

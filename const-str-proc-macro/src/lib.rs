@@ -47,11 +47,7 @@ use quote::ToTokens;
 use syn::{
     parse::Parser,
     parse::{Parse, ParseStream},
-    parse_macro_input,
-    LitByteStr,
-    LitInt,
-    LitStr,
-    Token,
+    parse_macro_input, LitByteStr, LitInt, LitStr, Token,
 };
 
 #[allow(unused_macros)]

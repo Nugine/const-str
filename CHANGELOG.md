@@ -7,15 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/Nugine/const-str/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/Nugine/const-str/compare/v0.1.4...HEAD
 
-## [0.1.4] - 2021-02-24
+## [0.1.4] - 2021-03-12
 
 [0.1.4]: https://github.com/Nugine/const-str/tree/v0.1.4
 
 ### Added
 
-+ `to_char_array`
++ `to_char_array!`
 
 ## [0.1.3] - 2020-10-04
 
@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-+ `regex_assert_match` (requires the feature `verify-regex`)
++ `regex_assert_match!` (requires the feature `verify-regex`)
 + `len!`
 + `as_bytes!`
 + `from_bytes!`

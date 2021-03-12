@@ -50,7 +50,6 @@
     missing_debug_implementations,
     missing_docs,
     clippy::all,
-    clippy::restriction,
     clippy::pedantic,
     clippy::nursery,
     clippy::cargo
@@ -64,7 +63,9 @@
 
 #[doc(hidden)]
 pub mod __imp {
-    pub use const_str_proc_macro::{as_bytes, from_utf8, len, replace, to_lowercase, to_uppercase};
+    pub use const_str_proc_macro::{
+        as_bytes, from_utf8, len, replace, to_char_array, to_lowercase, to_uppercase,
+    };
 
     #[cfg(feature = "verify-regex")]
     pub use const_str_proc_macro::{regex_assert_match, verified_regex};

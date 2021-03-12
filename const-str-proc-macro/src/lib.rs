@@ -21,7 +21,6 @@
     missing_debug_implementations,
     missing_docs,
     clippy::all,
-    clippy::restriction,
     clippy::pedantic,
     clippy::nursery,
     clippy::cargo
@@ -164,6 +163,15 @@ pub fn len(input: TokenStream) -> TokenStream {
         Ok(token) => token.into_token_stream().into(),
         Err(e) => TokenStream::from(e.to_compile_error()),
     }
+}
+
+/// Converts a string literal into an array of its characters.
+#[allow(clippy::integer_arithmetic)]
+#[proc_macro]
+pub fn to_char_array(input: TokenStream) -> TokenStream {
+    let input_str = parse_macro_input!(input as LitStr).value();
+    let iter = input_str.chars();
+    (quote::quote! { [#(#iter),*] }).into()
 }
 
 /// Returns a compile-time verified regex string literal.

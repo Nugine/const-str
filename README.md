@@ -9,7 +9,7 @@
 [crates-badge]: https://img.shields.io/crates/v/const-str.svg
 [crates-url]: https://crates.io/crates/const-str
 [mit-badge]: https://img.shields.io/badge/license-MIT-blue.svg
-[mit-url]: LICENSE
+[mit-url]: ./LICENSE
 [docs-badge]: https://docs.rs/const-str/badge.svg
 [docs-url]: https://docs.rs/const-str/
 [ci-badge]: https://github.com/Nugine/const-str/workflows/CI/badge.svg

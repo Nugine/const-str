@@ -1,6 +1,4 @@
-//! compile-time string operations
-//!
-
+#![doc = include_str!("../../README.md")]
 #![forbid(unsafe_code)]
 #![deny(missing_docs, clippy::all, clippy::cargo)]
 #![allow(

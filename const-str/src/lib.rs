@@ -203,3 +203,22 @@ macro_rules! replace {
 }
 
 // -----------------------------------------------------------------------------
+
+/// Checks that two strings are equal.
+///
+/// # Examples
+///
+/// ```
+/// const A: &str = "hello";
+/// const B: &str = "world";
+/// const C: &str = "hello";
+/// const EQ_AB: bool = const_str::equal!(A, B);
+/// const EQ_AC: bool = const_str::equal!(A, C);
+/// assert_eq!([EQ_AB, EQ_AC], [false, true]);
+///
+#[macro_export]
+macro_rules! equal {
+    ($lhs: expr, $rhs: expr) => {
+        $crate::__const::Equal($lhs, $rhs).const_eval()
+    };
+}

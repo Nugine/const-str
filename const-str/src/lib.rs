@@ -120,3 +120,20 @@ macro_rules! to_char_array {
         $crate::__proc::to_char_array!($s)
     };
 }
+
+// -----------------------------------------------------------------------------
+
+/// Converts a byte string literal to a string literal
+///
+/// # Examples
+/// ```
+/// let name: &'static str = const_str::from_utf8!(b"file");
+/// assert_eq!(name, "file");
+/// ```
+///
+#[macro_export]
+macro_rules! from_utf8 {
+    ($s: literal) => {
+        $crate::__proc::from_utf8!($s)
+    };
+}

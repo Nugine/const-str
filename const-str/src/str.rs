@@ -111,7 +111,7 @@ macro_rules! to_char_array {
 
 #[doc(hidden)]
 #[macro_export]
-macro_rules! __convert_ascii_case {
+macro_rules! __convert_str_bytes {
     ($str: expr, $f: ident) => {{
         type str = ::core::primitive::str;
         type usize = ::core::primitive::usize;
@@ -132,7 +132,7 @@ macro_rules! __convert_ascii_case {
             buf
         };
 
-        unsafe { ::core::str::from_utf8_unchecked(&OUTPUT_BYTES) }
+        OUTPUT_BYTES
     }};
 }
 
@@ -151,11 +151,12 @@ macro_rules! to_ascii_uppercase {
 
         const fn upper(x: u8) -> u8 {
             match x {
-                b'a'..=b'z' => x - (b'a' - b'A') ,
+                b'a'..=b'z' => x - (b'a' - b'A'),
                 _ => x,
             }
         }
-        $crate::__convert_ascii_case!($str, upper)
+
+        unsafe { ::core::str::from_utf8_unchecked(&{ $crate::__convert_str_bytes!($str, upper) }) }
     }};
 }
 
@@ -174,10 +175,29 @@ macro_rules! to_ascii_lowercase {
 
         const fn lower(x: u8) -> u8 {
             match x {
-                b'A'..=b'Z' => x + (b'a' - b'A') ,
+                b'A'..=b'Z' => x + (b'a' - b'A'),
                 _ => x,
             }
         }
-        $crate::__convert_ascii_case!($str, lower)
+        unsafe { ::core::str::from_utf8_unchecked(&{ $crate::__convert_str_bytes!($str, lower) }) }
+    }};
+}
+
+/// Converts a string to a byte array.
+///
+/// # Examples
+/// ```
+/// const S: &str = "hello";
+/// const B: [u8; S.len()] = const_str::to_byte_array!(S);
+/// assert_eq!(B, [b'h', b'e', b'l', b'l', b'o']);
+/// ```
+///
+#[macro_export]
+macro_rules! to_byte_array {
+    ($str: expr) => {{
+        const fn pass(x: u8) -> u8 {
+            x
+        }
+        $crate::__convert_str_bytes!($str, pass)
     }};
 }

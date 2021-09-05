@@ -41,3 +41,28 @@ impl<const L: usize> ToByteArray<&[u8; L]> {
         buf
     }
 }
+
+pub enum AsciiCase {
+    Lower,
+    Upper,
+}
+
+pub struct MapAsciiCase<T>(pub T, pub AsciiCase);
+
+impl MapAsciiCase<&str> {
+    pub const fn const_eval<const N: usize>(&self) -> [u8; N] {
+        const_assert!(self.0.len() == N);
+        let mut buf = ToByteArray(self.0).const_eval::<N>();
+
+        let mut i = 0;
+        while i < buf.len() {
+            buf[i] = match self.1 {
+                AsciiCase::Lower => buf[i].to_ascii_lowercase(),
+                AsciiCase::Upper => buf[i].to_ascii_uppercase(),
+            };
+            i += 1;
+        }
+
+        buf
+    }
+}

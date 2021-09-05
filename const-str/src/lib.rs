@@ -62,3 +62,44 @@ macro_rules! to_byte_array {
 }
 
 // -----------------------------------------------------------------------------
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __map_ascii_case {
+    ($s: expr, $case: expr) => {{
+        const INPUT: &str = $s;
+        const OUTPUT_BYTES: [u8; INPUT.len()] =
+            $crate::__const::MapAsciiCase(INPUT, $case).const_eval();
+        unsafe { ::core::str::from_utf8_unchecked(&OUTPUT_BYTES) }
+    }};
+}
+
+/// Returns a copy of this string where each character is mapped to its ASCII lower case equivalent.
+///
+/// # Examples
+/// ```
+/// const S: &str = "Hello, World";
+/// assert_eq!(const_str::to_ascii_lowercase!(S), "hello, world");
+/// ```
+///
+#[macro_export]
+macro_rules! to_ascii_lowercase {
+    ($s: expr) => {{
+        $crate::__map_ascii_case!($s, $crate::__const::AsciiCase::Lower)
+    }};
+}
+
+/// Returns a copy of this string where each character is mapped to its ASCII upper case equivalent.
+///
+/// # Examples
+/// ```
+/// const S: &str = "Hello, World";
+/// assert_eq!(const_str::to_ascii_uppercase!(S), "HELLO, WORLD");
+/// ```
+///
+#[macro_export]
+macro_rules! to_ascii_uppercase {
+    ($s: expr) => {{
+        $crate::__map_ascii_case!($s, $crate::__const::AsciiCase::Upper)
+    }};
+}

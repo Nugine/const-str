@@ -103,3 +103,20 @@ macro_rules! to_ascii_uppercase {
         $crate::__map_ascii_case!($s, $crate::__const::AsciiCase::Upper)
     }};
 }
+
+// -----------------------------------------------------------------------------
+
+/// Converts a string literal into an array of its characters.
+///
+/// # Examples
+/// ```
+/// let chars: [char; 5] = const_str::to_char_array!("Hello");
+/// assert_eq!(chars, ['H', 'e', 'l', 'l', 'o']);
+/// ```
+///
+#[macro_export]
+macro_rules! to_char_array {
+    ($s: literal) => {
+        $crate::__proc::to_char_array!($s)
+    };
+}

@@ -10,3 +10,5 @@ test:
 
 dev: fmt check test
 
+doc:
+    cargo doc --open --no-deps

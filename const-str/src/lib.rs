@@ -22,6 +22,15 @@ pub mod __proc;
 #[doc(hidden)]
 pub mod __const;
 
+#[cfg(feature = "verify-regex")]
+mod verify_regex;
+
+#[cfg(feature = "verify-http")]
+mod verify_http;
+
+#[cfg(feature = "case")]
+mod case;
+
 // -----------------------------------------------------------------------------
 
 /// Returns the length of a string slice or a byte string

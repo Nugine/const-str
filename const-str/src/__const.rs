@@ -99,3 +99,26 @@ impl Equal<&str, &str> {
         Equal(self.0.as_bytes(), self.1.as_bytes()).const_eval()
     }
 }
+
+pub struct Repeat<T>(pub T, pub usize);
+
+impl Repeat<&str> {
+    pub const fn const_eval<const N: usize>(&self) -> [u8; N] {
+        const_assert!(self.0.len().checked_mul(self.1).is_some());
+        const_assert!(self.0.len() * self.1 == N);
+        let mut buf = [0; N];
+        let bytes = self.0.as_bytes();
+        let mut i = 0;
+        let mut j = 0;
+        while i < self.1 {
+            let mut k = 0;
+            while k < bytes.len() {
+                buf[j] = bytes[k];
+                j += 1;
+                k += 1;
+            }
+            i += 1;
+        }
+        buf
+    }
+}

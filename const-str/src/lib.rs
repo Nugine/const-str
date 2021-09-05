@@ -74,12 +74,20 @@ macro_rules! to_byte_array {
 
 #[doc(hidden)]
 #[macro_export]
+macro_rules! __transmute_bytes_to_str {
+    ($b: expr) => {
+        ::core::mem::transmute::<&[u8], &str>($b)
+    };
+}
+
+#[doc(hidden)]
+#[macro_export]
 macro_rules! __map_ascii_case {
     ($s: expr, $case: expr) => {{
         const INPUT: &str = $s;
         const OUTPUT_BYTES: [u8; INPUT.len()] =
             $crate::__const::MapAsciiCase(INPUT, $case).const_eval();
-        unsafe { ::core::str::from_utf8_unchecked(&OUTPUT_BYTES) }
+        unsafe { $crate::__transmute_bytes_to_str!(&OUTPUT_BYTES) }
     }};
 }
 
@@ -222,3 +230,28 @@ macro_rules! equal {
         $crate::__const::Equal($lhs, $rhs).const_eval()
     };
 }
+
+// -----------------------------------------------------------------------------
+
+/// Creates a new string slice by repeating a string slice n times.
+///
+/// # Examples
+///
+/// ```
+/// const S: &str = "abc";
+/// const SSSS: &str = const_str::repeat!(S, 4);
+/// assert_eq!(SSSS, "abcabcabcabc");
+/// ```
+///
+#[macro_export]
+macro_rules! repeat {
+    ($s: expr, $n: expr) => {{
+        const INPUT: &str = $s;
+        const N: usize = $n;
+        const OUTPUT_LEN: usize = INPUT.len() * N;
+        const OUTPUT_BYTES: [u8; OUTPUT_LEN] = $crate::__const::Repeat(INPUT, N).const_eval();
+        unsafe { $crate::__transmute_bytes_to_str!(&OUTPUT_BYTES) }
+    }};
+}
+
+// -----------------------------------------------------------------------------

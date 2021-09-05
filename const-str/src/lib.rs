@@ -1,4 +1,35 @@
-#![doc = include_str!("../../README.md")]
+//! Compile-time string operations
+//!
+//! MSRV: Rust 1.52.0
+//!
+//! ## Examples
+//!
+//! ```rust
+//! assert_eq!(const_str::to_lowercase!("HELLO"), "hello");
+//!
+//! assert_eq!(const_str::to_uppercase!("hello"), "HELLO");
+//!
+//! assert_eq!(const_str::replace!("this is old", "old", "new"), "this is new");
+//! ```
+//!
+//! feature `verify-regex`
+//!
+//! ```rust
+//! use regex::Regex;
+//! let re = const_str::verified_regex!(r"^\d{4}-\d{2}-\d{2}$");
+//! assert!(Regex::new(re).is_ok());
+//!
+//! const_str::regex_assert_match!(r"^\d{4}-\d{2}-\d{2}$", "2014-01-01");
+//! ```
+//!
+//! feature `verify-http`
+//!
+//! ```rust
+//! use http::header::HeaderName;
+//! let name = const_str::verified_header_name!("content-md5");
+//! assert_eq!(HeaderName::from_static(name).as_str(), "content-md5");
+//! ```
+//!
 #![forbid(unsafe_code)]
 #![deny(missing_docs, clippy::all, clippy::cargo)]
 #![allow(

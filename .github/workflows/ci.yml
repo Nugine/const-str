@@ -9,7 +9,7 @@ on:
 name: CI
 
 env:
-  MSRV: 1.54
+  MSRV: 1.52.0
 
 jobs:
   check:

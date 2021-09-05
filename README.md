@@ -18,6 +18,8 @@
 
 compile-time string operations
 
+MSRV: Rust 1.54.0
+
 ## Examples
 
 ```rust

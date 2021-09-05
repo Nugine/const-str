@@ -8,6 +8,9 @@ on:
 
 name: CI
 
+env:
+  MSRV: 1.54
+
 jobs:
   check:
     name: Check
@@ -28,6 +31,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      # msrv test
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ env.MSRV }}
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --workspace --all-features
       # stable test
       - uses: actions-rs/toolchain@v1
         with:

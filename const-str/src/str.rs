@@ -108,3 +108,76 @@ macro_rules! to_char_array {
         $crate::__imp::to_char_array!($str)
     };
 }
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __convert_ascii_case {
+    ($str: expr, $f: ident) => {{
+        type str = ::core::primitive::str;
+        type usize = ::core::primitive::usize;
+        type u8 = ::core::primitive::u8;
+
+        const INPUT: &str = $str;
+
+        const OUTPUT_LEN: usize = INPUT.len();
+
+        const OUTPUT_BYTES: [u8; OUTPUT_LEN] = {
+            let mut buf = [0u8; OUTPUT_LEN];
+            let bytes = INPUT.as_bytes();
+            let mut i = 0;
+            while i < bytes.len() {
+                buf[i] = $f(bytes[i]);
+                i += 1;
+            }
+            buf
+        };
+
+        unsafe { ::core::str::from_utf8_unchecked(&OUTPUT_BYTES) }
+    }};
+}
+
+/// Returns a copy of this string where each character is mapped to its ASCII upper case equivalent.
+///
+/// # Examples
+/// ```
+/// const S: &str = "Hello, World";
+/// assert_eq!(const_str::to_ascii_uppercase!(S), "HELLO, WORLD");
+/// ```
+///
+#[macro_export]
+macro_rules! to_ascii_uppercase {
+    ($str: expr) => {{
+        type u8 = ::core::primitive::u8;
+
+        const fn upper(x: u8) -> u8 {
+            match x {
+                b'a'..=b'z' => x - (b'a' - b'A') ,
+                _ => x,
+            }
+        }
+        $crate::__convert_ascii_case!($str, upper)
+    }};
+}
+
+/// Returns a copy of this string where each character is mapped to its ASCII lower case equivalent.
+///
+/// # Examples
+/// ```
+/// const S: &str = "Hello, World";
+/// assert_eq!(const_str::to_ascii_lowercase!(S), "hello, world");
+/// ```
+///
+#[macro_export]
+macro_rules! to_ascii_lowercase {
+    ($str: expr) => {{
+        type u8 = ::core::primitive::u8;
+
+        const fn lower(x: u8) -> u8 {
+            match x {
+                b'A'..=b'Z' => x + (b'a' - b'A') ,
+                _ => x,
+            }
+        }
+        $crate::__convert_ascii_case!($str, lower)
+    }};
+}

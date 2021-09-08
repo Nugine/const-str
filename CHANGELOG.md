@@ -7,7 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/Nugine/const-str/compare/v0.1.4...HEAD
+[Unreleased]: https://github.com/Nugine/const-str/compare/v0.2.0...HEAD
+
+## [0.2.0] - 2021-09-08
+
+[0.2.0]: https://github.com/Nugine/const-str/tree/v0.2.0
+
+Refactor all macros. Set MSRV to `1.52.0`. 
+
+Some of the macros are const-compatible.
+
+### Added
+
++ `equal!`
++ `repeat!`
++ `to_ascii_lowercase!`
++ `to_ascii_uppercase!`
++ `to_byte_array!`
+
+### Removed
+
++ `as_bytes!`
 
 ## [0.1.4] - 2021-03-12
 

@@ -11,4 +11,4 @@ test:
 dev: fmt check test
 
 doc:
-    cargo doc --open --no-deps
+    cargo doc --open --no-deps --all-features

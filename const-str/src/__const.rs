@@ -448,3 +448,37 @@ fn test_to_str() {
     test_to_str!(i128, i128::MAX);
     test_to_str!(i128, i128::MIN);
 }
+
+pub struct Concat<'a>(pub &'a [&'a str]);
+
+impl<'a> Concat<'a> {
+    pub const fn output_len(&self) -> usize {
+        let mut ans = 0;
+        let mut iter = self.0;
+        while let [x, xs @ ..] = iter {
+            ans += x.len();
+            iter = xs;
+        }
+        ans
+    }
+
+    pub const fn const_eval<const N: usize>(&self) -> [u8; N] {
+        let mut buf = [0; N];
+        let mut pos = 0;
+
+        let mut iter = self.0;
+        while let [x, xs @ ..] = iter {
+            let x = x.as_bytes();
+            let mut i = 0;
+            while i < x.len() {
+                buf[pos] = x[i];
+                pos += 1;
+                i += 1;
+            }
+            iter = xs;
+        }
+        const_assert!(pos == N);
+
+        buf
+    }
+}

@@ -326,3 +326,34 @@ macro_rules! to_str {
         unsafe { $crate::__transmute_bytes_to_str!(&OUTPUT_BYTES) }
     }};
 }
+
+/// Concatenates values into a string slice.
+///
+/// The input type must be one of
+///
+/// + `&str`
+/// + `char`
+/// + `bool`
+/// + `u8`, `u16`, `u32`, `u128`, `usize`
+/// + `i8`, `i16`, `i32`, `i128`, `isize`
+///
+///
+/// # Examples
+///
+/// ```
+/// const PROMPT: &str = "The answer is";
+/// const ANSWER: usize = 42;
+/// const MESSAGE: &str = const_str::concat!(PROMPT, " ", ANSWER);
+///
+/// assert_eq!(MESSAGE, "The answer is 42");
+/// ```
+///
+#[macro_export]
+macro_rules! concat {
+    ($($x: expr),+ $(,)?) => {{
+        const STRS: &[&str] = &[$( $crate::to_str!($x) ),+];
+        const OUTPUT_LEN: usize = $crate::__const::Concat(STRS).output_len();
+        const OUTPUT_BYTES: [u8; OUTPUT_LEN] = $crate::__const::Concat(STRS).const_eval();
+        unsafe { $crate::__transmute_bytes_to_str!(&OUTPUT_BYTES) }
+    }}
+}

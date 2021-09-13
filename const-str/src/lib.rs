@@ -222,7 +222,7 @@ macro_rules! to_uppercase {
 
 // -----------------------------------------------------------------------------
 
-/// Replaces all matches of a pattern with another string literal.
+/// Replaces all matches of a pattern with another string slice.
 ///
 /// See [`str::replace`](https://doc.rust-lang.org/std/primitive.str.html#method.replace).
 ///
@@ -234,9 +234,11 @@ macro_rules! to_uppercase {
 ///
 #[macro_export]
 macro_rules! replace {
-    ($s: literal, $from: literal, $to: literal) => {
-        $crate::__proc::replace!($s, $from, $to)
-    };
+    ($s: expr, $from: expr, $to: expr) => {{
+        const OUTPUT_LEN: usize = $crate::__const::Replace($s, $from, $to).output_len();
+        const OUTPUT_BYTES: [u8; OUTPUT_LEN] = $crate::__const::Replace($s, $from, $to).const_eval();
+        unsafe { $crate::__transmute_bytes_to_str!(&OUTPUT_BYTES) }
+    }};
 }
 
 // -----------------------------------------------------------------------------

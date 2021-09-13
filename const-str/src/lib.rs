@@ -30,8 +30,7 @@
 //! assert_eq!(HeaderName::from_static(name).as_str(), "content-md5");
 //! ```
 //!
-#![forbid(unsafe_code)]
-#![deny(missing_docs, clippy::all, clippy::cargo)]
+#![deny(unsafe_code, missing_docs, clippy::all, clippy::cargo)]
 #![allow(
     clippy::missing_docs_in_private_items,
     clippy::missing_inline_in_public_items,
@@ -44,6 +43,8 @@ macro_rules! const_assert {
         let _: () = [()][(!($e) as usize)];
     };
 }
+
+mod utils;
 
 #[doc(hidden)]
 pub mod __proc;
@@ -236,7 +237,8 @@ macro_rules! to_uppercase {
 macro_rules! replace {
     ($s: expr, $from: expr, $to: expr) => {{
         const OUTPUT_LEN: usize = $crate::__const::Replace($s, $from, $to).output_len();
-        const OUTPUT_BYTES: [u8; OUTPUT_LEN] = $crate::__const::Replace($s, $from, $to).const_eval();
+        const OUTPUT_BYTES: [u8; OUTPUT_LEN] =
+            $crate::__const::Replace($s, $from, $to).const_eval();
         unsafe { $crate::__transmute_bytes_to_str!(&OUTPUT_BYTES) }
     }};
 }
@@ -286,3 +288,41 @@ macro_rules! repeat {
 }
 
 // -----------------------------------------------------------------------------
+
+/// Converts a value to a string slice.
+///
+/// The input type must be one of
+///
+/// + `&str`
+/// + `char`
+/// + `bool`
+/// + `u8`, `u16`, `u32`, `u128`, `usize`
+/// + `i8`, `i16`, `i32`, `i128`, `isize`
+///
+/// # Examples
+///
+/// ```
+/// const A: &str = const_str::to_str!("A");
+/// assert_eq!(A, "A");
+///
+/// const B: &str = const_str::to_str!('我');
+/// assert_eq!(B, "我");
+///
+/// const C: &str = const_str::to_str!(true);
+/// assert_eq!(C, "true");
+///
+/// const D: &str = const_str::to_str!(1_u8 + 1);
+/// assert_eq!(D, "2");
+///
+/// const E: &str = const_str::to_str!(-21_i32 * 2);
+/// assert_eq!(E, "-42")
+/// ```
+///
+#[macro_export]
+macro_rules! to_str {
+    ($x: expr) => {{
+        const OUTPUT_LEN: usize = $crate::__const::ToStr($x).output_len();
+        const OUTPUT_BYTES: [u8; OUTPUT_LEN] = $crate::__const::ToStr($x).const_eval();
+        unsafe { $crate::__transmute_bytes_to_str!(&OUTPUT_BYTES) }
+    }};
+}

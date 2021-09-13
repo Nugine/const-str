@@ -1,3 +1,5 @@
+use crate::utils;
+
 pub struct Len<T>(pub T);
 
 impl Len<&str> {
@@ -271,4 +273,178 @@ fn test_replace() {
     test_replace_str!("asd", "", "b");
     test_replace_str!("aba", "a", "c");
     test_replace_str!("this is old", "old", "new");
+}
+
+pub struct ToStr<T>(pub T);
+
+impl ToStr<&str> {
+    pub const fn output_len(&self) -> usize {
+        self.0.len()
+    }
+
+    pub const fn const_eval<const N: usize>(&self) -> [u8; N] {
+        ToByteArray(self.0).const_eval()
+    }
+}
+
+impl ToStr<bool> {
+    pub const fn output_len(&self) -> usize {
+        if self.0 {
+            4
+        } else {
+            5
+        }
+    }
+
+    pub const fn const_eval<const N: usize>(&self) -> [u8; N] {
+        let buf = [0; N];
+        let bytes: &[u8] = if self.0 { b"true" } else { b"false" };
+        utils::merge_bytes(buf, bytes, bytes.len())
+    }
+}
+
+impl ToStr<char> {
+    pub const fn output_len(&self) -> usize {
+        self.0.len_utf8()
+    }
+
+    pub const fn const_eval<const N: usize>(&self) -> [u8; N] {
+        let (utf8_buf, len) = utils::encode_utf8(self.0);
+        utils::merge_bytes([0; N], &utf8_buf, len)
+    }
+}
+
+macro_rules! impl_integer_to_str {
+    ($unsigned: ty, $signed: ty) => {
+        impl ToStr<$unsigned> {
+            pub const fn output_len(&self) -> usize {
+                let mut x = self.0;
+                let mut ans = 1;
+                while x > 9 {
+                    ans += 1;
+                    x /= 10;
+                }
+                ans
+            }
+
+            pub const fn const_eval<const N: usize>(&self) -> [u8; N] {
+                let mut buf = [0; N];
+                let mut pos = 0;
+                let mut x = self.0;
+                loop {
+                    buf[pos] = b'0' + (x % 10) as u8;
+                    pos += 1;
+                    x /= 10;
+                    if x == 0 {
+                        break;
+                    }
+                }
+                const_assert!(pos == N);
+                utils::reversed_bytes(buf)
+            }
+        }
+
+        impl ToStr<$signed> {
+            pub const fn output_len(&self) -> usize {
+                let x = self.0;
+                let abs_len = ToStr(x.unsigned_abs()).output_len();
+                abs_len + (x < 0) as usize
+            }
+
+            pub const fn const_eval<const N: usize>(&self) -> [u8; N] {
+                let mut buf = [0; N];
+                let mut pos = 0;
+
+                let mut x = self.0.unsigned_abs();
+
+                loop {
+                    buf[pos] = b'0' + (x % 10) as u8;
+                    pos += 1;
+                    x /= 10;
+                    if x == 0 {
+                        break;
+                    }
+                }
+
+                if self.0 < 0 {
+                    buf[pos] = b'-';
+                    pos += 1;
+                }
+
+                const_assert!(pos == N);
+                utils::reversed_bytes(buf)
+            }
+        }
+    };
+}
+
+impl_integer_to_str!(u8, i8);
+impl_integer_to_str!(u16, i16);
+impl_integer_to_str!(u32, i32);
+impl_integer_to_str!(u64, i64);
+impl_integer_to_str!(u128, i128);
+impl_integer_to_str!(usize, isize);
+
+#[test]
+fn test_to_str() {
+    extern crate alloc;
+    use alloc::string::ToString;
+
+    macro_rules! test_to_str {
+        ($ty: ty, $x: expr) => {{
+            const X: $ty = $x;
+            const OUTPUT_LEN: usize = ToStr(X).output_len();
+            const OUTPUT_BYTES: [u8; OUTPUT_LEN] = ToStr(X).const_eval();
+
+            let output = core::str::from_utf8(&OUTPUT_BYTES).unwrap();
+            let ans = X.to_string();
+            assert_eq!(OUTPUT_LEN, ans.len());
+            assert_eq!(output, ans);
+        }};
+    }
+
+    test_to_str!(&str, "lovelive superstar");
+
+    test_to_str!(bool, true);
+    test_to_str!(bool, false);
+
+    test_to_str!(char, '鲤');
+    test_to_str!(char, '鱼');
+
+    test_to_str!(u8, 0);
+    test_to_str!(u16, 0);
+    test_to_str!(u32, 0);
+    test_to_str!(u64, 0);
+    test_to_str!(u128, 0);
+
+    test_to_str!(u8, 10);
+    test_to_str!(u8, 128);
+    test_to_str!(u8, u8::MAX);
+
+    test_to_str!(u64, 1);
+    test_to_str!(u64, 10);
+    test_to_str!(u64, 42);
+    test_to_str!(u64, u64::MAX);
+
+    test_to_str!(u128, u128::MAX);
+
+    test_to_str!(i8, 0);
+    test_to_str!(i16, 0);
+    test_to_str!(i32, 0);
+    test_to_str!(i64, 0);
+    test_to_str!(i128, 0);
+
+    test_to_str!(i8, -10);
+    test_to_str!(i8, -42);
+    test_to_str!(i8, i8::MAX);
+    test_to_str!(i8, i8::MIN);
+
+    test_to_str!(i64, 1);
+    test_to_str!(i64, 10);
+    test_to_str!(i64, -42);
+    test_to_str!(i64, i64::MAX);
+    test_to_str!(i64, i64::MIN);
+
+    test_to_str!(i128, i128::MAX);
+    test_to_str!(i128, i128::MIN);
 }

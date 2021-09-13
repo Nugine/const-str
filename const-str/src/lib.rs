@@ -10,6 +10,14 @@
 //! assert_eq!(const_str::to_uppercase!("hello"), "HELLO");
 //!
 //! assert_eq!(const_str::replace!("this is old", "old", "new"), "this is new");
+//!
+//! assert_eq!(const_str::to_str!(1_u8 + 1_u8), "2");
+//!
+//! const PROMPT: &str = "The answer is";
+//! const ANSWER: usize = 42;
+//! const MESSAGE: &str = const_str::concat!(PROMPT, " ", ANSWER);
+//!
+//! assert_eq!(MESSAGE, "The answer is 42");
 //! ```
 //!
 //! feature `verify-regex`

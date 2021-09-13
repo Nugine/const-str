@@ -7,7 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/Nugine/const-str/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/Nugine/const-str/compare/v0.2.1...HEAD
+
+## [0.2.1] - 2021-09-14
+
+[0.2.1]: https://github.com/Nugine/const-str/tree/v0.2.1
+
+### Added
+
++ `to_str!`
++ `concat!`
+
+### Changed
+
++ make `replace!` const-compatible.
 
 ## [0.2.0] - 2021-09-08
 

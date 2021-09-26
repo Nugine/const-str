@@ -15,7 +15,8 @@ default = []
 verify-regex = ["const-str-proc-macro/regex"]
 verify-http = ["const-str-proc-macro/http"]
 case = ["const-str-proc-macro/heck"]
-all = ["verify-regex", "verify-http", "case"]
+std = []
+all = ["verify-regex", "verify-http", "case", "std"]
 
 [package.metadata.docs.rs]
 all-features = true
@@ -27,3 +28,4 @@ path = "../const-str-proc-macro"
 [dev-dependencies]
 regex = "1.3.9"
 http = "0.2.1"
+heck = "0.3.3"

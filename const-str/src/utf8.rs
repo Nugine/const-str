@@ -7,6 +7,24 @@ pub struct CharEncodeUtf8 {
     len: u8,
 }
 
+// const since 1.52
+pub const fn len_utf8(ch: char) -> usize {
+    const MAX_ONE_B: u32 = 0x80;
+    const MAX_TWO_B: u32 = 0x800;
+    const MAX_THREE_B: u32 = 0x10000;
+
+    let code = ch as u32;
+    if code < MAX_ONE_B {
+        1
+    } else if code < MAX_TWO_B {
+        2
+    } else if code < MAX_THREE_B {
+        3
+    } else {
+        4
+    }
+}
+
 impl CharEncodeUtf8 {
     /// Copied from [char::encode_utf8](https://github.com/rust-lang/rust/blob/0273e3bce7a0ce49e96a9662163e2380cb87e0be/library/core/src/char/methods.rs#L1600-L1645)
     pub const fn new(ch: char) -> Self {
@@ -17,9 +35,9 @@ impl CharEncodeUtf8 {
         const TAG_FOUR_B: u8 = 0b1111_0000;
 
         let mut buf = [0; 4];
-        let len = ch.len_utf8(); // const since 1.52
-
+        let len = len_utf8(ch);
         let code = ch as u32;
+
         match len {
             1 => {
                 buf[0] = code as u8;

@@ -37,7 +37,7 @@ impl ToStr<bool> {
 
 impl ToStr<char> {
     pub const fn output_len(&self) -> usize {
-        self.0.len_utf8()
+        crate::utf8::len_utf8(self.0)
     }
 
     pub const fn const_eval<const N: usize>(&self) -> StrBuf<N> {

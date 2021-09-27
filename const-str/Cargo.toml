@@ -1,6 +1,6 @@
 [package]
 name = "const-str"
-version = "0.3.0"
+version = "0.3.1-dev"
 authors = ["Nugine <nugine@foxmail.com>"]
 edition = "2018"
 description = "compile-time string operations"
@@ -22,7 +22,7 @@ all = ["verify-regex", "verify-http", "case", "std"]
 all-features = true
 
 [dependencies.const-str-proc-macro]
-version = "=0.3.0"
+version = "=0.3.1-dev"
 path = "../const-str-proc-macro"
 
 [dev-dependencies]

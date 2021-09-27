@@ -40,6 +40,7 @@ macro_rules! item_group {
 mod ascii;
 mod bytes;
 mod str;
+mod utf16;
 mod utf8;
 
 #[doc(hidden)]
@@ -74,6 +75,15 @@ pub mod __ctfe {
     mod concat;
     pub use self::concat::*;
 
+    #[cfg(feature = "std")]
+    item_group! {
+        mod cstr;
+        pub use self::cstr::*;
+    }
+
+    mod encode;
+    pub use self::encode::*;
+
     mod equal;
     pub use self::equal::*;
 
@@ -82,12 +92,6 @@ pub mod __ctfe {
 
     mod fmt;
     pub use self::fmt::*;
-
-    #[cfg(feature = "std")]
-    item_group! {
-        mod cstr;
-        pub use self::cstr::*;
-    }
 
     mod len;
     pub use self::len::*;

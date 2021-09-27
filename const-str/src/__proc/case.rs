@@ -1,9 +1,4 @@
-pub use const_str_proc_macro::{to_lowercase, to_uppercase};
-
-#[cfg(feature = "case")]
-pub use const_str_proc_macro::{
-    to_camel_case, to_kebab_case, to_shouty_kebab_case, to_shouty_snake_case, to_snake_case,
-};
+pub use const_str_proc_macro::convert_case;
 
 /// Converts a string literal to a specified case.
 ///
@@ -71,24 +66,24 @@ macro_rules! convert_case {
 #[macro_export]
 macro_rules! convert_case {
     (lower, $s: literal) => {
-        $crate::__proc::to_lowercase!($s)
+        $crate::__proc::convert_case!(lower, $s)
     };
     (upper, $s: literal) => {
-        $crate::__proc::to_uppercase!($s)
+        $crate::__proc::convert_case!(upper, $s)
     };
     (camel, $s: literal) => {
-        $crate::__proc::to_camel_case!($s)
+        $crate::__proc::convert_case!(camel, $s)
     };
     (snake, $s: literal) => {
-        $crate::__proc::to_snake_case!($s)
+        $crate::__proc::convert_case!(snake, $s)
     };
     (kebab, $s: literal) => {
-        $crate::__proc::to_kebab_case!($s)
+        $crate::__proc::convert_case!(kebab, $s)
     };
     (shouty_snake, $s: literal) => {
-        $crate::__proc::to_shouty_snake_case!($s)
+        $crate::__proc::convert_case!(shouty_snake, $s)
     };
     (shouty_kebab, $s: literal) => {
-        $crate::__proc::to_shouty_kebab_case!($s)
+        $crate::__proc::convert_case!(shouty_kebab, $s)
     };
 }

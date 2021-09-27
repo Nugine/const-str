@@ -1,24 +1,30 @@
+use std::collections::HashMap;
 use std::{fmt, mem};
 
 use std::string::String;
 use std::vec::Vec;
 
+use proc_macro::TokenStream;
+use quote::quote;
+use syn::parse::{Parse, ParseStream};
+use syn::{Expr, Ident, LitStr, Token};
+
 #[derive(Debug)]
-pub struct FmtPart {
+struct FmtPart {
     pub literal: Option<String>,
     pub pos: Option<usize>,
-    pub name: Option<syn::Ident>,
+    pub name: Option<Ident>,
     pub method: Option<FmtMethod>,
     pub spec: FmtSpec,
 }
 
 #[derive(Debug)]
-pub struct FmtSpec {
+struct FmtSpec {
     pub alternate: bool,
 }
 
 #[derive(Debug)]
-pub enum FmtMethod {
+enum FmtMethod {
     Debug,
     Display,
     LowerHex,
@@ -43,7 +49,7 @@ impl FmtPart {
     }
 
     #[cfg(test)]
-    fn named_ident(&self) -> Option<&syn::Ident> {
+    fn named_ident(&self) -> Option<&Ident> {
         self.name.as_ref()
     }
 
@@ -67,7 +73,7 @@ impl FmtPart {
         }
     }
 
-    fn from_named(name: syn::Ident, method: FmtMethod, spec: FmtSpec) -> Self {
+    fn from_named(name: Ident, method: FmtMethod, spec: FmtSpec) -> Self {
         Self {
             literal: None,
             pos: None,
@@ -79,7 +85,7 @@ impl FmtPart {
 }
 
 #[derive(Debug)]
-pub struct ParseError {
+struct ParseError {
     _priv: (),
 }
 
@@ -95,7 +101,7 @@ impl fmt::Display for ParseError {
     }
 }
 
-pub fn parse_fmt_string(s: &str) -> Result<Vec<FmtPart>, ParseError> {
+fn parse_fmt_string(s: &str) -> Result<Vec<FmtPart>, ParseError> {
     let mut ans = Vec::new();
     let mut iter = s.chars().peekable();
 
@@ -178,7 +184,7 @@ fn parse_fmt_spec(s: &str, pos_iter: &mut usize) -> Result<FmtPart, ParseError> 
         return Ok(FmtPart::from_positional(pos, method, spec));
     }
 
-    if let Ok(name) = syn::parse_str::<syn::Ident>(argument) {
+    if let Ok(name) = syn::parse_str::<Ident>(argument) {
         return Ok(FmtPart::from_named(name, method, spec));
     }
 
@@ -244,5 +250,170 @@ fn test_parse_fmt() {
         let parts = parse_fmt_string(s).unwrap();
         assert_eq!(parts.len(), 1);
         assert_eq!(parts[0].literal_str().unwrap(), "{}");
+    }
+}
+
+pub struct ConstFormat {
+    fmt_string: LitStr,
+    positional_args: Vec<Expr>,
+    named_args: HashMap<Ident, Expr>,
+}
+
+impl Parse for ConstFormat {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let fmt_string = input.parse::<LitStr>()?;
+        let mut comma = input.parse::<Option<Token![,]>>()?;
+
+        let mut positional_args = Vec::new();
+        let mut named_args = HashMap::new();
+
+        if input.is_empty() {
+            return Ok(ConstFormat {
+                fmt_string,
+                positional_args,
+                named_args,
+            });
+        }
+
+        while !input.is_empty() && !input.peek2(Token![=]) {
+            if comma.is_none() {
+                return Err(input.error("expected comma"));
+            }
+
+            let arg = input.parse::<Expr>()?;
+            comma = input.parse::<Option<Token![,]>>()?;
+            positional_args.push(arg);
+        }
+
+        if input.is_empty() {
+            return Ok(ConstFormat {
+                fmt_string,
+                positional_args,
+                named_args,
+            });
+        }
+
+        while input.peek2(Token![=]) {
+            if comma.is_none() {
+                return Err(input.error("expected comma"));
+            }
+            let name = input.parse::<Ident>()?;
+            let _ = input.parse::<Token![=]>()?;
+            let kwarg = input.parse::<Expr>()?;
+            comma = input.parse::<Option<Token![,]>>()?;
+            let prev = named_args.insert(name, kwarg);
+            if prev.is_some() {
+                return Err(input.error("duplicate argument"));
+            }
+        }
+
+        if input.is_empty() {
+            Ok(ConstFormat {
+                fmt_string,
+                positional_args,
+                named_args,
+            })
+        } else {
+            Err(input.error("unexpected tokens"))
+        }
+    }
+}
+
+impl ConstFormat {
+    fn fmt_method(method: &FmtMethod) -> proc_macro2::TokenStream {
+        match method {
+            FmtMethod::Debug => quote! { __fmt_debug },
+            FmtMethod::Display => quote! { __fmt_display },
+            FmtMethod::LowerHex => quote! { __fmt_lowerhex },
+            FmtMethod::UpperHex => quote! { __fmt_upperhex },
+            FmtMethod::Binary => quote! { __fmt_binary },
+        }
+    }
+
+    fn fmt_spec(part: &FmtPart) -> proc_macro2::TokenStream {
+        let alternate = part.spec.alternate;
+        quote! {{
+            const_str::__ctfe::FmtSpec {
+                alternate: #alternate
+            }
+        }}
+    }
+
+    pub fn eval(&self) -> TokenStream {
+        let parts = match parse_fmt_string(&self.fmt_string.value()) {
+            Ok(p) => p,
+            Err(err) => emit_error!(self.fmt_string, err.to_string()),
+        };
+
+        let mut eval_parts = Vec::new();
+
+        for p in parts {
+            eval_parts.push(loop {
+            if let Some(ref s) = p.literal {
+                break quote! {
+                    {
+                        const __FMT_PART: &str = #s;
+                        __FMT_PART
+                    },
+                };
+            }
+            if let Some(pos) = p.pos {
+                let method = p.method.as_ref().unwrap();
+                match self.positional_args.get(pos) {
+                    None => emit_error!(
+                        self.fmt_string,
+                        std::format!(
+                            "invalid reference to positional argument {} (no arguments were given)",
+                            pos
+                        )
+                    ),
+                    Some(arg) => {
+                        let method_ident = Self::fmt_method(method);
+                        let spec = Self::fmt_spec(&p);
+                        break quote! {
+                            {
+                                const __FMT_PART: &str = ::const_str::#method_ident!(#arg, #spec);
+                                __FMT_PART
+                            },
+                        };
+                    }
+                }
+            }
+            if let Some(ref name) = p.name {
+                let method_ident = Self::fmt_method(p.method.as_ref().unwrap());
+                let spec = Self::fmt_spec(&p);
+
+                break match self.named_args.get(name) {
+                    None => quote! {
+                        {
+                            const __FMT_PART: &str = ::const_str::#method_ident!(#name, #spec);
+                            __FMT_PART
+                        },
+                    },
+                    Some(kwarg) => quote! {
+                        {
+                            const __FMT_PART: &str = ::const_str::#method_ident!(#kwarg, #spec);
+                            __FMT_PART
+                        },
+                    },
+                };
+            }
+            unreachable!()
+        })
+        }
+
+        let tt = quote! {
+            {
+                use core::primitive::{str, usize};
+                const STRS: &[&str] = &[
+                    #(#eval_parts)*
+                ];
+                const OUTPUT_LEN: usize = const_str::__ctfe::Concat(STRS).output_len();
+                const OUTPUT_BUF: const_str::__ctfe::StrBuf<OUTPUT_LEN> = const_str::__ctfe::Concat(STRS).const_eval();
+                const_str::__strbuf_as_str!(&OUTPUT_BUF)
+            }
+        };
+
+        tt.into()
     }
 }

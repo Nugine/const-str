@@ -6,6 +6,7 @@ check:
     cargo clippy --all-features -- -D warnings
 
 test:
+    cargo test
     cargo test --all-features
 
 dev: fmt check test

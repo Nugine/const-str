@@ -93,6 +93,9 @@ pub mod __ctfe {
     mod fmt;
     pub use self::fmt::*;
 
+    mod hex_bytes;
+    pub use self::hex_bytes::*;
+
     mod len;
     pub use self::len::*;
 

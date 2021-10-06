@@ -99,6 +99,12 @@ pub mod __ctfe {
     mod len;
     pub use self::len::*;
 
+    #[cfg(feature = "std")]
+    item_group! {
+        mod net;
+        pub use self::net::*;
+    }
+
     mod parse;
     pub use self::parse::*;
 

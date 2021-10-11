@@ -1,8 +1,8 @@
 [package]
 name = "const-str-proc-macro"
-version = "0.3.1"
+version = "0.4.0-dev"
 authors = ["Nugine <nugine@foxmail.com>"]
-edition = "2018"
+edition = "2021"
 description = "compile-time string operations"
 license = "MIT"
 repository = "https://github.com/Nugine/const-str"

@@ -1,6 +1,6 @@
 [package]
 name = "const-str-proc-macro"
-version = "0.3.1-dev"
+version = "0.3.1"
 authors = ["Nugine <nugine@foxmail.com>"]
 edition = "2018"
 description = "compile-time string operations"
@@ -16,8 +16,8 @@ readme = "../README.md"
 proc_macro = true
 
 [dependencies]
-syn = "1.0.77"
-quote = "1.0.9"
+syn = "1.0"
+quote = "1.0"
 regex = { version = "1.5.4", optional = true }
 http = { version = "0.2.5", optional = true }
 proc-macro2 = "1.0.29"

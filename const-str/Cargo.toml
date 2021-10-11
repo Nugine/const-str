@@ -9,6 +9,7 @@ repository = "https://github.com/Nugine/const-str"
 keywords = ["string", "const", "proc-macro"]
 categories = ["text-processing", "no-std"]
 readme = "../README.md"
+rust-version = "1.56.0"
 
 [features]
 default = []

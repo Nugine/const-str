@@ -30,9 +30,9 @@ impl Parse<&str, &str> {
 }
 
 impl Parse<&str, char> {
-    pub const fn const_eval(&self) -> u32 {
+    pub const fn const_eval(&self) -> char {
         let s = self.0.as_bytes();
-        if let Some((ch, count)) = crate::utf8::next_code_point(s) {
+        if let Some((ch, count)) = crate::utf8::next_char(s) {
             if count == s.len() {
                 return ch;
             }
@@ -132,14 +132,6 @@ impl_integer_parse!(i8, i16, i32, i64, i128, isize);
 /// ```
 #[macro_export]
 macro_rules! parse {
-    ($s: expr, char) => {{
-        #[allow(clippy::transmute_int_to_char, unsafe_code)]
-        unsafe {
-            ::core::mem::transmute::<u32, char>(
-                $crate::__ctfe::Parse::<_, ::core::primitive::char>::new($s).const_eval(),
-            )
-        }
-    }};
     ($s: expr, $ty: ty) => {{
         $crate::__ctfe::Parse::<_, $ty>::new($s).const_eval()
     }};

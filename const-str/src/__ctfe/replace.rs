@@ -168,6 +168,6 @@ macro_rules! replace {
         const OUTPUT_LEN: usize = $crate::__ctfe::Replace($s, $from, $to).output_len();
         const OUTPUT_BUF: $crate::__ctfe::StrBuf<OUTPUT_LEN> =
             $crate::__ctfe::Replace($s, $from, $to).const_eval();
-        $crate::__strbuf_as_str!(&OUTPUT_BUF)
+        OUTPUT_BUF.as_str()
     }};
 }

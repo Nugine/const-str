@@ -47,6 +47,6 @@ macro_rules! repeat {
         const OUTPUT_LEN: usize = INPUT.len() * N;
         const OUTPUT_BUF: $crate::__ctfe::StrBuf<OUTPUT_LEN> =
             $crate::__ctfe::Repeat(INPUT, N).const_eval();
-        $crate::__strbuf_as_str!(&OUTPUT_BUF)
+        OUTPUT_BUF.as_str()
     }};
 }

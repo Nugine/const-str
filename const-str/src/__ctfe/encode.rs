@@ -49,9 +49,9 @@ impl<'a> Encode<'a, Utf16Encoder> {
         let mut buf = [0; N];
         let mut pos = 0;
 
-        while let Some((code, count)) = crate::utf8::next_code_point(s) {
+        while let Some((code, count)) = crate::utf8::next_char(s) {
             s = crate::bytes::advance(s, count);
-            let e = CharEncodeUtf16::from_code_point(code);
+            let e = CharEncodeUtf16::new(code);
 
             buf[pos] = e.first();
             pos += 1;

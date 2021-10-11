@@ -87,8 +87,8 @@ impl<const N: usize> Boundaries<N> {
                         match (k1, k0) {
                             (Upper, Lower) => push!(i - 1),
                             (NonAscii, Digit) => push!(i),
-                            (Lower, Digit) | (Upper, Digit) => {} // or-pattens stable since 1.53
-                            (Digit, Lower) | (Digit, Upper) | (Digit, NonAscii) => {}
+                            (Lower | Upper, Digit) => {} // or-pattens stable since 1.53
+                            (Digit, Lower | Upper | NonAscii) => {}
                             (_, Dot) => {}
                             (Dot, _) => match (k2, k0) {
                                 (None, _) => push!(i),
@@ -201,14 +201,12 @@ impl ConvAsciiCase<&str> {
         match self.1 {
             Lower => {
                 while pos < s.len() {
-                    let b = crate::ascii::to_lowercase(s[pos]);
-                    push!(b);
+                    push!(s[pos].to_ascii_lowercase());
                 }
             }
             Upper => {
                 while pos < s.len() {
-                    let b = crate::ascii::to_uppercase(s[pos]);
-                    push!(b);
+                    push!(s[pos].to_ascii_uppercase());
                 }
             }
             Camel | Snake | Kebab | ShoutySnake | ShoutyKebab => {
@@ -231,10 +229,10 @@ impl ConvAsciiCase<&str> {
                         let mut j = 0;
                         while j < word.len() {
                             let b = match self.1 {
-                                Snake | Kebab => crate::ascii::to_lowercase(word[j]),
-                                ShoutySnake | ShoutyKebab => crate::ascii::to_uppercase(word[j]),
-                                Camel if j == 0 => crate::ascii::to_uppercase(word[j]),
-                                Camel if j > 0 => crate::ascii::to_lowercase(word[j]),
+                                Snake | Kebab => word[j].to_ascii_lowercase(),
+                                ShoutySnake | ShoutyKebab => word[j].to_ascii_uppercase(),
+                                Camel if j == 0 => word[j].to_ascii_uppercase(),
+                                Camel if j > 0 => word[j].to_ascii_lowercase(),
                                 _ => constfn_unreachable!(),
                             };
                             push!(b);
@@ -263,7 +261,7 @@ macro_rules! __conv_ascii_case {
         const N: usize = $crate::__ctfe::ConvAsciiCase(INPUT, $case).output_len::<M>();
         const OUTPUT_BUF: $crate::__ctfe::StrBuf<N> =
             $crate::__ctfe::ConvAsciiCase(INPUT, $case).const_eval::<M, N>();
-        $crate::__strbuf_as_str!(&OUTPUT_BUF)
+        OUTPUT_BUF.as_str()
     }};
 }
 

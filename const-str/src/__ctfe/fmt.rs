@@ -37,7 +37,7 @@ macro_rules! __fmt_display {
         const OUTPUT_LEN: usize = $crate::__ctfe::Display($x, $spec).output_len();
         const OUTPUT_BUF: $crate::__ctfe::StrBuf<OUTPUT_LEN> =
             $crate::__ctfe::Display($x, $spec).const_eval();
-        $crate::__strbuf_as_str!(&OUTPUT_BUF)
+        OUTPUT_BUF.as_str()
     }};
 }
 
@@ -75,9 +75,9 @@ impl Debug<&str> {
     pub const fn output_len(&self) -> usize {
         let mut s = self.0.as_bytes();
         let mut ans = 0;
-        while let Some((ch, count)) = crate::utf8::next_code_point(s) {
+        while let Some((ch, count)) = crate::utf8::next_char(s) {
             s = crate::bytes::advance(s, count);
-            let e = unsafe { CharEscapeDebug::from_code_point(ch) };
+            let e = CharEscapeDebug::new(ch);
             ans += e.as_bytes().len()
         }
         ans
@@ -87,9 +87,9 @@ impl Debug<&str> {
         let mut buf = [0; N];
         let mut pos = 0;
         let mut s = self.0.as_bytes();
-        while let Some((ch, count)) = crate::utf8::next_code_point(s) {
+        while let Some((ch, count)) = crate::utf8::next_char(s) {
             s = crate::bytes::advance(s, count);
-            let e = unsafe { CharEscapeDebug::from_code_point(ch) };
+            let e = CharEscapeDebug::new(ch);
             let bytes = e.as_bytes();
             let mut i = 0;
             while i < bytes.len() {
@@ -109,7 +109,7 @@ macro_rules! __fmt_debug {
         const OUTPUT_LEN: usize = $crate::__ctfe::Debug($x, $spec).output_len();
         const OUTPUT_BUF: $crate::__ctfe::StrBuf<OUTPUT_LEN> =
             $crate::__ctfe::Debug($x, $spec).const_eval();
-        $crate::__strbuf_as_str!(&OUTPUT_BUF)
+        OUTPUT_BUF.as_str()
     }};
 }
 
@@ -143,11 +143,7 @@ macro_rules! impl_integer_hex {
                 let mut x = self.0;
                 loop {
                     let d = crate::ascii::num_to_hex_digit((x % 16) as u8);
-                    buf[pos] = if self.2 {
-                        crate::ascii::to_uppercase(d)
-                    } else {
-                        d
-                    };
+                    buf[pos] = if self.2 { d.to_ascii_uppercase() } else { d };
                     pos += 1;
                     x /= 16;
                     if x == 0 {
@@ -230,7 +226,7 @@ macro_rules! __fmt_lowerhex {
         const OUTPUT_LEN: usize = $crate::__ctfe::LowerHex($x, $spec).output_len();
         const OUTPUT_BUF: $crate::__ctfe::StrBuf<OUTPUT_LEN> =
             $crate::__ctfe::LowerHex($x, $spec).const_eval();
-        $crate::__strbuf_as_str!(&OUTPUT_BUF)
+        OUTPUT_BUF.as_str()
     }};
 }
 
@@ -241,7 +237,7 @@ macro_rules! __fmt_upperhex {
         const OUTPUT_LEN: usize = $crate::__ctfe::UpperHex($x, $spec).output_len();
         const OUTPUT_BUF: $crate::__ctfe::StrBuf<OUTPUT_LEN> =
             $crate::__ctfe::UpperHex($x, $spec).const_eval();
-        $crate::__strbuf_as_str!(&OUTPUT_BUF)
+        OUTPUT_BUF.as_str()
     }};
 }
 
@@ -318,6 +314,6 @@ macro_rules! __fmt_binary {
         const OUTPUT_LEN: usize = $crate::__ctfe::Binary($x, $spec).output_len();
         const OUTPUT_BUF: $crate::__ctfe::StrBuf<OUTPUT_LEN> =
             $crate::__ctfe::Binary($x, $spec).const_eval();
-        $crate::__strbuf_as_str!(&OUTPUT_BUF)
+        OUTPUT_BUF.as_str()
     }};
 }

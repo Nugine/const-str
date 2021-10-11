@@ -7,24 +7,6 @@ pub struct CharEncodeUtf8 {
     len: u8,
 }
 
-// const since 1.52
-pub const fn len_utf8(ch: char) -> usize {
-    const MAX_ONE_B: u32 = 0x80;
-    const MAX_TWO_B: u32 = 0x800;
-    const MAX_THREE_B: u32 = 0x10000;
-
-    let code = ch as u32;
-    if code < MAX_ONE_B {
-        1
-    } else if code < MAX_TWO_B {
-        2
-    } else if code < MAX_THREE_B {
-        3
-    } else {
-        4
-    }
-}
-
 impl CharEncodeUtf8 {
     /// Copied from [char::encode_utf8](https://github.com/rust-lang/rust/blob/0273e3bce7a0ce49e96a9662163e2380cb87e0be/library/core/src/char/methods.rs#L1600-L1645)
     pub const fn new(ch: char) -> Self {
@@ -35,7 +17,7 @@ impl CharEncodeUtf8 {
         const TAG_FOUR_B: u8 = 0b1111_0000;
 
         let mut buf = [0; 4];
-        let len = len_utf8(ch);
+        let len = ch.len_utf8();
         let code = ch as u32;
 
         match len {
@@ -99,7 +81,7 @@ pub struct CharEscapeUnicode {
 }
 
 impl CharEscapeUnicode {
-    pub const unsafe fn from_code_point(code: u32) -> Self {
+    const unsafe fn from_code_point(code: u32) -> Self {
         let mut hex_buf = [0; 10];
         let mut hex_pos = 0;
 
@@ -163,20 +145,6 @@ pub struct CharEscapeDebug {
 }
 
 impl CharEscapeDebug {
-    pub const unsafe fn from_code_point(code: u32) -> Self {
-        match code {
-            _ if code == '\t' as u32 => Self::backslash_ascii(b't'),
-            _ if code == '\r' as u32 => Self::backslash_ascii(b'r'),
-            _ if code == '\n' as u32 => Self::backslash_ascii(b'n'),
-            _ if code == '\\' as u32 || code == '"' as u32 || code == '\'' as u32 => {
-                Self::backslash_ascii(code as u8)
-            }
-            _ if code == ' ' as u32 => Self::ascii_printable(b' '),
-            _ if code >= '!' as u32 && code <= '~' as u32 => Self::ascii_printable(code as u8),
-            _ => Self::unicode_code_point(code),
-        }
-    }
-
     pub const fn new(ch: char) -> Self {
         match ch {
             '\t' => Self::backslash_ascii(b't'),
@@ -205,14 +173,6 @@ impl CharEscapeDebug {
 
     const fn unicode(ch: char) -> Self {
         let e = CharEscapeUnicode::new(ch);
-        Self {
-            buf: e.buf,
-            len: e.len,
-        }
-    }
-
-    const unsafe fn unicode_code_point(code: u32) -> Self {
-        let e = CharEscapeUnicode::from_code_point(code);
         Self {
             buf: e.buf,
             len: e.len,
@@ -253,79 +213,86 @@ fn test_char_escape_debug() {
     test_char_escape_debug!('\u{10ffff}');
 }
 
-/// Copied from [core::str::validations](https://github.com/rust-lang/rust/blob/e7958d35ca2c898a223efe402481e0ecb854310a/library/core/src/str/validations.rs#L7-L68)
-#[allow(clippy::many_single_char_names)]
-pub const fn next_code_point(bytes: &[u8]) -> Option<(u32, usize)> {
-    const CONT_MASK: u8 = 0b0011_1111;
+pub const fn next_char(bytes: &[u8]) -> Option<(char, usize)> {
+    /// Copied from [core::str::validations](https://github.com/rust-lang/rust/blob/e7958d35ca2c898a223efe402481e0ecb854310a/library/core/src/str/validations.rs#L7-L68)
+    #[allow(clippy::many_single_char_names)]
+    const fn next_code_point(bytes: &[u8]) -> Option<(u32, usize)> {
+        const CONT_MASK: u8 = 0b0011_1111;
 
-    const fn utf8_first_byte(byte: u8, width: u32) -> u32 {
-        (byte & (0x7F >> width)) as u32
-    }
-
-    const fn utf8_acc_cont_byte(ch: u32, byte: u8) -> u32 {
-        (ch << 6) | (byte & CONT_MASK) as u32
-    }
-
-    const fn unwrap_or_0(opt: Option<u8>) -> u8 {
-        match opt {
-            Some(byte) => byte,
-            None => 0,
+        const fn utf8_first_byte(byte: u8, width: u32) -> u32 {
+            (byte & (0x7F >> width)) as u32
         }
-    }
 
-    let mut i = 0;
+        const fn utf8_acc_cont_byte(ch: u32, byte: u8) -> u32 {
+            (ch << 6) | (byte & CONT_MASK) as u32
+        }
 
-    macro_rules! next {
-        () => {{
-            if i < bytes.len() {
-                let x = Some(bytes[i]);
-                i += 1;
-                x
-            } else {
-                None
+        const fn unwrap_or_0(opt: Option<u8>) -> u8 {
+            match opt {
+                Some(byte) => byte,
+                None => 0,
             }
-        }};
-    }
-
-    let x = match next!() {
-        Some(x) => x,
-        None => return None,
-    };
-    if x < 128 {
-        return Some((x as u32, i));
-    }
-
-    let init = utf8_first_byte(x, 2);
-    let y = unwrap_or_0(next!());
-    let mut ch = utf8_acc_cont_byte(init, y);
-    if x >= 0xE0 {
-        let z = unwrap_or_0(next!());
-        let y_z = utf8_acc_cont_byte((y & CONT_MASK) as u32, z);
-        ch = init << 12 | y_z;
-        if x >= 0xF0 {
-            let w = unwrap_or_0(next!());
-            ch = (init & 7) << 18 | utf8_acc_cont_byte(y_z, w);
         }
+
+        let mut i = 0;
+
+        macro_rules! next {
+            () => {{
+                if i < bytes.len() {
+                    let x = Some(bytes[i]);
+                    i += 1;
+                    x
+                } else {
+                    None
+                }
+            }};
+        }
+
+        let x = match next!() {
+            Some(x) => x,
+            None => return None,
+        };
+        if x < 128 {
+            return Some((x as u32, i));
+        }
+
+        let init = utf8_first_byte(x, 2);
+        let y = unwrap_or_0(next!());
+        let mut ch = utf8_acc_cont_byte(init, y);
+        if x >= 0xE0 {
+            let z = unwrap_or_0(next!());
+            let y_z = utf8_acc_cont_byte((y & CONT_MASK) as u32, z);
+            ch = init << 12 | y_z;
+            if x >= 0xF0 {
+                let w = unwrap_or_0(next!());
+                ch = (init & 7) << 18 | utf8_acc_cont_byte(y_z, w);
+            }
+        }
+
+        Some((ch, i))
     }
 
-    Some((ch, i))
+    match next_code_point(bytes) {
+        Some((ch, count)) => Some((unsafe { crate::str::char_from_u32(ch) }, count)),
+        None => None,
+    }
 }
 
 pub const fn str_count_chars(s: &str) -> usize {
     let mut s = s.as_bytes();
     let mut ans = 0;
-    while let Some((_, count)) = next_code_point(s) {
+    while let Some((_, count)) = next_char(s) {
         s = crate::bytes::advance(s, count);
         ans += 1;
     }
     ans
 }
 
-pub const fn str_chars<const N: usize>(s: &str) -> [u32; N] {
+pub const fn str_chars<const N: usize>(s: &str) -> [char; N] {
     let mut s = s.as_bytes();
-    let mut buf: [u32; N] = [0; N];
+    let mut buf: [char; N] = ['\0'; N];
     let mut pos = 0;
-    while let Some((ch, count)) = next_code_point(s) {
+    while let Some((ch, count)) = next_char(s) {
         s = crate::bytes::advance(s, count);
         buf[pos] = ch;
         pos += 1;
@@ -338,8 +305,7 @@ pub const fn str_chars<const N: usize>(s: &str) -> [u32; N] {
 fn test_str_chars() {
     const X: &str = "唐可可";
     const OUTPUT_LEN: usize = str_count_chars(X);
-    const OUTPUT_BUF: [char; OUTPUT_LEN] =
-        unsafe { core::mem::transmute(str_chars::<OUTPUT_LEN>(X)) };
+    const OUTPUT_BUF: [char; OUTPUT_LEN] = str_chars::<OUTPUT_LEN>(X);
     let ans = X.chars().collect::<Vec<_>>();
     assert_eq!(OUTPUT_BUF, ans.as_slice());
 }

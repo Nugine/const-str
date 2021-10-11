@@ -404,13 +404,13 @@ impl ConstFormat {
 
         let tt = quote! {
             {
-                use core::primitive::{str, usize};
+                use ::core::primitive::{str, usize};
                 const STRS: &[&str] = &[
                     #(#eval_parts)*
                 ];
                 const OUTPUT_LEN: usize = const_str::__ctfe::Concat(STRS).output_len();
                 const OUTPUT_BUF: const_str::__ctfe::StrBuf<OUTPUT_LEN> = const_str::__ctfe::Concat(STRS).const_eval();
-                const_str::__strbuf_as_str!(&OUTPUT_BUF)
+                OUTPUT_BUF.as_str()
             }
         };
 

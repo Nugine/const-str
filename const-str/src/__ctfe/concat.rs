@@ -63,6 +63,6 @@ macro_rules! concat {
         const STRS: &[&str] = &[$( $crate::to_str!($x) ),+];
         const OUTPUT_LEN: usize = $crate::__ctfe::Concat(STRS).output_len();
         const OUTPUT_BUF: $crate::__ctfe::StrBuf<OUTPUT_LEN> = $crate::__ctfe::Concat(STRS).const_eval();
-        $crate::__strbuf_as_str!(&OUTPUT_BUF)
+        OUTPUT_BUF.as_str()
     }}
 }

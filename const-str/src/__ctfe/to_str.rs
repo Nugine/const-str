@@ -37,7 +37,7 @@ impl ToStr<bool> {
 
 impl ToStr<char> {
     pub const fn output_len(&self) -> usize {
-        crate::utf8::len_utf8(self.0)
+        self.0.len_utf8()
     }
 
     pub const fn const_eval<const N: usize>(&self) -> StrBuf<N> {
@@ -216,6 +216,6 @@ macro_rules! to_str {
         const OUTPUT_LEN: usize = $crate::__ctfe::ToStr($x).output_len();
         const OUTPUT_BUF: $crate::__ctfe::StrBuf<OUTPUT_LEN> =
             $crate::__ctfe::ToStr($x).const_eval();
-        $crate::__strbuf_as_str!(&OUTPUT_BUF)
+        OUTPUT_BUF.as_str()
     }};
 }

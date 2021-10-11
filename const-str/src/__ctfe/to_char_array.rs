@@ -5,7 +5,7 @@ impl ToCharArray<&str> {
         crate::utf8::str_count_chars(self.0)
     }
 
-    pub const fn const_eval<const N: usize>(&self) -> [u32; N] {
+    pub const fn const_eval<const N: usize>(&self) -> [char; N] {
         crate::utf8::str_chars(self.0)
     }
 }
@@ -22,10 +22,8 @@ impl ToCharArray<&str> {
 macro_rules! to_char_array {
     ($s: expr) => {{
         const OUTPUT_LEN: usize = $crate::__ctfe::ToCharArray($s).output_len();
-
-        const OUTPUT_BUF: [char; OUTPUT_LEN] = unsafe {
-            ::core::mem::transmute($crate::__ctfe::ToCharArray($s).const_eval::<OUTPUT_LEN>())
-        };
+        const OUTPUT_BUF: [char; OUTPUT_LEN] =
+            $crate::__ctfe::ToCharArray($s).const_eval::<OUTPUT_LEN>();
         OUTPUT_BUF
     }};
 }

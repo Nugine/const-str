@@ -21,6 +21,8 @@ macro_rules! verified_regex {
 
 /// Asserts that the string literal matches the pattern.
 ///
+/// This macro requires the feature `verify-regex`.
+/// 
 /// # Examples
 /// ```
 /// const_str::regex_assert_match!(r"^\d{4}-\d{2}-\d{2}$", "2014-01-01");

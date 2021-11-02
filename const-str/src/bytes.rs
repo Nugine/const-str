@@ -112,3 +112,109 @@ pub const fn advance(mut s: &[u8], count: usize) -> &[u8] {
     constfn_assert!(i == count);
     s
 }
+
+pub const fn contains(haystack: &[u8], needle: &[u8]) -> bool {
+    let haystack_len = haystack.len();
+    let needle_len = needle.len();
+
+    let mut i = 0;
+    while i < haystack_len {
+        let mut j = 0;
+        while j < needle_len && i + j < haystack_len {
+            if haystack[i + j] != needle[j] {
+                break;
+            }
+            j += 1;
+        }
+        if j == needle_len {
+            return true;
+        }
+        i += 1;
+    }
+
+    false
+}
+
+#[test]
+fn test_contains() {
+    macro_rules! test_contains {
+        (true, $haystack: expr, $needle: expr) => {
+            assert!(contains($haystack.as_ref(), $needle.as_ref()));
+        };
+        (false, $haystack: expr, $needle: expr) => {
+            assert!(!contains($haystack.as_ref(), $needle.as_ref()));
+        };
+    }
+
+    let buf = b"abcdefgh";
+    test_contains!(true, buf, b"");
+    test_contains!(true, buf, b"a");
+    test_contains!(true, buf, b"ef");
+    test_contains!(false, buf, b"xyz");
+
+    test_contains!(true, "asd", "");
+    test_contains!(true, "asd", "a");
+    test_contains!(true, "asdf", "sd");
+    test_contains!(false, "", "a");
+    test_contains!(false, "asd", "abcd");
+
+    test_contains!(true, "唐可可", "可");
+    test_contains!(true, "Liyuu", "i");
+    test_contains!(false, "Liyuu", "我");
+}
+
+pub const fn starts_with(haystack: &[u8], needle: &[u8]) -> bool {
+    let haystack_len = haystack.len();
+    let needle_len = needle.len();
+
+    if needle_len > haystack_len {
+        return false;
+    }
+
+    let mut i = 0;
+    while i < needle_len {
+        if haystack[i] != needle[i] {
+            break;
+        }
+        i += 1
+    }
+
+    i == needle_len
+}
+
+#[test]
+fn test_starts_with() {
+    assert!(starts_with(b"", b""));
+    assert!(starts_with(b"a", b""));
+    assert!(starts_with(b"a", b"a"));
+    assert!(!starts_with(b"", b"a"));
+    assert!(!starts_with(b"ba", b"a"));
+}
+
+pub const fn ends_with(haystack: &[u8], needle: &[u8]) -> bool {
+    let haystack_len = haystack.len();
+    let needle_len = needle.len();
+
+    if needle_len > haystack_len {
+        return false;
+    }
+
+    let mut i = 0;
+    while i < needle_len {
+        if haystack[haystack_len - needle_len + i] != needle[i] {
+            break;
+        }
+        i += 1
+    }
+
+    i == needle_len
+}
+
+#[test]
+fn test_ends_with() {
+    assert!(ends_with(b"", b""));
+    assert!(ends_with(b"a", b""));
+    assert!(ends_with(b"a", b"a"));
+    assert!(!ends_with(b"", b"a"));
+    assert!(!ends_with(b"ab", b"a"));
+}

@@ -19,6 +19,9 @@ case = ["const-str-proc-macro/heck"]
 std = []
 all = ["verify-regex", "verify-http", "case", "std"]
 
+[dependencies]
+uuid = { version = "0.8.2", optional = true }
+
 [package.metadata.docs.rs]
 all-features = true
 

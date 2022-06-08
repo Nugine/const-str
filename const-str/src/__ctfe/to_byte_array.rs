@@ -25,7 +25,7 @@ impl<const L: usize> ToByteArray<&[u8; L]> {
 #[macro_export]
 macro_rules! to_byte_array {
     ($s: expr) => {{
-        const OUTPUT_LEN: usize = $crate::len!($s);
+        const OUTPUT_LEN: usize = $s.len();
         $crate::__ctfe::ToByteArray($s).const_eval::<OUTPUT_LEN>()
     }};
 }

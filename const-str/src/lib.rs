@@ -94,9 +94,6 @@ pub mod __ctfe {
     mod hex_bytes;
     pub use self::hex_bytes::*;
 
-    mod len;
-    pub use self::len::*;
-
     #[cfg(feature = "std")]
     item_group! {
         mod net;

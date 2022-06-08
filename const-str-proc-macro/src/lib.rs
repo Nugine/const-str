@@ -19,7 +19,7 @@ mod case;
 mod fmt;
 
 #[cfg(feature = "regex")]
-mod verify_regex;
+mod regex;
 
 use proc_macro::TokenStream;
 use quote::ToTokens;
@@ -90,7 +90,7 @@ pub fn verified_header_name(input: TokenStream) -> TokenStream {
 pub fn verified_regex(input: TokenStream) -> TokenStream {
     direct_convert(input, |s: &LitStr| {
         let s = s.value();
-        regex::Regex::new(&s).map(|_| s)
+        ::regex::Regex::new(&s).map(|_| s)
     })
 }
 
@@ -98,7 +98,7 @@ pub fn verified_regex(input: TokenStream) -> TokenStream {
 #[cfg(feature = "regex")]
 #[proc_macro]
 pub fn regex_assert_match(input: TokenStream) -> TokenStream {
-    use crate::verify_regex::RegexAssertMatch;
+    use crate::regex::RegexAssertMatch;
     let m = parse_macro_input!(input as RegexAssertMatch);
     m.eval()
 }

@@ -1,6 +1,6 @@
 //! Compile-time string operations
 //!
-//! MSRV: Rust 1.56.0
+//! MSRV: Rust 1.57.0
 //!
 #![deny(unsafe_code, missing_docs, clippy::all, clippy::cargo)]
 #![allow(
@@ -11,29 +11,27 @@
 #![cfg_attr(not(any(test, feature = "std")), no_std)]
 
 macro_rules! constfn_assert {
-    ($e:expr) => {{
-        let _: () = [()][(!($e) as usize)];
-    }};
+    ($e:expr) => {
+        assert!($e) // const since 1.57
+    };
 }
 
 macro_rules! constfn_panic {
     ($s: literal) => {{
-        #[allow(unconditional_panic)]
-        let _: &str = [$s][1];
-        loop {}
+        panic!($s) // const since 1.57
     }};
 }
 
 macro_rules! constfn_unreachable {
     () => {
-        constfn_panic!("unreachable")
+        unreachable!() // const since 1.57
     };
 }
 
 #[allow(unused_macros)]
 macro_rules! item_group {
-    ($($tt:tt)*) => {
-        $($tt)*
+    ($($item:item)*) => {
+        $($item)*
     }
 }
 

@@ -25,8 +25,9 @@ use proc_macro::TokenStream;
 use quote::ToTokens;
 use syn::parse::Parse;
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, LitByteStr, LitStr};
+use syn::{parse_macro_input, LitStr};
 
+#[cfg(any(feature = "http", feature = "regex"))]
 fn direct_convert<T, E, F>(input: TokenStream, f: F) -> TokenStream
 where
     T: Parse + Spanned,
@@ -40,16 +41,6 @@ where
     };
     let dst_token = LitStr::new(&s, src_token.span());
     dst_token.into_token_stream().into()
-}
-
-/// Converts a byte string literal to a string literal
-#[proc_macro]
-pub fn from_utf8(input: TokenStream) -> TokenStream {
-    direct_convert(input, |src_token: &LitByteStr| {
-        let src = src_token.value();
-        let err_msg = "the byte string literal is not a valid UTF-8 string";
-        String::from_utf8(src).map_err(|_| err_msg)
-    })
 }
 
 #[doc(hidden)]

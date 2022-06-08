@@ -52,9 +52,6 @@ pub mod __proc {
     mod fmt;
     pub use self::fmt::*;
 
-    mod str;
-    pub use self::str::*;
-
     #[cfg(feature = "http")]
     item_group! {
         mod http;
@@ -114,8 +111,8 @@ pub mod __ctfe {
     mod replace;
     pub use self::replace::*;
 
-    mod str_buf;
-    pub use self::str_buf::*;
+    mod str;
+    pub use self::str::*;
 
     mod to_byte_array;
     pub use self::to_byte_array::*;

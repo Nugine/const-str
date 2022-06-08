@@ -1,6 +1,6 @@
 #![allow(unsafe_code)]
 
-use super::str_buf::StrBuf;
+use super::str::StrBuf;
 
 pub struct Replace<'input, 'to, P>(pub &'input str, pub P, pub &'to str);
 

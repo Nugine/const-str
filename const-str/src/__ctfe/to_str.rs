@@ -1,6 +1,6 @@
 #![allow(unsafe_code)]
 
-use super::str_buf::StrBuf;
+use super::str::StrBuf;
 use crate::utf8::CharEncodeUtf8;
 
 pub struct ToStr<T>(pub T);

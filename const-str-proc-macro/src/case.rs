@@ -7,6 +7,8 @@ enum Case {
     Lower,
     Upper,
     #[cfg(feature = "heck")]
+    LowerCamel,
+    #[cfg(feature = "heck")]
     UpperCamel,
     #[cfg(feature = "heck")]
     Snake,
@@ -23,6 +25,7 @@ impl Case {
         #[cfg(feature = "heck")]
         use heck::{
             ToKebabCase,       //
+            ToLowerCamelCase,  //
             ToShoutyKebabCase, //
             ToShoutySnakeCase, //
             ToSnakeCase,       //
@@ -31,6 +34,8 @@ impl Case {
         match self {
             Case::Lower => s.to_lowercase(),
             Case::Upper => s.to_uppercase(),
+            #[cfg(feature = "heck")]
+            Case::LowerCamel => s.to_lower_camel_case(),
             #[cfg(feature = "heck")]
             Case::UpperCamel => s.to_upper_camel_case(),
             #[cfg(feature = "heck")]
@@ -57,6 +62,8 @@ impl Parse for ConvertCase {
         let case = match case.as_str() {
             "lower" => Case::Lower,
             "upper" => Case::Upper,
+            #[cfg(feature = "heck")]
+            "lower_camel" => Case::LowerCamel,
             #[cfg(feature = "heck")]
             "upper_camel" => Case::UpperCamel,
             #[cfg(feature = "heck")]

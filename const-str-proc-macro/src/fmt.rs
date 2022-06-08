@@ -333,7 +333,7 @@ impl ConstFormat {
     fn fmt_spec(part: &FmtPart) -> proc_macro2::TokenStream {
         let alternate = part.spec.alternate;
         quote! {{
-            const_str::__ctfe::FmtSpec {
+            FmtSpec {
                 alternate: #alternate
             }
         }}
@@ -349,68 +349,60 @@ impl ConstFormat {
 
         for p in parts {
             eval_parts.push(loop {
-            if let Some(ref s) = p.literal {
-                break quote! {
-                    {
-                        const __FMT_PART: &str = #s;
-                        __FMT_PART
-                    },
-                };
-            }
-            if let Some(pos) = p.pos {
-                let method = p.method.as_ref().unwrap();
-                match self.positional_args.get(pos) {
-                    None => emit_error!(
-                        self.fmt_string,
-                        std::format!(
+                if let Some(ref s) = p.literal {
+                    break quote! {
+                        {
+                            #s
+                        },
+                    };
+                }
+                if let Some(pos) = p.pos {
+                    let method = p.method.as_ref().unwrap();
+                    match self.positional_args.get(pos) {
+                        None => emit_error!(
+                            self.fmt_string,
+                            std::format!(
                             "invalid reference to positional argument {} (no arguments were given)",
                             pos
                         )
-                    ),
-                    Some(arg) => {
-                        let method_ident = Self::fmt_method(method);
-                        let spec = Self::fmt_spec(&p);
-                        break quote! {
-                            {
-                                const __FMT_PART: &str = ::const_str::#method_ident!(#arg, #spec);
-                                __FMT_PART
-                            },
-                        };
+                        ),
+                        Some(arg) => {
+                            let method_ident = Self::fmt_method(method);
+                            let spec = Self::fmt_spec(&p);
+                            break quote! {
+                                {
+                                    #method_ident!(#arg, #spec)
+                                },
+                            };
+                        }
                     }
                 }
-            }
-            if let Some(ref name) = p.name {
-                let method_ident = Self::fmt_method(p.method.as_ref().unwrap());
-                let spec = Self::fmt_spec(&p);
+                if let Some(ref name) = p.name {
+                    let method_ident = Self::fmt_method(p.method.as_ref().unwrap());
+                    let spec = Self::fmt_spec(&p);
 
-                break match self.named_args.get(name) {
-                    None => quote! {
-                        {
-                            const __FMT_PART: &str = ::const_str::#method_ident!(#name, #spec);
-                            __FMT_PART
+                    break match self.named_args.get(name) {
+                        None => quote! {
+                            {
+                                #method_ident!(#name, #spec)
+                            },
                         },
-                    },
-                    Some(kwarg) => quote! {
-                        {
-                            const __FMT_PART: &str = ::const_str::#method_ident!(#kwarg, #spec);
-                            __FMT_PART
+                        Some(kwarg) => quote! {
+                            {
+                                #method_ident!(#kwarg, #spec)
+                            },
                         },
-                    },
-                };
-            }
-            unreachable!()
-        })
+                    };
+                }
+                unreachable!()
+            })
         }
 
         let tt = quote! {
             {
-                use ::core::primitive::{str, usize};
-                const STRS: &[&str] = &[
+                &[
                     #(#eval_parts)*
-                ];
-                const OUTPUT_LEN: usize = const_str::__ctfe::Concat(STRS).output_len();
-                const OUTPUT_BUF: const_str::__ctfe::StrBuf<OUTPUT_LEN> = const_str::__ctfe::Concat(STRS).const_eval();
-                OUTPUT_BUF.as_str()
+                ]
             }
         };
 

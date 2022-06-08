@@ -52,9 +52,9 @@ pub fn from_utf8(input: TokenStream) -> TokenStream {
     })
 }
 
-/// Creates a string slice using interpolation of const expressions
+#[doc(hidden)]
 #[proc_macro]
-pub fn format(input: TokenStream) -> TokenStream {
+pub fn format_parts(input: TokenStream) -> TokenStream {
     use crate::fmt::ConstFormat;
     let m = parse_macro_input!(input as ConstFormat);
     m.eval()

@@ -43,6 +43,7 @@ mod utf16;
 mod utf8;
 
 #[doc(hidden)]
+#[cfg(feature = "proc-macro")]
 pub mod __proc {
     mod case;
     pub use self::case::*;
@@ -53,16 +54,16 @@ pub mod __proc {
     mod str;
     pub use self::str::*;
 
-    #[cfg(feature = "verify-http")]
+    #[cfg(feature = "http")]
     item_group! {
-        mod verify_http;
-        pub use self::verify_http::*;
+        mod http;
+        pub use self::http::*;
     }
 
-    #[cfg(feature = "verify-regex")]
+    #[cfg(feature = "regex")]
     item_group! {
-        mod verify_regex;
-        pub use self::verify_regex::*;
+        mod regex;
+        pub use self::regex::*;
     }
 }
 

@@ -1,7 +1,7 @@
 #![allow(clippy::comparison_chain)]
 #![allow(clippy::manual_range_contains)]
 
-//! Edited from https://github.com/rust-lang/rust/blob/3358a41acbcb82daf3cd71197b2a053152a9a376/library/core/src/unicode/printable.rs
+// Edited from <https://github.com/rust-lang/rust/blob/3358a41acbcb82daf3cd71197b2a053152a9a376/library/core/src/unicode/printable.rs>
 
 const fn check(
     x: u16,

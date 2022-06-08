@@ -9,6 +9,7 @@
     clippy::implicit_return
 )]
 #![cfg_attr(not(any(test, feature = "std")), no_std)]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 
 macro_rules! constfn_assert {
     ($e:expr) => {
@@ -43,7 +44,7 @@ mod utf16;
 mod utf8;
 
 #[doc(hidden)]
-#[cfg(feature = "proc-macro")]
+#[cfg(feature = "proc")]
 pub mod __proc {
     mod case;
     pub use self::case::*;

@@ -31,6 +31,7 @@ pub use const_str_proc_macro::format_parts;
 /// assert_eq!(MESSAGE_1, MESSAGE_5);
 /// ```
 ///
+#[cfg_attr(docsrs, doc(cfg(feature = "proc")))]
 #[macro_export]
 macro_rules! format {
     ($fmt: literal $($args:tt)*) => {{

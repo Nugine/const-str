@@ -39,8 +39,6 @@ impl ToCStr<&str> {
 /// The C-style string is guaranteed to be terminated by a nul byte.
 /// This trailing nul byte will be appended by this macro.
 /// The provided data should not contain any nul bytes in it.
-///
-/// This macro requires the feature `std`.
 /// 
 /// # Examples
 ///
@@ -48,6 +46,7 @@ impl ToCStr<&str> {
 /// use std::os::raw::c_char;
 /// const PRINTF_FMT: *const c_char = const_str::raw_cstr!("%d\n");
 /// ```
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 #[macro_export]
 macro_rules! raw_cstr {
     ($s: expr) => {{

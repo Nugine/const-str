@@ -291,8 +291,6 @@ pub const fn expect_ip(s: &str) -> IpAddr {
 
 /// Converts a string slice to an IP address.
 ///
-/// This macro requires the feature `std`.
-///
 /// # Examples
 /// ```
 /// use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
@@ -303,6 +301,7 @@ pub const fn expect_ip(s: &str) -> IpAddr {
 ///
 /// const LOCALHOSTS: [IpAddr;2] = [ip_addr!("127.0.0.1"), ip_addr!("::1")];
 /// ```
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 #[macro_export]
 macro_rules! ip_addr {
     (v4, $s:expr) => {

@@ -12,7 +12,7 @@ test:
 dev: fmt check test
 
 doc:
-    cargo doc --open --no-deps --all-features
+    RUSTDOCFLAGS='--cfg docsrs' cargo doc --open --no-deps --all-features
 
 miri:
     cargo +nightly miri test --all-features

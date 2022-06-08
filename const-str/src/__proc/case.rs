@@ -59,6 +59,7 @@ macro_rules! convert_case {
     };
 }
 
+#[cfg_attr(docsrs, doc(cfg(any(feature = "proc", feature = "case"))))]
 #[doc = convert_case_doc!() ] // stable since 1.54
 #[cfg(feature = "case")]
 #[macro_export]

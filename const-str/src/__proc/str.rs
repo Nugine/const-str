@@ -10,6 +10,7 @@ pub use const_str_proc_macro::from_utf8;
 /// assert_eq!(name, "file");
 /// ```
 ///
+#[cfg_attr(docsrs, doc(cfg(feature = "proc")))]
 #[macro_export]
 macro_rules! from_utf8 {
     ($s: literal) => {

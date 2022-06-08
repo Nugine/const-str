@@ -7,7 +7,7 @@ Converts a string literal to a specified case.
 
 These variants require the feature `case`.
 
-+ camel
++ upper_camel
 + kebab
 + snake
 + shouty_snake
@@ -20,7 +20,7 @@ use const_str::convert_case;
 const S1: &str = convert_case!(lower, "Lower Case");
 const S2: &str = convert_case!(upper, "Upper Case");
 # #[cfg(feature = "case")]
-const S3: &str = convert_case!(camel, "camel case");
+const S3: &str = convert_case!(upper_camel, "upper camel case");
 # #[cfg(feature = "case")]
 const S4: &str = convert_case!(snake, "snake case");
 # #[cfg(feature = "case")]
@@ -33,7 +33,7 @@ const S7: &str = convert_case!(shouty_kebab, "shouty kebab case");
 assert_eq!(S1, "lower case");
 assert_eq!(S2, "UPPER CASE");
 # #[cfg(feature = "case")]
-assert_eq!(S3, "CamelCase");
+assert_eq!(S3, "UpperCamelCase");
 # #[cfg(feature = "case")]
 assert_eq!(S4, "snake_case");
 # #[cfg(feature = "case")]
@@ -69,8 +69,8 @@ macro_rules! convert_case {
     (upper, $s: literal) => {
         $crate::__proc::convert_case!(upper, $s)
     };
-    (camel, $s: literal) => {
-        $crate::__proc::convert_case!(camel, $s)
+    (upper_camel, $s: literal) => {
+        $crate::__proc::convert_case!(upper_camel, $s)
     };
     (snake, $s: literal) => {
         $crate::__proc::convert_case!(snake, $s)

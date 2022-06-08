@@ -29,4 +29,4 @@ path = "../const-str-proc-macro"
 [dev-dependencies]
 regex = "1.5.4"
 http = "0.2.5"
-heck = "0.3.3"
+heck = { version = "0.4.0", features = ["unicode"] }

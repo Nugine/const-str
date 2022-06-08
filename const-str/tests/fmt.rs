@@ -20,14 +20,14 @@ fn test_const_format() {
     {
         const A: char = '我';
         const X: &str = const_format!("{a:?} {0}", A, a = A);
-        let ans = format!("{a} {0}", A, a = A.escape_default());
+        let ans = format!("{a:?} {0}", A, a = A);
         assert_eq!(X, ans);
     }
 
     {
         const A: &str = "团长\0\t\r\n\"'and希望之花";
         const X: &str = const_format!("{:?}", A);
-        let ans = A.escape_default().to_string();
+        let ans = format!("{:?}", A);
         assert_eq!(X, ans)
     }
 

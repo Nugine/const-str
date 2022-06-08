@@ -1,6 +1,6 @@
 #![allow(unsafe_code)]
 
-use crate::__ctfe::StrBuf;
+use crate::printable::is_printable;
 
 pub struct CharEncodeUtf8 {
     buf: [u8; 4],
@@ -144,23 +144,39 @@ pub struct CharEscapeDebug {
     len: u8,
 }
 
+pub struct CharEscapeDebugArgs {
+    pub escape_single_quote: bool,
+    pub escape_double_quote: bool,
+}
+
+impl CharEscapeDebugArgs {
+    #[cfg(test)]
+    pub const ESCAPE_ALL: Self = Self {
+        escape_single_quote: true,
+        escape_double_quote: true,
+    };
+}
+
 impl CharEscapeDebug {
-    pub const fn new(ch: char) -> Self {
+    pub const fn new(ch: char, args: CharEscapeDebugArgs) -> Self {
         match ch {
+            '\0' => Self::backslash_ascii(b'0'),
             '\t' => Self::backslash_ascii(b't'),
             '\r' => Self::backslash_ascii(b'r'),
             '\n' => Self::backslash_ascii(b'n'),
-            '\\' | '"' | '\'' => Self::backslash_ascii(ch as u8),
-            ' ' => Self::ascii_printable(b' '),
-            _ if ch.is_ascii_graphic() => Self::ascii_printable(ch as u8),
+            '\\' => Self::backslash_ascii(b'\\'),
+            '"' if args.escape_double_quote => Self::backslash_ascii(b'"'),
+            '\'' if args.escape_single_quote => Self::backslash_ascii(b'\''),
+            _ if is_printable(ch) => Self::printable(ch),
             _ => Self::unicode(ch),
         }
     }
 
-    const fn ascii_printable(ch: u8) -> Self {
+    const fn printable(ch: char) -> Self {
+        let e = CharEncodeUtf8::new(ch);
         Self {
-            buf: [ch, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            len: 1,
+            buf: [e.buf[0], e.buf[1], e.buf[2], e.buf[3], 0, 0, 0, 0, 0, 0],
+            len: e.len,
         }
     }
 
@@ -188,17 +204,17 @@ impl CharEscapeDebug {
         unsafe { core::str::from_utf8_unchecked(&self.buf[..self.len as usize]) }
     }
 
-    pub const fn to_str_buf<const N: usize>(&self) -> StrBuf<N> {
-        let buf = crate::bytes::clone(self.as_bytes());
-        unsafe { StrBuf::new_unchecked(buf) }
-    }
+    // pub const fn to_str_buf<const N: usize>(&self) -> StrBuf<N> {
+    //     let buf = crate::bytes::clone(self.as_bytes());
+    //     unsafe { StrBuf::new_unchecked(buf) }
+    // }
 }
 
 #[test]
 fn test_char_escape_debug() {
     macro_rules! test_char_escape_debug {
         ($ch: expr) => {{
-            let e = CharEscapeDebug::new($ch);
+            let e = CharEscapeDebug::new($ch, CharEscapeDebugArgs::ESCAPE_ALL);
             let output = e.as_str();
             let ans = $ch.escape_debug().to_string();
             assert_eq!(output, ans);

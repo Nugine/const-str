@@ -4,6 +4,7 @@ use super::StrBuf;
 use super::ToStr;
 
 use crate::utf8::CharEscapeDebug;
+use crate::utf8::CharEscapeDebugArgs;
 
 #[derive(Clone, Copy)]
 pub struct FmtSpec {
@@ -63,21 +64,65 @@ delegate_debug!(bool, u8, u16, u32, u64, usize, i8, i16, i32, i64, isize,);
 
 impl Debug<char> {
     pub const fn output_len(&self) -> usize {
-        CharEscapeDebug::new(self.0).as_bytes().len()
+        let escape = CharEscapeDebug::new(
+            self.0,
+            CharEscapeDebugArgs {
+                escape_single_quote: true,
+                escape_double_quote: false,
+            },
+        );
+
+        escape.as_bytes().len() + 2
     }
 
     pub const fn const_eval<const N: usize>(&self) -> StrBuf<N> {
-        CharEscapeDebug::new(self.0).to_str_buf()
+        let mut buf = [0; N];
+        let mut pos = 0;
+
+        macro_rules! push {
+            ($x: expr) => {{
+                buf[pos] = $x;
+                pos += 1;
+            }};
+        }
+
+        push!(b'\'');
+        {
+            let e = CharEscapeDebug::new(
+                self.0,
+                CharEscapeDebugArgs {
+                    escape_single_quote: true,
+                    escape_double_quote: false,
+                },
+            );
+            let bytes = e.as_bytes();
+            let mut i = 0;
+            while i < bytes.len() {
+                push!(bytes[i]);
+                i += 1;
+            }
+        }
+        push!(b'\'');
+
+        constfn_assert!(pos == N);
+
+        unsafe { StrBuf::new_unchecked(buf) }
     }
 }
 
 impl Debug<&str> {
     pub const fn output_len(&self) -> usize {
         let mut s = self.0.as_bytes();
-        let mut ans = 0;
+        let mut ans = 2;
         while let Some((ch, count)) = crate::utf8::next_char(s) {
             s = crate::bytes::advance(s, count);
-            let e = CharEscapeDebug::new(ch);
+            let e = CharEscapeDebug::new(
+                ch,
+                CharEscapeDebugArgs {
+                    escape_single_quote: false,
+                    escape_double_quote: true,
+                },
+            );
             ans += e.as_bytes().len()
         }
         ans
@@ -86,18 +131,38 @@ impl Debug<&str> {
     pub const fn const_eval<const N: usize>(&self) -> StrBuf<N> {
         let mut buf = [0; N];
         let mut pos = 0;
+
+        macro_rules! push {
+            ($x: expr) => {{
+                buf[pos] = $x;
+                pos += 1;
+            }};
+        }
+
+        push!(b'"');
+
         let mut s = self.0.as_bytes();
         while let Some((ch, count)) = crate::utf8::next_char(s) {
             s = crate::bytes::advance(s, count);
-            let e = CharEscapeDebug::new(ch);
+            let e = CharEscapeDebug::new(
+                ch,
+                CharEscapeDebugArgs {
+                    escape_single_quote: false,
+                    escape_double_quote: true,
+                },
+            );
             let bytes = e.as_bytes();
             let mut i = 0;
             while i < bytes.len() {
-                buf[pos] = bytes[i];
+                push!(bytes[i]);
                 i += 1;
-                pos += 1;
             }
         }
+
+        push!(b'"');
+
+        constfn_assert!(pos == N);
+
         unsafe { StrBuf::new_unchecked(buf) }
     }
 }

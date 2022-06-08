@@ -39,6 +39,7 @@ macro_rules! item_group {
 
 mod ascii;
 mod bytes;
+mod printable;
 mod str;
 mod utf16;
 mod utf8;

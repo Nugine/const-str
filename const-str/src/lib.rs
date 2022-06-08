@@ -124,10 +124,4 @@ pub mod __ctfe {
 
     mod to_str;
     pub use self::to_str::*;
-
-    #[cfg(feature = "uuid")]
-    item_group! {
-        mod uuid;
-        pub use self::uuid::*;
-    }
 }

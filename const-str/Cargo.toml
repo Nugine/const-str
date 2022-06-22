@@ -1,6 +1,6 @@
 [package]
 name = "const-str"
-version = "0.4.1-dev"
+version = "0.4.1"
 authors = ["Nugine <nugine@foxmail.com>"]
 edition = "2021"
 description = "compile-time string operations"
@@ -25,7 +25,7 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies.const-str-proc-macro]
-version = "=0.4.1-dev"
+version = "=0.4.1"
 path = "../const-str-proc-macro"
 optional = true
 

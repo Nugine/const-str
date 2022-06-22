@@ -245,7 +245,9 @@ fn test_char_escape_debug() {
         }};
     }
 
-    for ch in '\0'..='\u{7f}' {
+    // ignore '\0' because the std behavior has been changed
+    // fixed since v0.4
+    for ch in '\u{1}'..='\u{7f}' {
         test_char_escape_debug!(ch);
     }
 

@@ -23,7 +23,8 @@ impl<'input, 'from, 'to> Replace<'input, 'to, &'from str> {
         }
 
         if replace_from_len == 0 {
-            return input_len + (input_len + 1) * replace_to_len;
+            let input_chars_count = crate::utf8::str_count_chars(self.0);
+            return input_len + (input_chars_count + 1) * replace_to_len;
         }
 
         let mut ans = 0;
@@ -61,35 +62,46 @@ impl<'input, 'from, 'to> Replace<'input, 'to, &'from str> {
         let mut buf = [0; N];
         let mut pos = 0;
 
+        macro_rules! push {
+            ($x: expr) => {{
+                buf[pos] = $x;
+                pos += 1;
+            }};
+        }
+
         if input_len == 0 {
             if replace_from_len == 0 {
                 let mut k = 0;
                 while k < replace_to_len {
-                    buf[pos] = replace_to[k];
-                    pos += 1;
+                    push!(replace_to[k]);
                     k += 1;
                 }
             }
+            constfn_assert!(pos == N);
             return unsafe { StrBuf::new_unchecked(buf) };
         }
 
         if replace_from_len == 0 {
-            let mut i = 0;
+            let mut s = input;
             loop {
                 let mut k = 0;
                 while k < replace_to_len {
-                    buf[pos] = replace_to[k];
-                    pos += 1;
+                    push!(replace_to[k]);
                     k += 1;
                 }
-                if i < input_len {
-                    buf[pos] = input[i];
-                    pos += 1;
-                    i += 1;
-                } else {
-                    break;
+                match crate::utf8::next_char(s) {
+                    Some((_, count)) => {
+                        let mut i = 0;
+                        while i < count {
+                            push!(s[i]);
+                            i += 1;
+                        }
+                        s = crate::bytes::advance(s, count);
+                    }
+                    None => break,
                 }
             }
+            constfn_assert!(pos == N);
             return unsafe { StrBuf::new_unchecked(buf) };
         }
 
@@ -106,17 +118,16 @@ impl<'input, 'from, 'to> Replace<'input, 'to, &'from str> {
             if j == replace_from_len {
                 let mut k = 0;
                 while k < replace_to_len {
-                    buf[pos] = replace_to[k];
-                    pos += 1;
+                    push!(replace_to[k]);
                     k += 1;
                 }
                 i += j;
             } else {
-                buf[pos] = input[i];
-                pos += 1;
+                push!(input[i]);
                 i += 1;
             }
         }
+        constfn_assert!(pos == N);
         unsafe { StrBuf::new_unchecked(buf) }
     }
 }
@@ -150,6 +161,8 @@ fn test_replace() {
     test_replace_str!("asd", "", "b");
     test_replace_str!("aba", "a", "c");
     test_replace_str!("this is old", "old", "new");
+    test_replace_str!("我", "", "1");
+    test_replace_str!("我", "", "我");
 }
 
 /// Replaces all matches of a pattern with another string slice.

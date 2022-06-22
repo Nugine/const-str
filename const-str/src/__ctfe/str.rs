@@ -6,6 +6,10 @@ impl<const N: usize> StrBuf<N> {
     /// # Safety
     /// `buf` must contain valid utf-8 bytes.
     pub const unsafe fn new_unchecked(buf: [u8; N]) -> Self {
+        #[cfg(debug_assertions)]
+        {
+            constfn_assert!(crate::utf8::run_utf8_validation(&buf).is_ok());
+        }
         Self(buf)
     }
 

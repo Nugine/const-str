@@ -2,9 +2,11 @@ on:
   push:
     branches:
       - master
+      - v0.3
   pull_request:
     branches:
       - master
+      - v0.3
 
 name: CI
 

@@ -2,62 +2,27 @@
 
 use super::str::StrBuf;
 
-pub struct Replace<'input, 'to, P>(pub &'input str, pub P, pub &'to str);
+pub struct Replace<I, P, O>(pub I, pub P, pub O);
 
-impl<'input, 'from, 'to> Replace<'input, 'to, &'from str> {
+impl<'input, 'from, 'to> Replace<&'input str, &'from str, &'to str> {
     pub const fn output_len(&self) -> usize {
-        let input = self.0.as_bytes();
-        let replace_from = self.1.as_bytes();
-        let replace_to = self.2.as_bytes();
+        let Self(mut input, replace_from, replace_to) = *self;
 
-        let input_len = input.len();
-        let replace_from_len = replace_from.len();
-        let replace_to_len = replace_to.len();
-
-        if input_len == 0 {
-            if replace_from_len == 0 {
-                return replace_to_len;
-            } else {
-                return 0;
-            }
-        }
-
-        if replace_from_len == 0 {
-            let input_chars_count = crate::utf8::str_count_chars(self.0);
-            return input_len + (input_chars_count + 1) * replace_to_len;
+        if replace_from.is_empty() {
+            let input_chars = crate::utf8::str_count_chars(self.0);
+            return input.len() + (input_chars + 1) * replace_to.len();
         }
 
         let mut ans = 0;
-
-        let mut i = 0;
-        while i < input_len {
-            let mut j = 0;
-            while j < replace_from_len && i + j < input_len {
-                if input[i + j] == replace_from[j] {
-                    j += 1;
-                } else {
-                    break;
-                }
-            }
-            if j == replace_from_len {
-                ans += replace_to_len;
-                i += j;
-            } else {
-                ans += 1;
-                i += 1;
-            }
+        while let Some((pos, remain)) = crate::str::next_match(input, replace_from) {
+            ans += pos + replace_to.len();
+            input = remain;
         }
         ans
     }
 
     pub const fn const_eval<const N: usize>(&self) -> StrBuf<N> {
-        let input = self.0.as_bytes();
-        let replace_from = self.1.as_bytes();
-        let replace_to = self.2.as_bytes();
-
-        let input_len = input.len();
-        let replace_from_len = replace_from.len();
-        let replace_to_len = replace_to.len();
+        let Self(input, replace_from, replace_to) = *self;
 
         let mut buf = [0; N];
         let mut pos = 0;
@@ -69,64 +34,48 @@ impl<'input, 'from, 'to> Replace<'input, 'to, &'from str> {
             }};
         }
 
-        if input_len == 0 {
-            if replace_from_len == 0 {
-                let mut k = 0;
-                while k < replace_to_len {
-                    push!(replace_to[k]);
-                    k += 1;
-                }
-            }
-            constfn_assert!(pos == N);
-            return unsafe { StrBuf::new_unchecked(buf) };
-        }
-
-        if replace_from_len == 0 {
-            let mut s = input;
+        if replace_from.is_empty() {
+            let mut input = input.as_bytes();
+            let replace_to = replace_to.as_bytes();
             loop {
                 let mut k = 0;
-                while k < replace_to_len {
+                while k < replace_to.len() {
                     push!(replace_to[k]);
                     k += 1;
                 }
-                match crate::utf8::next_char(s) {
-                    Some((_, count)) => {
-                        let mut i = 0;
-                        while i < count {
-                            push!(s[i]);
-                            i += 1;
-                        }
-                        s = crate::bytes::advance(s, count);
-                    }
+
+                let count = match crate::utf8::next_char(input) {
+                    Some((_, count)) => count,
                     None => break,
+                };
+
+                let mut i = 0;
+                while i < count {
+                    push!(input[i]);
+                    i += 1;
                 }
+
+                input = crate::bytes::advance(input, count);
             }
-            constfn_assert!(pos == N);
-            return unsafe { StrBuf::new_unchecked(buf) };
+        } else {
+            let mut input = input;
+            let replace_to = replace_to.as_bytes();
+
+            while let Some((pos, remain)) = crate::str::next_match(input, replace_from) {
+                let mut i = 0;
+                while i < pos {
+                    push!(input.as_bytes()[i]);
+                    i += 1;
+                }
+                let mut k = 0;
+                while k < replace_to.len() {
+                    push!(replace_to[k]);
+                    k += 1;
+                }
+                input = remain;
+            }
         }
 
-        let mut i = 0;
-        while i < input_len {
-            let mut j = 0;
-            while j < replace_from_len && i + j < input_len {
-                if input[i + j] == replace_from[j] {
-                    j += 1;
-                } else {
-                    break;
-                }
-            }
-            if j == replace_from_len {
-                let mut k = 0;
-                while k < replace_to_len {
-                    push!(replace_to[k]);
-                    k += 1;
-                }
-                i += j;
-            } else {
-                push!(input[i]);
-                i += 1;
-            }
-        }
         constfn_assert!(pos == N);
         unsafe { StrBuf::new_unchecked(buf) }
     }
@@ -140,8 +89,7 @@ fn test_replace() {
             const REPLACE_FROM: &str = $replace_from;
             const REPLACE_TO: &str = $replace_to;
 
-            const CONSTFN: Replace<'static, 'static, &str> =
-                Replace(INPUT, REPLACE_FROM, REPLACE_TO);
+            const CONSTFN: Replace<&str, &str, &str> = Replace(INPUT, REPLACE_FROM, REPLACE_TO);
             const OUTPUT_LEN: usize = CONSTFN.output_len();
 
             let ans = INPUT.replace(REPLACE_FROM, REPLACE_TO);
@@ -163,6 +111,7 @@ fn test_replace() {
     test_replace_str!("this is old", "old", "new");
     test_replace_str!("我", "", "1");
     test_replace_str!("我", "", "我");
+    test_replace_str!("aaaa", "aa", "bb");
 }
 
 /// Replaces all matches of a pattern with another string slice.

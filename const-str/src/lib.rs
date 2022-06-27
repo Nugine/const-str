@@ -119,4 +119,7 @@ pub mod __ctfe {
 
     mod to_str;
     pub use self::to_str::*;
+
+    mod split;
+    pub use self::split::*;
 }

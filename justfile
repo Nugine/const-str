@@ -16,3 +16,13 @@ doc:
 
 miri:
     cargo +nightly miri test --all-features
+
+sync-version:
+    #!/bin/bash -e
+    vers='0.4.2'
+    pushd const-str-proc-macro
+    cargo set-version $vers
+    popd
+    pushd const-str
+    cargo set-version $vers
+    popd

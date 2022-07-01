@@ -10,15 +10,16 @@ impl<'input, 'from, 'to> Replace<&'input str, &'from str, &'to str> {
 
         if replace_from.is_empty() {
             let input_chars = crate::utf8::str_count_chars(self.0);
-            return input.len() + (input_chars + 1) * replace_to.len();
+            input.len() + (input_chars + 1) * replace_to.len()
+        } else {
+            let mut ans = 0;
+            while let Some((pos, remain)) = crate::str::next_match(input, replace_from) {
+                ans += pos + replace_to.len();
+                input = remain;
+            }
+            ans += input.len();
+            ans
         }
-
-        let mut ans = 0;
-        while let Some((pos, remain)) = crate::str::next_match(input, replace_from) {
-            ans += pos + replace_to.len();
-            input = remain;
-        }
-        ans
     }
 
     pub const fn const_eval<const N: usize>(&self) -> StrBuf<N> {
@@ -74,6 +75,13 @@ impl<'input, 'from, 'to> Replace<&'input str, &'from str, &'to str> {
                 }
                 input = remain;
             }
+
+            let input = input.as_bytes();
+            let mut i = 0;
+            while i < input.len() {
+                push!(input[i]);
+                i += 1;
+            }
         }
 
         constfn_assert!(pos == N);
@@ -112,6 +120,10 @@ fn test_replace() {
     test_replace_str!("我", "", "1");
     test_replace_str!("我", "", "我");
     test_replace_str!("aaaa", "aa", "bb");
+    test_replace_str!("run / v4", " ", "");
+    test_replace_str!("token", " ", "");
+    test_replace_str!("v4 / udp", " ", "");
+    test_replace_str!("v4 / upnp", "p", "");
 }
 
 /// Replaces all matches of a pattern with another string slice.

@@ -19,10 +19,5 @@ miri:
 
 sync-version:
     #!/bin/bash -e
-    vers='0.4.2'
-    pushd const-str-proc-macro
-    cargo set-version $vers
-    popd
-    pushd const-str
-    cargo set-version $vers
-    popd
+    cargo set-version -p const-str-proc-macro '0.4.2'
+    cargo set-version -p const-str '0.4.3'

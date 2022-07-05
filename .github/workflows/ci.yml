@@ -20,7 +20,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: stable
+          toolchain: nightly
           override: true
       - uses: actions-rs/cargo@v1
         with:
@@ -41,7 +41,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --workspace --all-features
+          args: --workspace --features all
       # stable test
       - uses: actions-rs/toolchain@v1
         with:
@@ -51,7 +51,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --workspace --all-features
+          args: --workspace --features all
       # nightly test
       - uses: actions-rs/toolchain@v1
         with:
@@ -87,7 +87,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: stable
+          toolchain: nightly
           override: true
       - run: rustup component add clippy
       - uses: actions-rs/cargo@v1

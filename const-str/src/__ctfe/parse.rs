@@ -1,9 +1,6 @@
 use core::marker::PhantomData;
 
-pub struct Parse<T, U>(T, PhantomData<U>);
-
-// FIXME: should be `PhantomData<fn(T)->U>`
-// blocked by feature(const_fn_fn_ptr_basics)
+pub struct Parse<T, U>(T, PhantomData<fn(T) -> U>);
 
 impl<T, U> Parse<T, U> {
     pub const fn new(t: T) -> Self {

@@ -390,10 +390,12 @@ pub const fn run_utf8_validation(v: &[u8]) -> Result<(), Utf8Error> {
     } else {
         0
     };
-    // FIXME: waiting feature(const_align_offset)
-    // <https://github.com/rust-lang/rust/issues/90962>
-    // let align = v.as_ptr().align_offset(usize_bytes);
+
+    #[cfg(not(feature = "unstable"))]
     let align = usize::MAX;
+
+    #[cfg(feature = "unstable")] // feature(const_align_offset)
+    let align = v.as_ptr().align_offset(usize_bytes);
 
     while index < len {
         let old_offset = index;

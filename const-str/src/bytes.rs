@@ -25,36 +25,47 @@ pub const fn equal(lhs: &[u8], rhs: &[u8]) -> bool {
     true
 }
 
-pub const fn subslice<T>(mut s: &[T], range: Range<usize>) -> &[T] {
-    constfn_assert!(range.end >= range.start);
+pub const fn subslice<T>(s: &[T], range: Range<usize>) -> &[T] {
+    constfn_assert!(range.start <= range.end && range.end <= s.len());
 
-    let mut i = 0;
-    let mut j = s.len();
+    #[cfg(not(feature = "unstable"))]
+    {
+        let mut s = s;
+        let mut i = 0;
+        let mut j = s.len();
 
-    while i < range.start {
-        match s {
-            [_, xs @ ..] => {
-                i += 1;
-                s = xs;
+        while i < range.start {
+            match s {
+                [_, xs @ ..] => {
+                    i += 1;
+                    s = xs;
+                }
+                _ => break,
             }
-            _ => break,
         }
-    }
 
-    while j > range.end {
-        match s {
-            [xs @ .., _] => {
-                j -= 1;
-                s = xs;
+        while j > range.end {
+            match s {
+                [xs @ .., _] => {
+                    j -= 1;
+                    s = xs;
+                }
+                _ => break,
             }
-            _ => break,
         }
-    }
 
-    constfn_assert!(i == range.start);
-    constfn_assert!(j == range.end);
-    constfn_assert!(s.len() == j - i);
-    s
+        constfn_assert!(i == range.start);
+        constfn_assert!(j == range.end);
+        constfn_assert!(s.len() == j - i);
+        s
+    }
+    #[cfg(feature = "unstable")] // feature(const_slice_from_raw_parts)
+    #[allow(unsafe_code)]
+    unsafe {
+        let data = s.as_ptr().add(range.start);
+        let len = range.end - range.start;
+        core::slice::from_raw_parts(data, len)
+    }
 }
 
 #[test]
@@ -99,18 +110,29 @@ fn test_reversed() {
     assert_eq!(reversed(arr), [2, 1, 0]);
 }
 
-pub const fn advance(mut s: &[u8], count: usize) -> &[u8] {
+pub const fn advance(s: &[u8], count: usize) -> &[u8] {
     constfn_assert!(count <= s.len());
-    let mut i = 0;
-    while i < count {
-        match s {
-            [_, xs @ ..] => s = xs,
-            _ => break,
+    #[cfg(not(feature = "unstable"))]
+    {
+        let mut s = s;
+        let mut i = 0;
+        while i < count {
+            match s {
+                [_, xs @ ..] => s = xs,
+                _ => break,
+            }
+            i += 1;
         }
-        i += 1;
+        constfn_assert!(i == count);
+        s
     }
-    constfn_assert!(i == count);
-    s
+    #[cfg(feature = "unstable")] // feature(const_slice_from_raw_parts)
+    #[allow(unsafe_code)]
+    unsafe {
+        let data = s.as_ptr().add(count);
+        let len = s.len() - count;
+        core::slice::from_raw_parts(data, len)
+    }
 }
 
 pub const fn contains(haystack: &[u8], needle: &[u8]) -> bool {

@@ -9,12 +9,13 @@ test:
     cargo test
     cargo test --all-features
 
-dev: fmt check test
+dev: fmt check test miri
 
 doc:
     RUSTDOCFLAGS='--cfg docsrs' cargo doc --open --no-deps --all-features
 
 miri:
+    cargo +nightly miri test
     cargo +nightly miri test --all-features
 
 sync-version:

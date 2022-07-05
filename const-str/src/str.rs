@@ -2,10 +2,17 @@ pub const fn equal(lhs: &str, rhs: &str) -> bool {
     crate::bytes::equal(lhs.as_bytes(), rhs.as_bytes())
 }
 
-// https://github.com/rust-lang/rust/issues/89259
-#[allow(unsafe_code, clippy::transmute_int_to_char)]
+#[allow(unsafe_code)]
 pub const unsafe fn char_from_u32(x: u32) -> char {
-    core::mem::transmute(x)
+    #[cfg(not(feature = "unstable"))]
+    #[allow(clippy::transmute_int_to_char)]
+    {
+        core::mem::transmute(x)
+    }
+    #[cfg(feature = "unstable")] // feature(const_char_convert)
+    {
+        core::char::from_u32_unchecked(x)
+    }
 }
 
 pub const fn contains(haystack: &str, needle: &str) -> bool {

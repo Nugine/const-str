@@ -19,6 +19,7 @@ regex = ["proc", "const-str-proc-macro?/regex"]
 http = ["proc", "const-str-proc-macro?/http"]
 case = ["proc", "const-str-proc-macro?/heck"]
 all = ["std", "proc", "regex", "http", "case"]
+unstable = []
 
 [package.metadata.docs.rs]
 all-features = true

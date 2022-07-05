@@ -1,5 +1,7 @@
 #![allow(unsafe_code)]
 
+use crate::utf8::CharEncodeUtf8;
+
 use super::str::StrBuf;
 
 pub struct Replace<I, P, O>(pub I, pub P, pub O);
@@ -89,46 +91,65 @@ impl<'input, 'from, 'to> Replace<&'input str, &'from str, &'to str> {
     }
 }
 
+impl<'input, 'to> Replace<&'input str, char, &'to str> {
+    pub const fn output_len(&self) -> usize {
+        let ch = CharEncodeUtf8::new(self.1);
+        Replace(self.0, ch.as_str(), self.2).output_len()
+    }
+    pub const fn const_eval<const N: usize>(&self) -> StrBuf<N> {
+        let ch = CharEncodeUtf8::new(self.1);
+        Replace(self.0, ch.as_str(), self.2).const_eval()
+    }
+}
+
 #[test]
 fn test_replace() {
-    macro_rules! test_replace_str {
-        ($input: expr, $replace_from: expr, $replace_to: expr) => {{
-            const INPUT: &str = $input;
-            const REPLACE_FROM: &str = $replace_from;
-            const REPLACE_TO: &str = $replace_to;
+    macro_rules! testcase {
+        ($input: expr, $from: expr, $to: expr) => {{
+            const OUTPUT_LEN: usize = Replace($input, $from, $to).output_len();
+            const OUTPUT_BUF: StrBuf<OUTPUT_LEN> = Replace($input, $from, $to).const_eval();
+            const OUTPUT: &str = OUTPUT_BUF.as_str();
 
-            const CONSTFN: Replace<&str, &str, &str> = Replace(INPUT, REPLACE_FROM, REPLACE_TO);
-            const OUTPUT_LEN: usize = CONSTFN.output_len();
-
-            let ans = INPUT.replace(REPLACE_FROM, REPLACE_TO);
+            let ans = $input.replace($from, $to);
+            assert_eq!(OUTPUT, &*ans, "ans = {:?}", ans);
             assert_eq!(OUTPUT_LEN, ans.len());
-
-            let output_buf = CONSTFN.const_eval::<OUTPUT_LEN>();
-            let output = output_buf.as_str();
-            assert_eq!(output, ans);
         }};
     }
 
-    test_replace_str!("", "", "");
-    test_replace_str!("", "", "a");
-    test_replace_str!("", "a", "");
-    test_replace_str!("", "a", "b");
-    test_replace_str!("a", "", "b");
-    test_replace_str!("asd", "", "b");
-    test_replace_str!("aba", "a", "c");
-    test_replace_str!("this is old", "old", "new");
-    test_replace_str!("我", "", "1");
-    test_replace_str!("我", "", "我");
-    test_replace_str!("aaaa", "aa", "bb");
-    test_replace_str!("run / v4", " ", "");
-    test_replace_str!("token", " ", "");
-    test_replace_str!("v4 / udp", " ", "");
-    test_replace_str!("v4 / upnp", "p", "");
+    testcase!("", "", "");
+    testcase!("", "", "a");
+    testcase!("", "a", "");
+    testcase!("", "a", "b");
+    testcase!("a", "", "b");
+    testcase!("asd", "", "b");
+    testcase!("aba", "a", "c");
+    testcase!("this is old", "old", "new");
+    testcase!("我", "", "1");
+    testcase!("我", "", "我");
+    testcase!("我", "我", "");
+    testcase!("aaaa", "aa", "bb");
+    testcase!("run / v4", " ", "");
+    testcase!("token", " ", "");
+    testcase!("v4 / udp", " ", "");
+    testcase!("v4 / upnp", "p", "");
+
+    testcase!("", 'a', "");
+    testcase!("", 'a', "b");
+    testcase!("aba", 'a', "c");
+    testcase!("run / v4", ' ', "");
+    testcase!("token", ' ', "");
+    testcase!("v4 / udp", ' ', "");
+    testcase!("我", '我', "");
 }
 
 /// Replaces all matches of a pattern with another string slice.
 ///
 /// See [`str::replace`](https://doc.rust-lang.org/std/primitive.str.html#method.replace).
+///
+/// The pattern type must be one of
+///
+/// + [`&str`](str)
+/// + [`char`]
 ///
 /// # Examples
 ///

@@ -10,10 +10,10 @@ impl<'a, 'b> Contains<'a, &'b str> {
 
 impl<'a> Contains<'a, char> {
     pub const fn const_eval(&self) -> bool {
-        let haystack = self.0.as_bytes();
+        let haystack = self.0;
         let ch = CharEncodeUtf8::new(self.1);
-        let needle = ch.as_bytes();
-        crate::bytes::contains(haystack, needle)
+        let needle = ch.as_str();
+        crate::str::contains(haystack, needle)
     }
 }
 

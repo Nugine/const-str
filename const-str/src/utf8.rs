@@ -54,9 +54,9 @@ impl CharEncodeUtf8 {
         crate::bytes::subslice(&self.buf, 0..self.len as usize)
     }
 
-    #[cfg(test)]
-    pub fn as_str(&self) -> &str {
-        unsafe { core::str::from_utf8_unchecked(&self.buf[..self.len as usize]) }
+    // const since 1.55
+    pub const fn as_str(&self) -> &str {
+        unsafe { core::str::from_utf8_unchecked(self.as_bytes()) }
     }
 }
 

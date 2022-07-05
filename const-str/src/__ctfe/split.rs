@@ -1,3 +1,5 @@
+use crate::utf8::CharEncodeUtf8;
+
 pub struct Split<T, P>(pub T, pub P);
 
 impl<'input, 'pat> Split<&'input str, &'pat str> {
@@ -17,7 +19,7 @@ impl<'input, 'pat> Split<&'input str, &'pat str> {
     }
 
     #[allow(unsafe_code)]
-    pub const fn const_eval<const N: usize>(&self) -> [&str; N] {
+    pub const fn const_eval<const N: usize>(&self) -> [&'input str; N] {
         let Self(mut input, pat) = *self;
 
         let mut buf: [&str; N] = [""; N];
@@ -60,40 +62,59 @@ impl<'input, 'pat> Split<&'input str, &'pat str> {
     }
 }
 
+impl<'input> Split<&'input str, char> {
+    pub const fn output_len(&self) -> usize {
+        let ch = CharEncodeUtf8::new(self.1);
+        Split(self.0, ch.as_str()).output_len()
+    }
+
+    pub const fn const_eval<const N: usize>(&self) -> [&'input str; N] {
+        let ch = CharEncodeUtf8::new(self.1);
+        Split(self.0, ch.as_str()).const_eval()
+    }
+}
+
 #[test]
 fn test_split() {
-    macro_rules! test_split_str {
+    macro_rules! testcase {
         ($input: expr, $pat: expr) => {{
-            const INPUT: &str = $input;
-            const PATTERN: &str = $pat;
+            const OUTPUT_LEN: usize = Split($input, $pat).output_len();
+            const OUTPUT: &[&str] = &Split($input, $pat).const_eval::<OUTPUT_LEN>();
 
-            const CONSTFN: Split<&str, &str> = Split(INPUT, PATTERN);
-            const OUTPUT_LEN: usize = CONSTFN.output_len();
-
-            let ans = INPUT.split(PATTERN).collect::<Vec<_>>();
-            assert_eq!(OUTPUT_LEN, ans.len(), "ans = {:?}", ans);
-
-            let output = CONSTFN.const_eval::<OUTPUT_LEN>();
-            assert_eq!(output.as_slice(), &*ans);
+            let ans = $input.split($pat).collect::<Vec<_>>();
+            assert_eq!(OUTPUT, &*ans, "ans = {:?}", ans);
+            assert_eq!(OUTPUT_LEN, ans.len());
         }};
     }
 
-    test_split_str!("", "");
-    test_split_str!("a中1😂1!", "");
-    test_split_str!("a中1😂1!", "a");
-    test_split_str!("a中1😂1!", "中");
-    test_split_str!("a中1😂1!", "1");
-    test_split_str!("a中1😂1!", "😂");
-    test_split_str!("a中1😂1!", "!");
-    test_split_str!("11111", "1");
-    test_split_str!("222", "22");
-    test_split_str!("啊哈哈哈", "哈哈");
-    test_split_str!("some string:another string", ":")
+    testcase!("", "");
+    testcase!("a中1😂1!", "");
+    testcase!("a中1😂1!", "a");
+    testcase!("a中1😂1!", "中");
+    testcase!("a中1😂1!", "1");
+    testcase!("a中1😂1!", "😂");
+    testcase!("a中1😂1!", "!");
+    testcase!("11111", "1");
+    testcase!("222", "22");
+    testcase!("啊哈哈哈", "哈哈");
+    testcase!("some string:another string", ":");
+
+    testcase!("11111", '1');
+    testcase!("a中1😂1!", 'a');
+    testcase!("a中1😂1!", '中');
+    testcase!("a中1😂1!", '1');
+    testcase!("a中1😂1!", '😂');
+    testcase!("a中1😂1!", '!');
 }
 
 /// Returns an array of substrings of a string slice, separated by characters matched by a pattern.
 ///
 /// See [`str::split`](https://doc.rust-lang.org/std/primitive.str.html#method.split).
+///
+/// The pattern type must be one of
+///
+/// + [`&str`](str)
+/// + [`char`]
 ///
 /// # Examples
 ///

@@ -12,7 +12,7 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![cfg_attr(
     feature = "unstable", 
-    feature(const_slice_from_raw_parts),    // https://github.com/rust-lang/rust/issues/67456
+    // feature(const_slice_from_raw_parts),    // https://github.com/rust-lang/rust/issues/67456
     feature(const_char_convert),            // https://github.com/rust-lang/rust/issues/89259
     feature(const_align_offset),            // https://github.com/rust-lang/rust/issues/90962
 )]

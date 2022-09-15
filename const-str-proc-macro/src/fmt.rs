@@ -103,7 +103,7 @@ impl fmt::Display for ParseError {
 
 fn parse_fmt_string(s: &str) -> Result<Vec<FmtPart>, ParseError> {
     let mut ans = Vec::new();
-    let mut iter = s.chars().peekable();
+    let mut iter = s.chars();
 
     let mut literal: String = String::new();
     let mut fmt_spec: String = String::new();

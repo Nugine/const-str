@@ -34,7 +34,7 @@ impl ToCStr<&str> {
     }
 }
 
-/// Converts a string slice to [`*const c_char`](std::os::raw::c_char).
+/// Converts a string slice to [`*const c_char`](core::ffi::c_char).
 ///
 /// The C-style string is guaranteed to be terminated by a nul byte.
 /// This trailing nul byte will be appended by this macro.
@@ -43,7 +43,7 @@ impl ToCStr<&str> {
 /// # Examples
 ///
 /// ```
-/// use std::os::raw::c_char;
+/// use core::ffi::c_char;
 /// const PRINTF_FMT: *const c_char = const_str::raw_cstr!("%d\n");
 /// ```
 #[macro_export]

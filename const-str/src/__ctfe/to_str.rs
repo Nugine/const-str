@@ -72,7 +72,7 @@ macro_rules! impl_integer_to_str {
                         break;
                     }
                 }
-                constfn_assert!(pos == N);
+                assert!(pos == N);
                 let buf = crate::bytes::reversed(buf);
                 unsafe { StrBuf::new_unchecked(buf) }
             }
@@ -105,7 +105,7 @@ macro_rules! impl_integer_to_str {
                     pos += 1;
                 }
 
-                constfn_assert!(pos == N);
+                assert!(pos == N);
                 let buf = crate::bytes::reversed(buf);
                 unsafe { StrBuf::new_unchecked(buf) }
             }

@@ -29,7 +29,7 @@ pub const fn ends_with(haystack: &str, needle: &str) -> bool {
 
 #[allow(unsafe_code)]
 pub const fn next_match<'h>(haystack: &'h str, needle: &str) -> Option<(usize, &'h str)> {
-    constfn_assert!(!needle.is_empty());
+    assert!(!needle.is_empty());
 
     let lhs = haystack.as_bytes();
     let rhs = needle.as_bytes();

@@ -30,7 +30,7 @@ impl<'a> Concat<'a> {
             }
             iter = xs;
         }
-        constfn_assert!(pos == N);
+        assert!(pos == N);
 
         unsafe { StrBuf::new_unchecked(buf) }
     }

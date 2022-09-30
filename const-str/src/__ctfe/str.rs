@@ -8,7 +8,7 @@ impl<const N: usize> StrBuf<N> {
     pub const unsafe fn new_unchecked(buf: [u8; N]) -> Self {
         #[cfg(debug_assertions)]
         {
-            constfn_assert!(crate::utf8::run_utf8_validation(&buf).is_ok());
+            assert!(crate::utf8::run_utf8_validation(&buf).is_ok());
         }
         Self(buf)
     }
@@ -29,7 +29,7 @@ impl<const N: usize> StrBuf<N> {
 }
 
 pub const fn from_utf8<const N: usize>(v: &[u8]) -> StrBuf<N> {
-    constfn_assert!(v.len() == N);
+    assert!(v.len() == N);
 
     match crate::utf8::run_utf8_validation(v) {
         Ok(()) => {
@@ -42,7 +42,7 @@ pub const fn from_utf8<const N: usize>(v: &[u8]) -> StrBuf<N> {
             unsafe { StrBuf::new_unchecked(buf) }
         }
         Err(_) => {
-            constfn_panic!("invalid utf-8 sequence")
+            panic!("invalid utf-8 sequence")
         }
     }
 }

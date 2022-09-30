@@ -35,16 +35,16 @@ impl<'a> Iter<'a> {
                 b'a'..=b'f' => b - b'a' + 10,
                 b'A'..=b'F' => b - b'A' + 10,
                 b' ' | b'\r' | b'\n' | b'\t' => continue,
-                _ => constfn_panic!("invalid character"),
+                _ => panic!("invalid character"),
             };
 
             let low = match next!() {
-                None => constfn_panic!("expected even number of hex characters"),
+                None => panic!("expected even number of hex characters"),
                 Some(b) => match b {
                     b'0'..=b'9' => b - b'0',
                     b'a'..=b'f' => b - b'a' + 10,
                     b'A'..=b'F' => b - b'A' + 10,
-                    _ => constfn_panic!("expected hex character"),
+                    _ => panic!("expected hex character"),
                 },
             };
 
@@ -79,7 +79,7 @@ impl<'a> HexBytes<&'a str> {
             buf[pos] = val;
             pos += 1;
         }
-        constfn_assert!(pos == N);
+        assert!(pos == N);
 
         buf
     }
@@ -115,7 +115,7 @@ impl<'a, 'b> HexBytes<&'b [&'a str]> {
             }
             i += 1;
         }
-        constfn_assert!(pos == N);
+        assert!(pos == N);
         buf
     }
 }

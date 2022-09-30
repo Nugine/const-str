@@ -16,7 +16,7 @@ impl Parse<&str, bool> {
         if crate::str::equal(self.0, "false") {
             return false;
         }
-        constfn_panic!("parse error")
+        panic!("parse error")
     }
 }
 
@@ -34,7 +34,7 @@ impl Parse<&str, char> {
                 return ch;
             }
         }
-        constfn_panic!("parse error")
+        panic!("parse error")
     }
 }
 
@@ -62,7 +62,7 @@ macro_rules! impl_integer_parse {
                 let s = self.0.as_bytes();
                 let is_signed = <$ty as IsSignedInteger>::OUTPUT;
                 let (is_positive, digits) = match s {
-                    [] => constfn_panic!("parse error"),
+                    [] => panic!("parse error"),
                     [x, xs @ ..] => match x {
                         b'+' => (true, xs),
                         b'-' if is_signed => (false, xs),
@@ -84,10 +84,10 @@ macro_rules! impl_integer_parse {
                             };
                             match val {
                                 Some(val) => ans = val,
-                                None => constfn_panic!("parse error"),
+                                None => panic!("parse error"),
                             }
                         }
-                        None => constfn_panic!("parse error"),
+                        None => panic!("parse error"),
                     };
 
                     i += 1;

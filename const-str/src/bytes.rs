@@ -1,7 +1,7 @@
 use core::ops::Range;
 
 pub const fn clone<const N: usize>(bytes: &[u8]) -> [u8; N] {
-    constfn_assert!(bytes.len() == N);
+    assert!(bytes.len() == N);
     let mut buf = [0; N];
     let mut i = 0;
     while i < bytes.len() {
@@ -26,7 +26,7 @@ pub const fn equal(lhs: &[u8], rhs: &[u8]) -> bool {
 }
 
 pub const fn subslice<T>(s: &[T], range: Range<usize>) -> &[T] {
-    constfn_assert!(range.start <= range.end && range.end <= s.len());
+    assert!(range.start <= range.end && range.end <= s.len());
 
     #[allow(unsafe_code)]
     unsafe {
@@ -48,7 +48,7 @@ fn test_subslice() {
 }
 
 pub const fn merge<const N: usize>(mut buf: [u8; N], bytes: &[u8]) -> [u8; N] {
-    constfn_assert!(N <= bytes.len());
+    assert!(N <= bytes.len());
     let mut i = 0;
     while i < bytes.len() {
         buf[i] = bytes[i];
@@ -79,7 +79,7 @@ fn test_reversed() {
 }
 
 pub const fn advance(s: &[u8], count: usize) -> &[u8] {
-    constfn_assert!(count <= s.len());
+    assert!(count <= s.len());
 
     #[allow(unsafe_code)]
     unsafe {

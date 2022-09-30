@@ -86,7 +86,7 @@ impl<'input, 'from, 'to> Replace<&'input str, &'from str, &'to str> {
             }
         }
 
-        constfn_assert!(pos == N);
+        assert!(pos == N);
         unsafe { StrBuf::new_unchecked(buf) }
     }
 }

@@ -104,7 +104,7 @@ impl Debug<char> {
         }
         push!(b'\'');
 
-        constfn_assert!(pos == N);
+        assert!(pos == N);
 
         unsafe { StrBuf::new_unchecked(buf) }
     }
@@ -161,7 +161,7 @@ impl Debug<&str> {
 
         push!(b'"');
 
-        constfn_assert!(pos == N);
+        assert!(pos == N);
 
         unsafe { StrBuf::new_unchecked(buf) }
     }
@@ -221,7 +221,7 @@ macro_rules! impl_integer_hex {
                     buf[pos] = b'0';
                     pos += 1;
                 }
-                constfn_assert!(pos == N);
+                assert!(pos == N);
                 let buf = crate::bytes::reversed(buf);
                 unsafe { StrBuf::new_unchecked(buf) }
             }
@@ -345,7 +345,7 @@ macro_rules! impl_integer_binary {
                     buf[pos] = b'0';
                     pos += 1;
                 }
-                constfn_assert!(pos == N);
+                assert!(pos == N);
                 let buf = crate::bytes::reversed(buf);
                 unsafe { StrBuf::new_unchecked(buf) }
             }

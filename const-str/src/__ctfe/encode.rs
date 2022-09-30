@@ -26,11 +26,11 @@ impl<'a> Encode<'a, Utf8Encoder> {
             let mut i = 0;
             while i < bytes.len() {
                 let b = bytes[i];
-                constfn_assert!(b != 0);
+                assert!(b != 0);
                 buf[i] = b;
                 i += 1;
             }
-            constfn_assert!(i + 1 == N);
+            assert!(i + 1 == N);
             buf
         } else {
             crate::bytes::clone(bytes)
@@ -62,9 +62,9 @@ impl<'a> Encode<'a, Utf16Encoder> {
             }
 
             if self.1.nul_terminated {
-                constfn_assert!(buf[pos - 1] != 0);
+                assert!(buf[pos - 1] != 0);
                 if e.has_second() {
-                    constfn_assert!(buf[pos - 2] != 0);
+                    assert!(buf[pos - 2] != 0);
                 }
             }
         }
@@ -73,7 +73,7 @@ impl<'a> Encode<'a, Utf16Encoder> {
             pos += 1;
         }
 
-        constfn_assert!(pos == N);
+        assert!(pos == N);
 
         buf
     }

@@ -78,7 +78,7 @@ macro_rules! impl_read_uint {
                 allow_leading_zeros: bool,
                 max_digits: usize,
             ) -> (Self, Option<$ty>) {
-                constfn_assert!(radix == 10 || radix == 16);
+                assert!(radix == 10 || radix == 16);
                 let Self { s, mut i, .. } = self;
                 let mut digit_count = 0;
                 let mut ans: $ty = 0;
@@ -230,7 +230,7 @@ impl<'a> Parser<'a> {
                         None => break 'dfa,
                     }
                 },
-                _ => constfn_unreachable!(),
+                _ => unreachable!(),
             }
         }
         {
@@ -268,14 +268,14 @@ macro_rules! parse_with {
 pub const fn expect_ipv4(s: &str) -> Ipv4Addr {
     match parse_with!(s, read_ipv4) {
         Some(val) => val,
-        None => constfn_panic!("invalid ipv4 address"),
+        None => panic!("invalid ipv4 address"),
     }
 }
 
 pub const fn expect_ipv6(s: &str) -> Ipv6Addr {
     match parse_with!(s, read_ipv6) {
         Some(val) => val,
-        None => constfn_panic!("invalid ipv6 address"),
+        None => panic!("invalid ipv6 address"),
     }
 }
 
@@ -284,7 +284,7 @@ pub const fn expect_ip(s: &str) -> IpAddr {
         Some(val) => IpAddr::V4(val),
         None => match parse_with!(s, read_ipv6) {
             Some(val) => IpAddr::V6(val),
-            None => constfn_panic!("invalid ip address"),
+            None => panic!("invalid ip address"),
         },
     }
 }

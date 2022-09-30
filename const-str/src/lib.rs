@@ -16,24 +16,6 @@
     feature(const_align_offset),            // https://github.com/rust-lang/rust/issues/90962
 )]
 
-macro_rules! constfn_assert {
-    ($e:expr) => {
-        assert!($e) // const since 1.57
-    };
-}
-
-macro_rules! constfn_panic {
-    ($s: literal) => {{
-        panic!($s) // const since 1.57
-    }};
-}
-
-macro_rules! constfn_unreachable {
-    () => {
-        unreachable!() // const since 1.57
-    };
-}
-
 #[allow(unused_macros)]
 macro_rules! item_group {
     ($($item:item)*) => {

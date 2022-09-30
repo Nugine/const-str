@@ -7,7 +7,7 @@ impl ToCStr<&str> {
         let bytes = self.0.as_bytes();
         let mut i = 0;
         while i < bytes.len() {
-            constfn_assert!(bytes[i] != 0);
+            assert!(bytes[i] != 0);
             i += 1;
         }
     }
@@ -23,13 +23,13 @@ impl ToCStr<&str> {
         let bytes = self.0.as_bytes();
         let mut i = 0;
         while i < bytes.len() {
-            constfn_assert!(bytes[i] != 0);
+            assert!(bytes[i] != 0);
             buf[pos] = bytes[i];
             pos += 1;
             i += 1;
         }
         pos += 1;
-        constfn_assert!(pos == N);
+        assert!(pos == N);
         buf
     }
 }

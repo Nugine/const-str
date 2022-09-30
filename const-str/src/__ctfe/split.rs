@@ -57,7 +57,7 @@ impl<'input, 'pat> Split<&'input str, &'pat str> {
             buf[pos] = input;
             pos += 1;
         }
-        constfn_assert!(pos == N);
+        assert!(pos == N);
         buf
     }
 }

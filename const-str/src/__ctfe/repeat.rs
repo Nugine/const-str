@@ -12,8 +12,8 @@ impl Repeat<&str> {
 }
 
 const fn bytes_repeat<const N: usize>(bytes: &[u8], n: usize) -> [u8; N] {
-    constfn_assert!(bytes.len().checked_mul(n).is_some());
-    constfn_assert!(bytes.len() * n == N);
+    assert!(bytes.len().checked_mul(n).is_some());
+    assert!(bytes.len() * n == N);
     let mut buf = [0; N];
     let mut i = 0;
     let mut j = 0;

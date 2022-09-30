@@ -315,7 +315,7 @@ pub const fn str_chars<const N: usize>(s: &str) -> [char; N] {
         buf[pos] = ch;
         pos += 1;
     }
-    constfn_assert!(pos == N);
+    assert!(pos == N);
     buf
 }
 

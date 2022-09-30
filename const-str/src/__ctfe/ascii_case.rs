@@ -58,7 +58,7 @@ struct Boundaries<const N: usize> {
 impl<const N: usize> Boundaries<N> {
     const fn new(src: &str) -> Self {
         let s = src.as_bytes();
-        constfn_assert!(s.len() + 1 == N);
+        assert!(s.len() + 1 == N);
 
         let mut buf = [0; N];
         let mut pos = 0;
@@ -149,7 +149,7 @@ pub struct ConvAsciiCase<T>(pub T, pub AsciiCase);
 
 impl ConvAsciiCase<&str> {
     pub const fn output_len<const M: usize>(&self) -> usize {
-        constfn_assert!(self.0.len() + 1 == M);
+        assert!(self.0.len() + 1 == M);
 
         use AsciiCase::*;
         match self.1 {
@@ -185,7 +185,7 @@ impl ConvAsciiCase<&str> {
     }
 
     pub const fn const_eval<const M: usize, const N: usize>(&self) -> StrBuf<N> {
-        constfn_assert!(self.0.len() + 1 == M);
+        assert!(self.0.len() + 1 == M);
 
         let mut buf = [0; N];
         let mut pos = 0;
@@ -236,7 +236,7 @@ impl ConvAsciiCase<&str> {
                                     let is_upper = match self.1 {
                                         LowerCamel => !is_starting_boundary && j == 0,
                                         UpperCamel => j == 0,
-                                        _ => constfn_unreachable!(),
+                                        _ => unreachable!(),
                                     };
                                     if is_upper {
                                         word[j].to_ascii_uppercase()
@@ -244,7 +244,7 @@ impl ConvAsciiCase<&str> {
                                         word[j].to_ascii_lowercase()
                                     }
                                 }
-                                _ => constfn_unreachable!(),
+                                _ => unreachable!(),
                             };
                             push!(b);
                             j += 1;
@@ -257,7 +257,7 @@ impl ConvAsciiCase<&str> {
             }
         }
 
-        constfn_assert!(pos == N);
+        assert!(pos == N);
 
         unsafe { StrBuf::new_unchecked(buf) }
     }

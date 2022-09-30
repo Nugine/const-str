@@ -60,11 +60,8 @@ pub mod __ctfe {
     mod concat;
     pub use self::concat::*;
 
-    #[cfg(feature = "std")]
-    item_group! {
-        mod cstr;
-        pub use self::cstr::*;
-    }
+    mod cstr;
+    pub use self::cstr::*;
 
     mod encode;
     pub use self::encode::*;

@@ -28,25 +28,6 @@ impl<const N: usize> StrBuf<N> {
     }
 }
 
-pub const fn from_utf8<const N: usize>(v: &[u8]) -> StrBuf<N> {
-    assert!(v.len() == N);
-
-    match crate::utf8::run_utf8_validation(v) {
-        Ok(()) => {
-            let mut buf = [0; N];
-            let mut i = 0;
-            while i < v.len() {
-                buf[i] = v[i];
-                i += 1;
-            }
-            unsafe { StrBuf::new_unchecked(buf) }
-        }
-        Err(_) => {
-            panic!("invalid utf-8 sequence")
-        }
-    }
-}
-
 /// Converts a byte string to a string slice
 ///
 /// # Examples
@@ -60,10 +41,12 @@ pub const fn from_utf8<const N: usize>(v: &[u8]) -> StrBuf<N> {
 #[macro_export]
 macro_rules! from_utf8 {
     ($s: expr) => {{
-        use ::core::primitive::{str, u8, usize};
-        const INPUT: &[u8] = $s;
-        const N: usize = INPUT.len();
-        const OUTPUT_BUF: $crate::__ctfe::StrBuf<N> = $crate::__ctfe::from_utf8(INPUT);
-        OUTPUT_BUF.as_str()
+        use ::core::primitive::str;
+        // const since 1.63
+        const OUTPUT: &str = match ::core::str::from_utf8($s) {
+            Ok(s) => s,
+            Err(_) => panic!("invalid utf-8 bytes"),
+        };
+        OUTPUT
     }};
 }

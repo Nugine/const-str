@@ -17,9 +17,9 @@ rust-version = "1.64.0"
 proc_macro = true
 
 [dependencies]
-syn = "1.0.98"
-quote = "1.0.20"
-regex = { version = "1.5.6", optional = true }
+syn = "1.0.101"
+quote = "1.0.21"
+regex = { version = "1.6.0", optional = true }
 http = { version = "0.2.8", optional = true }
-proc-macro2 = "1.0.40"
+proc-macro2 = "1.0.46"
 heck = { version = "0.4.0", features = ["unicode"], optional = true }

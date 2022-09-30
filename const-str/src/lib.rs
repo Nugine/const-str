@@ -78,8 +78,8 @@ pub mod __ctfe {
     mod fmt;
     pub use self::fmt::*;
 
-    mod hex_bytes;
-    pub use self::hex_bytes::*;
+    mod hex;
+    pub use self::hex::*;
 
     #[cfg(feature = "std")]
     item_group! {

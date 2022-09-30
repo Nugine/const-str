@@ -1,4 +1,4 @@
-pub struct HexBytes<T>(pub T);
+pub struct Hex<T>(pub T);
 
 struct Iter<'a> {
     s: &'a [u8],
@@ -56,7 +56,7 @@ impl<'a> Iter<'a> {
     }
 }
 
-impl<'a> HexBytes<&'a str> {
+impl<'a> Hex<&'a str> {
     pub const fn output_len(&self) -> usize {
         let mut ans = 0;
         let mut iter = Iter::new(self.0);
@@ -85,7 +85,7 @@ impl<'a> HexBytes<&'a str> {
     }
 }
 
-impl<'a, 'b> HexBytes<&'b [&'a str]> {
+impl<'a, 'b> Hex<&'b [&'a str]> {
     pub const fn output_len(&self) -> usize {
         let mut i = 0;
         let mut ans = 0;
@@ -120,14 +120,14 @@ impl<'a, 'b> HexBytes<&'b [&'a str]> {
     }
 }
 
-impl<'a, const L: usize> HexBytes<[&'a str; L]> {
+impl<'a, const L: usize> Hex<[&'a str; L]> {
     pub const fn output_len(&self) -> usize {
         let ss: &[&str] = &self.0;
-        HexBytes(ss).output_len()
+        Hex(ss).output_len()
     }
     pub const fn const_eval<const N: usize>(&self) -> [u8; N] {
         let ss: &[&str] = &self.0;
-        HexBytes(ss).const_eval()
+        Hex(ss).const_eval()
     }
 }
 
@@ -143,7 +143,7 @@ impl<'a, const L: usize> HexBytes<[&'a str; L]> {
 ///
 /// # Examples
 /// ```
-/// use const_str::hex_bytes as hex;
+/// use const_str::hex;
 ///
 /// const DATA: [u8; 4] = hex!("01020304");
 /// assert_eq!(DATA, [1, 2, 3, 4]);
@@ -164,10 +164,10 @@ impl<'a, const L: usize> HexBytes<[&'a str; L]> {
 /// assert_eq!(B2, B1);
 /// ```
 #[macro_export]
-macro_rules! hex_bytes {
+macro_rules! hex {
     ($s: expr) => {{
-        const OUTPUT_LEN: usize = $crate::__ctfe::HexBytes($s).output_len();
-        const OUTPUT_BUF: [u8; OUTPUT_LEN] = $crate::__ctfe::HexBytes($s).const_eval();
+        const OUTPUT_LEN: usize = $crate::__ctfe::Hex($s).output_len();
+        const OUTPUT_BUF: [u8; OUTPUT_LEN] = $crate::__ctfe::Hex($s).const_eval();
         OUTPUT_BUF
     }};
 }

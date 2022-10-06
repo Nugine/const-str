@@ -8,6 +8,8 @@ check:
 test:
     cargo test
     cargo test --all-features
+    cargo test --release
+    cargo test --all-features --release
 
 dev: fmt check test miri
 

@@ -8,7 +8,7 @@ impl<const N: usize> StrBuf<N> {
     pub const unsafe fn new_unchecked(buf: [u8; N]) -> Self {
         #[cfg(debug_assertions)]
         {
-            assert!(crate::utf8::run_utf8_validation(&buf).is_ok());
+            assert!(core::str::from_utf8(&buf).is_ok())
         }
         Self(buf)
     }

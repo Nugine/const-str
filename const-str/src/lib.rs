@@ -60,6 +60,9 @@ pub mod __ctfe {
     mod concat;
     pub use self::concat::*;
 
+    mod concat_bytes;
+    pub use self::concat_bytes::*;
+
     mod cstr;
     pub use self::cstr::*;
 

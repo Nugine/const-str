@@ -46,6 +46,7 @@ macro_rules! format {
     }};
 }
 
+#[allow(clippy::uninlined_format_args)]
 #[test]
 fn test_const_format() {
     use crate::format as const_format;

@@ -109,4 +109,7 @@ pub mod __ctfe {
 
     mod split;
     pub use self::split::*;
+
+    mod is_ascii;
+    pub use self::is_ascii::*;
 }

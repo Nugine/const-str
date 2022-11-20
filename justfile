@@ -22,5 +22,5 @@ miri:
 
 sync-version:
     #!/bin/bash -e
-    cargo set-version -p const-str-proc-macro   '0.5.2'
-    cargo set-version -p const-str              '0.5.2'
+    cargo set-version -p const-str-proc-macro   '0.5.3'
+    cargo set-version -p const-str              '0.5.3'

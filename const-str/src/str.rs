@@ -9,7 +9,7 @@ pub const unsafe fn char_from_u32(x: u32) -> char {
     {
         core::mem::transmute(x)
     }
-    #[cfg(feature = "unstable")] // feature(const_char_convert)
+    #[cfg(feature = "unstable")] // feature(const_char_from_u32_unchecked)
     {
         core::char::from_u32_unchecked(x)
     }

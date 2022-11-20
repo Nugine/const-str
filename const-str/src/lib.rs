@@ -112,4 +112,7 @@ pub mod __ctfe {
 
     mod is_ascii;
     pub use self::is_ascii::*;
+
+    mod eq_ignore_ascii_case;
+    pub use self::eq_ignore_ascii_case::*;
 }

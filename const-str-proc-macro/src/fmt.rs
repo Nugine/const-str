@@ -361,10 +361,7 @@ impl ConstFormat {
                     match self.positional_args.get(pos) {
                         None => emit_error!(
                             self.fmt_string,
-                            std::format!(
-                            "invalid reference to positional argument {} (no arguments were given)",
-                            pos
-                        )
+                            std::format!("invalid reference to positional argument {pos} (no arguments were given)")
                         ),
                         Some(arg) => {
                             let method_ident = Self::fmt_method(method);

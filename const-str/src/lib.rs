@@ -57,6 +57,9 @@ pub mod __ctfe {
     mod ascii_case;
     pub use self::ascii_case::*;
 
+    mod compare;
+    pub use self::compare::*;
+
     mod concat;
     pub use self::concat::*;
 

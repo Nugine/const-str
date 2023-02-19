@@ -1,3 +1,4 @@
+use core::cmp::Ordering;
 use core::ops::Range;
 
 pub const fn clone<const N: usize>(bytes: &[u8]) -> [u8; N] {
@@ -23,6 +24,31 @@ pub const fn equal(lhs: &[u8], rhs: &[u8]) -> bool {
         i += 1;
     }
     true
+}
+
+pub const fn compare(lhs: &[u8], rhs: &[u8]) -> Ordering {
+    let lhs_len = lhs.len();
+    let rhs_len = rhs.len();
+    let min_len = if lhs_len < rhs_len { lhs_len } else { rhs_len };
+
+    let mut i = 0;
+    while i < min_len {
+        if lhs[i] < rhs[i] {
+            return Ordering::Less;
+        }
+        if lhs[i] > rhs[i] {
+            return Ordering::Greater;
+        }
+        i += 1;
+    }
+
+    if lhs_len < rhs_len {
+        Ordering::Less
+    } else if lhs_len > rhs_len {
+        Ordering::Greater
+    } else {
+        Ordering::Equal
+    }
 }
 
 pub const fn subslice<T>(s: &[T], range: Range<usize>) -> &[T] {

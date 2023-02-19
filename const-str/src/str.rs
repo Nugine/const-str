@@ -1,5 +1,11 @@
+use core::cmp::Ordering;
+
 pub const fn equal(lhs: &str, rhs: &str) -> bool {
     crate::bytes::equal(lhs.as_bytes(), rhs.as_bytes())
+}
+
+pub const fn compare(lhs: &str, rhs: &str) -> Ordering {
+    crate::bytes::compare(lhs.as_bytes(), rhs.as_bytes())
 }
 
 #[allow(unsafe_code)]

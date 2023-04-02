@@ -56,35 +56,6 @@ impl<'a> Iter<'a> {
     }
 }
 
-impl<'a> Hex<&'a str> {
-    pub const fn output_len(&self) -> usize {
-        let mut ans = 0;
-        let mut iter = Iter::new(self.0);
-
-        while let (next, Some(_)) = iter.next() {
-            iter = next;
-            ans += 1;
-        }
-
-        ans
-    }
-
-    pub const fn const_eval<const N: usize>(&self) -> [u8; N] {
-        let mut buf = [0; N];
-        let mut pos = 0;
-        let mut iter = Iter::new(self.0);
-
-        while let (next, Some(val)) = iter.next() {
-            iter = next;
-            buf[pos] = val;
-            pos += 1;
-        }
-        assert!(pos == N);
-
-        buf
-    }
-}
-
 impl<'a, 'b> Hex<&'b [&'a str]> {
     pub const fn output_len(&self) -> usize {
         let mut i = 0;
@@ -117,6 +88,17 @@ impl<'a, 'b> Hex<&'b [&'a str]> {
         }
         assert!(pos == N);
         buf
+    }
+}
+
+impl<'a> Hex<&'a str> {
+    pub const fn output_len(&self) -> usize {
+        let ss: &[&str] = &[self.0];
+        Hex(ss).output_len()
+    }
+    pub const fn const_eval<const N: usize>(&self) -> [u8; N] {
+        let ss: &[&str] = &[self.0];
+        Hex(ss).const_eval()
     }
 }
 

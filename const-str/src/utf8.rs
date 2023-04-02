@@ -60,23 +60,6 @@ impl CharEncodeUtf8 {
     }
 }
 
-#[test]
-fn test_char_encode_utf8() {
-    macro_rules! test_char_encode_utf8 {
-        ($ch: expr) => {{
-            let e = CharEncodeUtf8::new($ch);
-            let output = e.as_str();
-            let mut ans = [0; 4];
-            let ans = $ch.encode_utf8(&mut ans);
-            assert_eq!(output, ans);
-        }};
-    }
-
-    test_char_encode_utf8!('\0');
-    test_char_encode_utf8!('我');
-    test_char_encode_utf8!('\u{10ffff}');
-}
-
 pub struct CharEscapeUnicode {
     buf: [u8; 10],
     len: u8,
@@ -123,22 +106,6 @@ impl CharEscapeUnicode {
     pub fn as_str(&self) -> &str {
         unsafe { core::str::from_utf8_unchecked(&self.buf[..self.len as usize]) }
     }
-}
-
-#[test]
-fn test_char_escape_unicode() {
-    macro_rules! test_char_escape_unicode {
-        ($ch: expr) => {{
-            let e = CharEscapeUnicode::new($ch);
-            let output = e.as_str();
-            let ans = $ch.escape_unicode().to_string();
-            assert_eq!(output, ans);
-        }};
-    }
-
-    test_char_escape_unicode!('\0');
-    test_char_escape_unicode!('我');
-    test_char_escape_unicode!('\u{10ffff}');
 }
 
 pub struct CharEscapeDebug {
@@ -210,25 +177,6 @@ impl CharEscapeDebug {
     //     let buf = crate::bytes::clone(self.as_bytes());
     //     unsafe { StrBuf::new_unchecked(buf) }
     // }
-}
-
-#[test]
-fn test_char_escape_debug() {
-    macro_rules! test_char_escape_debug {
-        ($ch: expr) => {{
-            let e = CharEscapeDebug::new($ch, CharEscapeDebugArgs::ESCAPE_ALL);
-            let output = e.as_str();
-            let ans = $ch.escape_debug().to_string();
-            assert_eq!(output, ans);
-        }};
-    }
-
-    for ch in '\0'..='\u{7f}' {
-        test_char_escape_debug!(ch);
-    }
-
-    // test_char_escape_debug!('我');
-    test_char_escape_debug!('\u{10ffff}');
 }
 
 pub const fn next_char(bytes: &[u8]) -> Option<(char, usize)> {
@@ -319,11 +267,68 @@ pub const fn str_chars<const N: usize>(s: &str) -> [char; N] {
     buf
 }
 
-#[test]
-fn test_str_chars() {
-    const X: &str = "唐可可";
-    const OUTPUT_LEN: usize = str_count_chars(X);
-    const OUTPUT_BUF: [char; OUTPUT_LEN] = str_chars::<OUTPUT_LEN>(X);
-    let ans = X.chars().collect::<Vec<_>>();
-    assert_eq!(OUTPUT_BUF, ans.as_slice());
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_char_encode_utf8() {
+        macro_rules! test_char_encode_utf8 {
+            ($ch: expr) => {{
+                let e = CharEncodeUtf8::new($ch);
+                let output = e.as_str();
+                let mut ans = [0; 4];
+                let ans = $ch.encode_utf8(&mut ans);
+                assert_eq!(output, ans);
+            }};
+        }
+
+        test_char_encode_utf8!('\0');
+        test_char_encode_utf8!('我');
+        test_char_encode_utf8!('\u{10ffff}');
+    }
+
+    #[test]
+    fn test_char_escape_unicode() {
+        macro_rules! test_char_escape_unicode {
+            ($ch: expr) => {{
+                let e = CharEscapeUnicode::new($ch);
+                let output = e.as_str();
+                let ans = $ch.escape_unicode().to_string();
+                assert_eq!(output, ans);
+            }};
+        }
+
+        test_char_escape_unicode!('\0');
+        test_char_escape_unicode!('我');
+        test_char_escape_unicode!('\u{10ffff}');
+    }
+
+    #[test]
+    fn test_char_escape_debug() {
+        macro_rules! test_char_escape_debug {
+            ($ch: expr) => {{
+                let e = CharEscapeDebug::new($ch, CharEscapeDebugArgs::ESCAPE_ALL);
+                let output = e.as_str();
+                let ans = $ch.escape_debug().to_string();
+                assert_eq!(output, ans);
+            }};
+        }
+
+        for ch in '\0'..='\u{7f}' {
+            test_char_escape_debug!(ch);
+        }
+
+        // test_char_escape_debug!('我');
+        test_char_escape_debug!('\u{10ffff}');
+    }
+
+    #[test]
+    fn test_str_chars() {
+        const X: &str = "唐可可";
+        const OUTPUT_LEN: usize = str_count_chars(X);
+        const OUTPUT_BUF: [char; OUTPUT_LEN] = str_chars::<OUTPUT_LEN>(X);
+        let ans = X.chars().collect::<Vec<_>>();
+        assert_eq!(OUTPUT_BUF, ans.as_slice());
+    }
 }

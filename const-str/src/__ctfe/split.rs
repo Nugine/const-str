@@ -74,39 +74,6 @@ impl<'input> Split<&'input str, char> {
     }
 }
 
-#[test]
-fn test_split() {
-    macro_rules! testcase {
-        ($input: expr, $pat: expr) => {{
-            const OUTPUT_LEN: usize = Split($input, $pat).output_len();
-            const OUTPUT: &[&str] = &Split($input, $pat).const_eval::<OUTPUT_LEN>();
-
-            let ans = $input.split($pat).collect::<Vec<_>>();
-            assert_eq!(OUTPUT, &*ans, "ans = {:?}", ans);
-            assert_eq!(OUTPUT_LEN, ans.len());
-        }};
-    }
-
-    testcase!("", "");
-    testcase!("a中1😂1!", "");
-    testcase!("a中1😂1!", "a");
-    testcase!("a中1😂1!", "中");
-    testcase!("a中1😂1!", "1");
-    testcase!("a中1😂1!", "😂");
-    testcase!("a中1😂1!", "!");
-    testcase!("11111", "1");
-    testcase!("222", "22");
-    testcase!("啊哈哈哈", "哈哈");
-    testcase!("some string:another string", ":");
-
-    testcase!("11111", '1');
-    testcase!("a中1😂1!", 'a');
-    testcase!("a中1😂1!", '中');
-    testcase!("a中1😂1!", '1');
-    testcase!("a中1😂1!", '😂');
-    testcase!("a中1😂1!", '!');
-}
-
 /// Returns an array of substrings of a string slice, separated by characters matched by a pattern.
 ///
 /// See [`str::split`](https://doc.rust-lang.org/std/primitive.str.html#method.split).
@@ -135,4 +102,42 @@ macro_rules! split {
         const OUTPUT_BUF: [&str; OUTPUT_LEN] = $crate::__ctfe::Split($s, $pat).const_eval();
         OUTPUT_BUF
     }};
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_split() {
+        macro_rules! testcase {
+            ($input: expr, $pat: expr) => {{
+                const OUTPUT_LEN: usize = Split($input, $pat).output_len();
+                const OUTPUT: &[&str] = &Split($input, $pat).const_eval::<OUTPUT_LEN>();
+
+                let ans = $input.split($pat).collect::<Vec<_>>();
+                assert_eq!(OUTPUT, &*ans, "ans = {:?}", ans);
+                assert_eq!(OUTPUT_LEN, ans.len());
+            }};
+        }
+
+        testcase!("", "");
+        testcase!("a中1😂1!", "");
+        testcase!("a中1😂1!", "a");
+        testcase!("a中1😂1!", "中");
+        testcase!("a中1😂1!", "1");
+        testcase!("a中1😂1!", "😂");
+        testcase!("a中1😂1!", "!");
+        testcase!("11111", "1");
+        testcase!("222", "22");
+        testcase!("啊哈哈哈", "哈哈");
+        testcase!("some string:another string", ":");
+
+        testcase!("11111", '1');
+        testcase!("a中1😂1!", 'a');
+        testcase!("a中1😂1!", '中');
+        testcase!("a中1😂1!", '1');
+        testcase!("a中1😂1!", '😂');
+        testcase!("a中1😂1!", '!');
+    }
 }

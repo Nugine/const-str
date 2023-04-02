@@ -156,6 +156,7 @@ impl<'a, 'b> StripSuffix<'a, &'b str> {
 ///
 /// const FOO_BAR: &str = "foo:bar";
 /// const BAR: &str = const_str::unwrap!(const_str::strip_prefix!(FOO_BAR, "foo:"));
+/// assert_eq!(BAR, "bar");
 /// ```
 ///
 #[macro_export]
@@ -176,6 +177,7 @@ macro_rules! strip_prefix {
 ///
 /// const FOO_BAR: &str = "foo:bar";
 /// const FOO: &str = const_str::unwrap!(const_str::strip_suffix!(FOO_BAR, ":bar"));
+/// assert_eq!(FOO, "foo");
 /// ```
 ///
 #[macro_export]

@@ -103,46 +103,6 @@ impl<'input, 'to> Replace<&'input str, char, &'to str> {
     }
 }
 
-#[test]
-fn test_replace() {
-    macro_rules! testcase {
-        ($input: expr, $from: expr, $to: expr) => {{
-            const OUTPUT_LEN: usize = Replace($input, $from, $to).output_len();
-            const OUTPUT_BUF: StrBuf<OUTPUT_LEN> = Replace($input, $from, $to).const_eval();
-            const OUTPUT: &str = OUTPUT_BUF.as_str();
-
-            let ans = $input.replace($from, $to);
-            assert_eq!(OUTPUT, &*ans, "ans = {:?}", ans);
-            assert_eq!(OUTPUT_LEN, ans.len());
-        }};
-    }
-
-    testcase!("", "", "");
-    testcase!("", "", "a");
-    testcase!("", "a", "");
-    testcase!("", "a", "b");
-    testcase!("a", "", "b");
-    testcase!("asd", "", "b");
-    testcase!("aba", "a", "c");
-    testcase!("this is old", "old", "new");
-    testcase!("我", "", "1");
-    testcase!("我", "", "我");
-    testcase!("我", "我", "");
-    testcase!("aaaa", "aa", "bb");
-    testcase!("run / v4", " ", "");
-    testcase!("token", " ", "");
-    testcase!("v4 / udp", " ", "");
-    testcase!("v4 / upnp", "p", "");
-
-    testcase!("", 'a', "");
-    testcase!("", 'a', "b");
-    testcase!("aba", 'a', "c");
-    testcase!("run / v4", ' ', "");
-    testcase!("token", ' ', "");
-    testcase!("v4 / udp", ' ', "");
-    testcase!("我", '我', "");
-}
-
 /// Replaces all matches of a pattern with another string slice.
 ///
 /// See [`str::replace`](https://doc.rust-lang.org/std/primitive.str.html#method.replace).
@@ -166,4 +126,49 @@ macro_rules! replace {
             $crate::__ctfe::Replace($s, $from, $to).const_eval();
         OUTPUT_BUF.as_str()
     }};
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_replace() {
+        macro_rules! testcase {
+            ($input: expr, $from: expr, $to: expr) => {{
+                const OUTPUT_LEN: usize = Replace($input, $from, $to).output_len();
+                const OUTPUT_BUF: StrBuf<OUTPUT_LEN> = Replace($input, $from, $to).const_eval();
+                const OUTPUT: &str = OUTPUT_BUF.as_str();
+
+                let ans = $input.replace($from, $to);
+                assert_eq!(OUTPUT, &*ans, "ans = {:?}", ans);
+                assert_eq!(OUTPUT_LEN, ans.len());
+            }};
+        }
+
+        testcase!("", "", "");
+        testcase!("", "", "a");
+        testcase!("", "a", "");
+        testcase!("", "a", "b");
+        testcase!("a", "", "b");
+        testcase!("asd", "", "b");
+        testcase!("aba", "a", "c");
+        testcase!("this is old", "old", "new");
+        testcase!("我", "", "1");
+        testcase!("我", "", "我");
+        testcase!("我", "我", "");
+        testcase!("aaaa", "aa", "bb");
+        testcase!("run / v4", " ", "");
+        testcase!("token", " ", "");
+        testcase!("v4 / udp", " ", "");
+        testcase!("v4 / upnp", "p", "");
+
+        testcase!("", 'a', "");
+        testcase!("", 'a', "b");
+        testcase!("aba", 'a', "c");
+        testcase!("run / v4", ' ', "");
+        testcase!("token", ' ', "");
+        testcase!("v4 / udp", ' ', "");
+        testcase!("我", '我', "");
+    }
 }

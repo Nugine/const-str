@@ -1,3 +1,5 @@
+use crate::slice::subslice;
+
 use core::cmp::Ordering;
 
 pub const fn clone<const N: usize>(bytes: &[u8]) -> [u8; N] {
@@ -130,6 +132,22 @@ pub const fn ends_with(haystack: &[u8], needle: &[u8]) -> bool {
     }
 
     i == needle_len
+}
+
+pub const fn strip_prefix<'s>(s: &'s [u8], prefix: &[u8]) -> Option<&'s [u8]> {
+    if starts_with(s, prefix) {
+        Some(subslice(s, prefix.len()..s.len()))
+    } else {
+        None
+    }
+}
+
+pub const fn strip_suffix<'s>(s: &'s [u8], suffix: &[u8]) -> Option<&'s [u8]> {
+    if ends_with(s, suffix) {
+        Some(subslice(s, 0..s.len() - suffix.len()))
+    } else {
+        None
+    }
 }
 
 #[cfg(test)]

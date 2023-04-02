@@ -128,3 +128,53 @@ macro_rules! ends_with {
         $crate::__ctfe::EndsWith($haystack, $pattern).const_eval()
     }};
 }
+
+pub struct StripPrefix<'a, P>(pub &'a str, pub P);
+
+impl<'a, 'b> StripPrefix<'a, &'b str> {
+    pub const fn const_eval(&self) -> Option<&'a str> {
+        crate::str::strip_prefix(self.0, self.1)
+    }
+}
+
+pub struct StripSuffix<'a, P>(pub &'a str, pub P);
+
+impl<'a, 'b> StripSuffix<'a, &'b str> {
+    pub const fn const_eval(&self) -> Option<&'a str> {
+        crate::str::strip_suffix(self.0, self.1)
+    }
+}
+
+/// Returns a string slice with the prefix removed.
+///
+/// # Examples
+///
+/// ```
+/// assert_eq!(const_str::strip_prefix!("foo:bar", "foo:"), Some("bar"));
+/// assert_eq!(const_str::strip_prefix!("foo:bar", "bar"), None);
+/// assert_eq!(const_str::strip_prefix!("foofoo", "foo"), Some("foo"));
+/// ```
+///
+#[macro_export]
+macro_rules! strip_prefix {
+    ($s: expr, $prefix: expr) => {{
+        $crate::__ctfe::StripPrefix($s, $prefix).const_eval()
+    }};
+}
+
+/// Returns a string slice with the suffix removed.
+///
+/// # Examples
+///
+/// ```
+/// assert_eq!(const_str::strip_suffix!("bar:foo", ":foo"), Some("bar"));
+/// assert_eq!(const_str::strip_suffix!("bar:foo", "bar"), None);
+/// assert_eq!(const_str::strip_suffix!("foofoo", "foo"), Some("foo"));
+/// ```
+///
+#[macro_export]
+macro_rules! strip_suffix {
+    ($s: expr, $suffix: expr) => {{
+        $crate::__ctfe::StripSuffix($s, $suffix).const_eval()
+    }};
+}

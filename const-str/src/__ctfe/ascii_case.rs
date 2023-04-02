@@ -3,6 +3,7 @@
 use core::ops::Range;
 
 use crate::__ctfe::StrBuf;
+use crate::slice::subslice;
 
 #[derive(Clone, Copy)]
 #[repr(u8)]
@@ -167,7 +168,7 @@ impl ConvAsciiCase<&str> {
 
                 while i < words_count {
                     let rng = boundaries.word_range(i);
-                    let word = crate::bytes::subslice(self.0.as_bytes(), rng);
+                    let word = subslice(self.0.as_bytes(), rng);
 
                     if !TokenKind::is_boundary_word(word) {
                         if has_sep && !is_starting_boundary {
@@ -221,7 +222,7 @@ impl ConvAsciiCase<&str> {
 
                 while i < words_count {
                     let rng = boundaries.word_range(i);
-                    let word = crate::bytes::subslice(self.0.as_bytes(), rng);
+                    let word = subslice(self.0.as_bytes(), rng);
 
                     if !TokenKind::is_boundary_word(word) {
                         if let (Some(sep), false) = (sep, is_starting_boundary) {

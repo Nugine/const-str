@@ -3,6 +3,7 @@
 use super::StrBuf;
 use super::ToStr;
 
+use crate::slice::advance;
 use crate::utf8::CharEscapeDebug;
 use crate::utf8::CharEscapeDebugArgs;
 
@@ -115,7 +116,7 @@ impl Debug<&str> {
         let mut s = self.0.as_bytes();
         let mut ans = 2;
         while let Some((ch, count)) = crate::utf8::next_char(s) {
-            s = crate::bytes::advance(s, count);
+            s = advance(s, count);
             let e = CharEscapeDebug::new(
                 ch,
                 CharEscapeDebugArgs {
@@ -143,7 +144,7 @@ impl Debug<&str> {
 
         let mut s = self.0.as_bytes();
         while let Some((ch, count)) = crate::utf8::next_char(s) {
-            s = crate::bytes::advance(s, count);
+            s = advance(s, count);
             let e = CharEscapeDebug::new(
                 ch,
                 CharEscapeDebugArgs {

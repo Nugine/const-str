@@ -1,5 +1,4 @@
 use core::cmp::Ordering;
-use core::ops::Range;
 
 pub const fn clone<const N: usize>(bytes: &[u8]) -> [u8; N] {
     assert!(bytes.len() == N);
@@ -51,28 +50,6 @@ pub const fn compare(lhs: &[u8], rhs: &[u8]) -> Ordering {
     }
 }
 
-pub const fn subslice<T>(s: &[T], range: Range<usize>) -> &[T] {
-    assert!(range.start <= range.end && range.end <= s.len());
-
-    #[allow(unsafe_code)]
-    unsafe {
-        let data = s.as_ptr().add(range.start);
-        let len = range.end - range.start;
-        core::slice::from_raw_parts(data, len)
-    }
-}
-
-#[test]
-fn test_subslice() {
-    let buf = b"abcdefgh";
-    assert_eq!(subslice(buf, 0..0), &[]);
-    assert_eq!(subslice(buf, 0..1), b"a");
-    assert_eq!(subslice(buf, 1..3), b"bc");
-    assert_eq!(subslice(buf, 7..8), b"h");
-
-    assert_eq!(subslice::<u8>(&[], 0..0), &[]);
-}
-
 pub const fn merge<const N: usize>(mut buf: [u8; N], bytes: &[u8]) -> [u8; N] {
     assert!(N <= bytes.len());
     let mut i = 0;
@@ -93,26 +70,6 @@ pub const fn reversed<const N: usize>(mut arr: [u8; N]) -> [u8; N] {
         i += 1;
     }
     arr
-}
-
-#[test]
-fn test_reversed() {
-    let arr = [0, 1];
-    assert_eq!(reversed(arr), [1, 0]);
-
-    let arr = [0, 1, 2];
-    assert_eq!(reversed(arr), [2, 1, 0]);
-}
-
-pub const fn advance(s: &[u8], count: usize) -> &[u8] {
-    assert!(count <= s.len());
-
-    #[allow(unsafe_code)]
-    unsafe {
-        let data = s.as_ptr().add(count);
-        let len = s.len() - count;
-        core::slice::from_raw_parts(data, len)
-    }
 }
 
 pub const fn contains(haystack: &[u8], needle: &[u8]) -> bool {
@@ -137,34 +94,6 @@ pub const fn contains(haystack: &[u8], needle: &[u8]) -> bool {
     false
 }
 
-#[test]
-fn test_contains() {
-    macro_rules! test_contains {
-        (true, $haystack: expr, $needle: expr) => {
-            assert!(contains($haystack.as_ref(), $needle.as_ref()));
-        };
-        (false, $haystack: expr, $needle: expr) => {
-            assert!(!contains($haystack.as_ref(), $needle.as_ref()));
-        };
-    }
-
-    let buf = b"abcdefgh";
-    test_contains!(true, buf, b"");
-    test_contains!(true, buf, b"a");
-    test_contains!(true, buf, b"ef");
-    test_contains!(false, buf, b"xyz");
-
-    test_contains!(true, "asd", "");
-    test_contains!(true, "asd", "a");
-    test_contains!(true, "asdf", "sd");
-    test_contains!(false, "", "a");
-    test_contains!(false, "asd", "abcd");
-
-    test_contains!(true, "唐可可", "可");
-    test_contains!(true, "Liyuu", "i");
-    test_contains!(false, "Liyuu", "我");
-}
-
 pub const fn starts_with(haystack: &[u8], needle: &[u8]) -> bool {
     let haystack_len = haystack.len();
     let needle_len = needle.len();
@@ -182,15 +111,6 @@ pub const fn starts_with(haystack: &[u8], needle: &[u8]) -> bool {
     }
 
     i == needle_len
-}
-
-#[test]
-fn test_starts_with() {
-    assert!(starts_with(b"", b""));
-    assert!(starts_with(b"a", b""));
-    assert!(starts_with(b"a", b"a"));
-    assert!(!starts_with(b"", b"a"));
-    assert!(!starts_with(b"ba", b"a"));
 }
 
 pub const fn ends_with(haystack: &[u8], needle: &[u8]) -> bool {
@@ -212,11 +132,62 @@ pub const fn ends_with(haystack: &[u8], needle: &[u8]) -> bool {
     i == needle_len
 }
 
-#[test]
-fn test_ends_with() {
-    assert!(ends_with(b"", b""));
-    assert!(ends_with(b"a", b""));
-    assert!(ends_with(b"a", b"a"));
-    assert!(!ends_with(b"", b"a"));
-    assert!(!ends_with(b"ab", b"a"));
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_reversed() {
+        let arr = [0, 1];
+        assert_eq!(reversed(arr), [1, 0]);
+
+        let arr = [0, 1, 2];
+        assert_eq!(reversed(arr), [2, 1, 0]);
+    }
+
+    #[test]
+    fn test_contains() {
+        macro_rules! test_contains {
+            (true, $haystack: expr, $needle: expr) => {
+                assert!(contains($haystack.as_ref(), $needle.as_ref()));
+            };
+            (false, $haystack: expr, $needle: expr) => {
+                assert!(!contains($haystack.as_ref(), $needle.as_ref()));
+            };
+        }
+
+        let buf = b"abcdefgh";
+        test_contains!(true, buf, b"");
+        test_contains!(true, buf, b"a");
+        test_contains!(true, buf, b"ef");
+        test_contains!(false, buf, b"xyz");
+
+        test_contains!(true, "asd", "");
+        test_contains!(true, "asd", "a");
+        test_contains!(true, "asdf", "sd");
+        test_contains!(false, "", "a");
+        test_contains!(false, "asd", "abcd");
+
+        test_contains!(true, "唐可可", "可");
+        test_contains!(true, "Liyuu", "i");
+        test_contains!(false, "Liyuu", "我");
+    }
+
+    #[test]
+    fn test_starts_with() {
+        assert!(starts_with(b"", b""));
+        assert!(starts_with(b"a", b""));
+        assert!(starts_with(b"a", b"a"));
+        assert!(!starts_with(b"", b"a"));
+        assert!(!starts_with(b"ba", b"a"));
+    }
+
+    #[test]
+    fn test_ends_with() {
+        assert!(ends_with(b"", b""));
+        assert!(ends_with(b"a", b""));
+        assert!(ends_with(b"a", b"a"));
+        assert!(!ends_with(b"", b"a"));
+        assert!(!ends_with(b"ab", b"a"));
+    }
 }

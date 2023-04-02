@@ -1,3 +1,4 @@
+use crate::slice::advance;
 use crate::utf16::CharEncodeUtf16;
 
 pub struct Utf8Encoder {
@@ -50,7 +51,7 @@ impl<'a> Encode<'a, Utf16Encoder> {
         let mut pos = 0;
 
         while let Some((code, count)) = crate::utf8::next_char(s) {
-            s = crate::bytes::advance(s, count);
+            s = advance(s, count);
             let e = CharEncodeUtf16::new(code);
 
             buf[pos] = e.first();

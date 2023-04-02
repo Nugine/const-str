@@ -1,5 +1,6 @@
 #![allow(unsafe_code)]
 
+use crate::slice::advance;
 use crate::utf8::CharEncodeUtf8;
 
 use super::str::StrBuf;
@@ -58,7 +59,7 @@ impl<'input, 'from, 'to> Replace<&'input str, &'from str, &'to str> {
                     i += 1;
                 }
 
-                input = crate::bytes::advance(input, count);
+                input = advance(input, count);
             }
         } else {
             let mut input = input;

@@ -1,6 +1,8 @@
 #![allow(unsafe_code)]
 
 use crate::printable::is_printable;
+use crate::slice::advance;
+use crate::slice::subslice;
 
 pub struct CharEncodeUtf8 {
     buf: [u8; 4],
@@ -49,7 +51,7 @@ impl CharEncodeUtf8 {
     }
 
     pub const fn as_bytes(&self) -> &[u8] {
-        crate::bytes::subslice(&self.buf, 0..self.len as usize)
+        subslice(&self.buf, 0..self.len as usize)
     }
 
     // const since 1.55
@@ -196,7 +198,7 @@ impl CharEscapeDebug {
     }
 
     pub const fn as_bytes(&self) -> &[u8] {
-        crate::bytes::subslice(&self.buf, 0..self.len as usize)
+        subslice(&self.buf, 0..self.len as usize)
     }
 
     #[cfg(test)]
@@ -298,7 +300,7 @@ pub const fn str_count_chars(s: &str) -> usize {
     let mut s = s.as_bytes();
     let mut ans = 0;
     while let Some((_, count)) = next_char(s) {
-        s = crate::bytes::advance(s, count);
+        s = advance(s, count);
         ans += 1;
     }
     ans
@@ -309,7 +311,7 @@ pub const fn str_chars<const N: usize>(s: &str) -> [char; N] {
     let mut buf: [char; N] = ['\0'; N];
     let mut pos = 0;
     while let Some((ch, count)) = next_char(s) {
-        s = crate::bytes::advance(s, count);
+        s = advance(s, count);
         buf[pos] = ch;
         pos += 1;
     }

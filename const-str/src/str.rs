@@ -1,5 +1,7 @@
 use core::cmp::Ordering;
 
+use crate::slice::advance;
+
 pub const fn equal(lhs: &str, rhs: &str) -> bool {
     crate::bytes::equal(lhs.as_bytes(), rhs.as_bytes())
 }
@@ -50,7 +52,7 @@ pub const fn next_match<'h>(haystack: &'h str, needle: &str) -> Option<(usize, &
             j += 1;
         }
         if j == rhs.len() {
-            let remain = crate::bytes::advance(lhs, i + rhs.len());
+            let remain = advance(lhs, i + rhs.len());
             let remain = unsafe { core::str::from_utf8_unchecked(remain) };
             return Some((i, remain));
         }

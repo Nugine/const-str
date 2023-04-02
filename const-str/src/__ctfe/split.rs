@@ -1,4 +1,8 @@
+use crate::slice::advance;
+use crate::slice::subslice;
 use crate::utf8::CharEncodeUtf8;
+
+use core::str;
 
 pub struct Split<T, P>(pub T, pub P);
 
@@ -29,28 +33,24 @@ impl<'input, 'pat> Split<&'input str, &'pat str> {
             let mut input = input.as_bytes();
 
             {
-                buf[pos] =
-                    unsafe { core::str::from_utf8_unchecked(crate::bytes::subslice(input, 0..0)) };
+                buf[pos] = unsafe { str::from_utf8_unchecked(subslice(input, 0..0)) };
                 pos += 1;
             }
 
             while let Some((_, count)) = crate::utf8::next_char(input) {
-                buf[pos] = unsafe {
-                    core::str::from_utf8_unchecked(crate::bytes::subslice(input, 0..count))
-                };
+                buf[pos] = unsafe { str::from_utf8_unchecked(subslice(input, 0..count)) };
                 pos += 1;
-                input = crate::bytes::advance(input, count);
+                input = advance(input, count);
             }
 
             {
-                buf[pos] =
-                    unsafe { core::str::from_utf8_unchecked(crate::bytes::subslice(input, 0..0)) };
+                buf[pos] = unsafe { str::from_utf8_unchecked(subslice(input, 0..0)) };
                 pos += 1;
             }
         } else {
             while let Some((m, remain)) = crate::str::next_match(input, pat) {
-                let substr = crate::bytes::subslice(input.as_bytes(), 0..m);
-                buf[pos] = unsafe { core::str::from_utf8_unchecked(substr) };
+                let substr = subslice(input.as_bytes(), 0..m);
+                buf[pos] = unsafe { str::from_utf8_unchecked(substr) };
                 pos += 1;
                 input = remain;
             }
@@ -113,7 +113,7 @@ fn test_split() {
 ///
 /// The pattern type must be one of
 ///
-/// + [`&str`](str)
+/// + [`&str`](prim@str)
 /// + [`char`]
 ///
 /// # Examples

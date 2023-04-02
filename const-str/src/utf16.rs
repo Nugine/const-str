@@ -1,3 +1,5 @@
+use crate::slice::advance;
+
 pub struct CharEncodeUtf16 {
     buf: [u16; 2],
 }
@@ -33,7 +35,7 @@ pub const fn str_len_utf16(s: &str) -> usize {
     let mut s = s.as_bytes();
     let mut ans = 0;
     while let Some((ch, count)) = crate::utf8::next_char(s) {
-        s = crate::bytes::advance(s, count);
+        s = advance(s, count);
         ans += ch.len_utf16(); // const since 1.52
     }
     ans

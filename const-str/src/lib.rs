@@ -119,4 +119,7 @@ pub mod __ctfe {
 
     mod eq_ignore_ascii_case;
     pub use self::eq_ignore_ascii_case::*;
+
+    mod unwrap;
+    pub use self::unwrap::*;
 }

@@ -153,6 +153,9 @@ impl<'a, 'b> StripSuffix<'a, &'b str> {
 /// assert_eq!(const_str::strip_prefix!("foo:bar", "foo:"), Some("bar"));
 /// assert_eq!(const_str::strip_prefix!("foo:bar", "bar"), None);
 /// assert_eq!(const_str::strip_prefix!("foofoo", "foo"), Some("foo"));
+///
+/// const FOO_BAR: &str = "foo:bar";
+/// const BAR: &str = const_str::unwrap!(const_str::strip_prefix!(FOO_BAR, "foo:"));
 /// ```
 ///
 #[macro_export]
@@ -170,6 +173,9 @@ macro_rules! strip_prefix {
 /// assert_eq!(const_str::strip_suffix!("bar:foo", ":foo"), Some("bar"));
 /// assert_eq!(const_str::strip_suffix!("bar:foo", "bar"), None);
 /// assert_eq!(const_str::strip_suffix!("foofoo", "foo"), Some("foo"));
+///
+/// const FOO_BAR: &str = "foo:bar";
+/// const FOO: &str = const_str::unwrap!(const_str::strip_suffix!(FOO_BAR, ":bar"));
 /// ```
 ///
 #[macro_export]

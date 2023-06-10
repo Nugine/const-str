@@ -1,6 +1,6 @@
 [package]
 name = "const-str"
-version = "0.5.5-dev"
+version = "0.5.5"
 authors = ["Nugine <nugine@foxmail.com>"]
 edition = "2021"
 description = "compile-time string operations"

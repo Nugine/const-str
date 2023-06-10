@@ -23,8 +23,8 @@ miri:
 sync-version:
     #!/bin/bash -e
     cargo set-version -p const-str-proc-macro   '0.5.4'
-    cargo set-version -p const-str              '0.5.4'
+    cargo set-version -p const-str              '0.5.5-dev'
 
 publish:
-    cargo publish -p const-str-proc-macro
-    cargo publish -p const-str
+    # cargo publish -p const-str-proc-macro
+    # cargo publish -p const-str

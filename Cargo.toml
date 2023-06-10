@@ -3,3 +3,4 @@ members = [
     "const-str",
     "const-str-proc-macro",
 ]
+resolver = "2"

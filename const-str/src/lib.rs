@@ -114,6 +114,9 @@ pub mod __ctfe {
     mod split;
     pub use self::split::*;
 
+    mod squish;
+    pub use self::squish::*;
+
     mod is_ascii;
     pub use self::is_ascii::*;
 

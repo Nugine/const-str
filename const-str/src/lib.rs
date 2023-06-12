@@ -111,6 +111,9 @@ pub mod __ctfe {
     mod to_str;
     pub use self::to_str::*;
 
+    mod sorted;
+    pub use self::sorted::*;
+
     mod split;
     pub use self::split::*;
 

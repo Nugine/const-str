@@ -37,8 +37,8 @@ macro_rules! to_byte_array {
 /// ```
 /// const S: &str = "hello";
 /// const B: &[u8; 6] = b"hello\0";
-/// assert_eq!(const_str::to_byte_array!(S), [b'h', b'e', b'l', b'l', b'o']);
-/// assert_eq!(const_str::to_byte_array!(B), [b'h', b'e', b'l', b'l', b'o', b'\0']);
+/// assert_eq!(const_str::to_byte_array_with_len!(S, 7, 0), [b'h', b'e', b'l', b'l', b'o', 0, 0]);
+/// assert_eq!(const_str::to_byte_array_with_len!(B, 7, 0), [b'h', b'e', b'l', b'l', b'o', b'\0', 0]);
 /// ```
 ///
 #[macro_export]

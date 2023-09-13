@@ -3,7 +3,7 @@ use crate::slice::subslice;
 use core::cmp::Ordering;
 
 pub const fn clone<const N: usize>(bytes: &[u8], init_val: u8) -> [u8; N] {
-    assert!(bytes.len() == N);
+    assert!(bytes.len() <= N);
     let mut buf = [init_val; N];
     let mut i = 0;
     while i < bytes.len() {

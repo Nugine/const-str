@@ -263,7 +263,7 @@ pub const fn str_chars<const N: usize>(s: &str, init_val: char) -> [char; N] {
         buf[pos] = ch;
         pos += 1;
     }
-    assert!(pos == N);
+    assert!(pos <= N);
     buf
 }
 

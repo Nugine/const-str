@@ -6,7 +6,7 @@ impl ConcatBytesPart<u8> {
     }
 
     pub const fn const_eval<const N: usize>(&self) -> [u8; N] {
-        crate::bytes::clone(&[self.0])
+        crate::bytes::clone(&[self.0], 0)
     }
 }
 
@@ -16,7 +16,7 @@ impl<const L: usize> ConcatBytesPart<&[u8; L]> {
     }
 
     pub const fn const_eval<const N: usize>(&self) -> [u8; N] {
-        crate::bytes::clone(self.0)
+        crate::bytes::clone(self.0, 0)
     }
 }
 
@@ -26,7 +26,7 @@ impl ConcatBytesPart<&[u8]> {
     }
 
     pub const fn const_eval<const N: usize>(&self) -> [u8; N] {
-        crate::bytes::clone(self.0)
+        crate::bytes::clone(self.0, 0)
     }
 }
 
@@ -36,7 +36,7 @@ impl<const L: usize> ConcatBytesPart<[u8; L]> {
     }
 
     pub const fn const_eval<const N: usize>(&self) -> [u8; N] {
-        crate::bytes::clone(&self.0)
+        crate::bytes::clone(&self.0, 0)
     }
 }
 
@@ -46,7 +46,7 @@ impl ConcatBytesPart<&str> {
     }
 
     pub const fn const_eval<const N: usize>(&self) -> [u8; N] {
-        crate::bytes::clone(self.0.as_bytes())
+        crate::bytes::clone(self.0.as_bytes(), 0)
     }
 }
 

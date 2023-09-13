@@ -254,9 +254,9 @@ pub const fn str_count_chars(s: &str) -> usize {
     ans
 }
 
-pub const fn str_chars<const N: usize>(s: &str) -> [char; N] {
+pub const fn str_chars<const N: usize>(s: &str, init_val: char) -> [char; N] {
     let mut s = s.as_bytes();
-    let mut buf: [char; N] = ['\0'; N];
+    let mut buf: [char; N] = [init_val; N];
     let mut pos = 0;
     while let Some((ch, count)) = next_char(s) {
         s = advance(s, count);
@@ -327,7 +327,7 @@ mod tests {
     fn test_str_chars() {
         const X: &str = "唐可可";
         const OUTPUT_LEN: usize = str_count_chars(X);
-        const OUTPUT_BUF: [char; OUTPUT_LEN] = str_chars::<OUTPUT_LEN>(X);
+        const OUTPUT_BUF: [char; OUTPUT_LEN] = str_chars::<OUTPUT_LEN>(X, '\0');
         let ans = X.chars().collect::<Vec<_>>();
         assert_eq!(OUTPUT_BUF, ans.as_slice());
     }

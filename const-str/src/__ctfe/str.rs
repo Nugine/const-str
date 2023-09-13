@@ -23,7 +23,7 @@ impl<const N: usize> StrBuf<N> {
     }
 
     pub const fn from_str(s: &str) -> Self {
-        let buf = crate::bytes::clone::<N>(s.as_bytes());
+        let buf = crate::bytes::clone::<N>(s.as_bytes(), 0);
         unsafe { Self::new_unchecked(buf) }
     }
 }

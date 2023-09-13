@@ -34,7 +34,7 @@ impl<'a> Encode<'a, Utf8Encoder> {
             assert!(i + 1 == N);
             buf
         } else {
-            crate::bytes::clone(bytes)
+            crate::bytes::clone(bytes, 0)
         }
     }
 }

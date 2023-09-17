@@ -9,9 +9,9 @@
 )]
 
 #[allow(unused_macros)]
-macro_rules! emit_error {
+macro_rules! proc_error {
     ($token:expr, $msg: expr) => {
-        return TokenStream::from(syn::Error::new($token.span(), $msg).to_compile_error())
+        TokenStream::from(syn::Error::new($token.span(), $msg).to_compile_error())
     };
 }
 
@@ -37,7 +37,7 @@ where
     let src_token: T = parse_macro_input!(input as T);
     let s = match f(&src_token) {
         Ok(s) => s,
-        Err(e) => emit_error!(src_token, e.to_string()),
+        Err(e) => return proc_error!(src_token, e.to_string()),
     };
     let dst_token = LitStr::new(&s, src_token.span());
     dst_token.into_token_stream().into()

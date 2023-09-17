@@ -22,13 +22,13 @@ impl RegexAssertMatch {
 
         let re: Regex = match Regex::new(&self.re.value()) {
             Ok(re) => re,
-            Err(e) => emit_error!(self.re, e.to_string()),
+            Err(e) => return proc_error!(self.re, e.to_string()),
         };
 
         let text = self.text.value();
 
         if !re.is_match(&text) {
-            emit_error!(self.text, "the string literal does not match the pattern")
+            return proc_error!(self.text, "the string literal does not match the pattern");
         }
 
         TokenStream::new()

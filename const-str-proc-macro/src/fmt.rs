@@ -5,6 +5,7 @@ use std::string::String;
 use std::vec::Vec;
 
 use proc_macro::TokenStream;
+use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 use syn::parse::{Parse, ParseStream};
 use syn::{Expr, Ident, LitStr, Token};
@@ -342,57 +343,16 @@ impl ConstFormat {
     pub fn eval(&self) -> TokenStream {
         let parts = match parse_fmt_string(&self.fmt_string.value()) {
             Ok(p) => p,
-            Err(err) => emit_error!(self.fmt_string, err.to_string()),
+            Err(err) => return proc_error!(self.fmt_string, err.to_string()),
         };
 
-        let mut eval_parts = Vec::new();
+        let mut eval_parts: Vec<TokenStream2> = Vec::new();
 
         for p in parts {
-            eval_parts.push(loop {
-                if let Some(ref s) = p.literal {
-                    break quote! {
-                        {
-                            #s
-                        },
-                    };
-                }
-                if let Some(pos) = p.pos {
-                    let method = p.method.as_ref().unwrap();
-                    match self.positional_args.get(pos) {
-                        None => emit_error!(
-                            self.fmt_string,
-                            std::format!("invalid reference to positional argument {pos} (no arguments were given)")
-                        ),
-                        Some(arg) => {
-                            let method_ident = Self::fmt_method(method);
-                            let spec = Self::fmt_spec(&p);
-                            break quote! {
-                                {
-                                    #method_ident!(#arg, #spec)
-                                },
-                            };
-                        }
-                    }
-                }
-                if let Some(ref name) = p.name {
-                    let method_ident = Self::fmt_method(p.method.as_ref().unwrap());
-                    let spec = Self::fmt_spec(&p);
-
-                    break match self.named_args.get(name) {
-                        None => quote! {
-                            {
-                                #method_ident!(#name, #spec)
-                            },
-                        },
-                        Some(kwarg) => quote! {
-                            {
-                                #method_ident!(#kwarg, #spec)
-                            },
-                        },
-                    };
-                }
-                unreachable!()
-            })
+            match self.convert_part(p) {
+                Ok(tt) => eval_parts.push(tt),
+                Err(err) => return err,
+            }
         }
 
         let tt = quote! {
@@ -404,5 +364,39 @@ impl ConstFormat {
         };
 
         tt.into()
+    }
+
+    fn convert_part(&self, p: FmtPart) -> Result<TokenStream2, TokenStream> {
+        if let Some(ref s) = p.literal {
+            return Ok(quote! { { #s }, });
+        }
+        if let Some(pos) = p.pos {
+            let method = p.method.as_ref().unwrap();
+            match self.positional_args.get(pos) {
+                None => {
+                    return Err(proc_error!(
+                        self.fmt_string,
+                        std::format!(
+                        "invalid reference to positional argument {pos} (no arguments were given)"
+                    )
+                    ))
+                }
+                Some(arg) => {
+                    let method_ident = Self::fmt_method(method);
+                    let spec = Self::fmt_spec(&p);
+                    return Ok(quote! { { #method_ident!(#arg, #spec) }, });
+                }
+            }
+        }
+        if let Some(ref name) = p.name {
+            let method_ident = Self::fmt_method(p.method.as_ref().unwrap());
+            let spec = Self::fmt_spec(&p);
+
+            return Ok(match self.named_args.get(name) {
+                None => quote! { { #method_ident!(#name, #spec) }, },
+                Some(kwarg) => quote! { { #method_ident!(#kwarg, #spec) }, },
+            });
+        }
+        unreachable!()
     }
 }

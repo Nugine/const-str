@@ -2,7 +2,7 @@
 
 Toolchain
 
-+ [Rust 1.64.0 or newer](https://rustup.rs/)
++ [Rust 1.65.0 or newer](https://rustup.rs/)
 + [just](https://github.com/casey/just)
 
 Get the source code

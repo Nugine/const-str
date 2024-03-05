@@ -1,6 +1,6 @@
 [package]
 name = "const-str-proc-macro"
-version = "0.5.4"
+version = "0.5.7"
 authors = ["Nugine <nugine@foxmail.com>"]
 edition = "2021"
 description = "compile-time string operations"

@@ -1,9 +1,6 @@
 use std::collections::HashMap;
 use std::{fmt, mem};
 
-use std::string::String;
-use std::vec::Vec;
-
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;

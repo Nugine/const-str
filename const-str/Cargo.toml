@@ -33,4 +33,4 @@ optional = true
 [dev-dependencies]
 regex = "1.7.0"
 http = "1.0.0"
-heck = { version = "0.4.0", features = ["unicode"] }
+heck = { version = "0.5.0", features = ["unicode"] }

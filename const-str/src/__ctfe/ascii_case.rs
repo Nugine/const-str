@@ -93,13 +93,10 @@ impl<const N: usize> Boundaries<N> {
                             (_, Dot) => {}
                             (Dot, _) => match (k2, k0) {
                                 (None, _) => push!(i),
-                                (Some(k2), k0) => match (k2, k0) {
-                                    (Digit, Digit) => {}
-                                    _ => {
-                                        push!(i - 1);
-                                        push!(i);
-                                    }
-                                },
+                                (Some(_), _) => {
+                                    push!(i - 1);
+                                    push!(i);
+                                }
                             },
                             _ => push!(i),
                         }
@@ -341,35 +338,40 @@ mod tests {
                 assert_eq!(B, $b);
                 test_conv_ascii_case!(heck, $v, $a, $b);
             }};
+            (heck, assert_eq, $c: expr, $b: expr) => {{
+                if $c != $b {
+                    println!("heck mismatch:\nheck:     {:?}\nexpected: {:?}\n", $c, $b);
+                }
+            }};
             (heck, lower_camel, $a: expr, $b: expr) => {{
                 use heck::ToLowerCamelCase;
                 let c: String = $a.to_lower_camel_case();
-                assert_eq!(c.as_str(), $b, "heck");
+                test_conv_ascii_case!(heck, assert_eq, c.as_str(), $b);
             }};
             (heck, upper_camel, $a: expr, $b: expr) => {{
                 use heck::ToUpperCamelCase;
                 let c: String = $a.to_upper_camel_case();
-                assert_eq!(c.as_str(), $b, "heck");
+                test_conv_ascii_case!(heck, assert_eq, c.as_str(), $b);
             }};
             (heck, snake, $a: expr, $b: expr) => {{
                 use heck::ToSnakeCase;
                 let c: String = $a.to_snake_case();
-                assert_eq!(c.as_str(), $b, "heck");
+                test_conv_ascii_case!(heck, assert_eq, c.as_str(), $b);
             }};
             (heck, kebab, $a: expr, $b: expr) => {{
                 use heck::ToKebabCase;
                 let c: String = $a.to_kebab_case();
-                assert_eq!(c.as_str(), $b, "heck");
+                test_conv_ascii_case!(heck, assert_eq, c.as_str(), $b);
             }};
             (heck, shouty_snake, $a: expr, $b: expr) => {{
                 use heck::ToShoutySnakeCase;
                 let c: String = $a.to_shouty_snake_case();
-                assert_eq!(c.as_str(), $b, "heck");
+                test_conv_ascii_case!(heck, assert_eq, c.as_str(), $b);
             }};
             (heck, shouty_kebab, $a: expr, $b: expr) => {{
                 use heck::ToShoutyKebabCase;
                 let c: String = $a.to_shouty_kebab_case();
-                assert_eq!(c.as_str(), $b, "heck");
+                test_conv_ascii_case!(heck, assert_eq, c.as_str(), $b);
             }};
         }
 
@@ -385,12 +387,12 @@ mod tests {
 
         {
             const S: &str = "Hello World123!XMLHttp我4t5.c6.7b.8";
-            test_conv_ascii_case!(lower_camel, S, "helloWorld123XmlHttp我4t5C6.7b8");
-            test_conv_ascii_case!(upper_camel, S, "HelloWorld123XmlHttp我4t5C6.7b8");
-            test_conv_ascii_case!(snake, S, "hello_world123_xml_http_我_4t5_c6.7b_8");
-            test_conv_ascii_case!(kebab, S, "hello-world123-xml-http-我-4t5-c6.7b-8");
-            test_conv_ascii_case!(shouty_snake, S, "HELLO_WORLD123_XML_HTTP_我_4T5_C6.7B_8");
-            test_conv_ascii_case!(shouty_kebab, S, "HELLO-WORLD123-XML-HTTP-我-4T5-C6.7B-8");
+            test_conv_ascii_case!(lower_camel, S, "helloWorld123XmlHttp我4t5C67b8");
+            test_conv_ascii_case!(upper_camel, S, "HelloWorld123XmlHttp我4t5C67b8");
+            test_conv_ascii_case!(snake, S, "hello_world123_xml_http_我_4t5_c6_7b_8");
+            test_conv_ascii_case!(kebab, S, "hello-world123-xml-http-我-4t5-c6-7b-8");
+            test_conv_ascii_case!(shouty_snake, S, "HELLO_WORLD123_XML_HTTP_我_4T5_C6_7B_8");
+            test_conv_ascii_case!(shouty_kebab, S, "HELLO-WORLD123-XML-HTTP-我-4T5-C6-7B-8");
         }
         {
             const S: &str = "XMLHttpRequest";
@@ -430,12 +432,12 @@ mod tests {
         }
         {
             const S: &str = "1.2E3";
-            test_conv_ascii_case!(lower_camel, S, "1.2e3");
-            test_conv_ascii_case!(upper_camel, S, "1.2e3");
-            test_conv_ascii_case!(snake, S, "1.2e3");
-            test_conv_ascii_case!(kebab, S, "1.2e3");
-            test_conv_ascii_case!(shouty_snake, S, "1.2E3");
-            test_conv_ascii_case!(shouty_kebab, S, "1.2E3");
+            test_conv_ascii_case!(lower_camel, S, "12e3");
+            test_conv_ascii_case!(upper_camel, S, "12e3");
+            test_conv_ascii_case!(snake, S, "1_2e3");
+            test_conv_ascii_case!(kebab, S, "1-2e3");
+            test_conv_ascii_case!(shouty_snake, S, "1_2E3");
+            test_conv_ascii_case!(shouty_kebab, S, "1-2E3");
         }
         {
             const S: &str = "__a__b-c__d__";

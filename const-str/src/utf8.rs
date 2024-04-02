@@ -193,6 +193,7 @@ pub const fn next_char(bytes: &[u8]) -> Option<(char, usize)> {
             (ch << 6) | (byte & CONT_MASK) as u32
         }
 
+        #[allow(clippy::manual_unwrap_or_default)] // FIXME
         const fn unwrap_or_0(opt: Option<u8>) -> u8 {
             match opt {
                 Some(byte) => byte,

@@ -12,7 +12,6 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![cfg_attr(
     feature = "unstable", 
-    feature(const_char_from_u32_unchecked), // https://github.com/rust-lang/rust/issues/89259
     feature(const_align_offset),            // https://github.com/rust-lang/rust/issues/90962
 )]
 

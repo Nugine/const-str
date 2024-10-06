@@ -6,7 +6,7 @@ use core::str;
 
 pub struct Split<T, P>(pub T, pub P);
 
-impl<'input, 'pat> Split<&'input str, &'pat str> {
+impl<'input> Split<&'input str, &str> {
     pub const fn output_len(&self) -> usize {
         let Self(mut input, pat) = *self;
 

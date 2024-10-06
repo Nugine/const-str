@@ -4,7 +4,7 @@ use super::StrBuf;
 
 pub struct Concat<'a>(pub &'a [&'a str]);
 
-impl<'a> Concat<'a> {
+impl Concat<'_> {
     pub const fn output_len(&self) -> usize {
         let mut ans = 0;
         let mut iter = self.0;
@@ -69,7 +69,7 @@ macro_rules! concat {
 
 pub struct Join<'a>(pub &'a [&'a str], pub &'a str);
 
-impl<'a> Join<'a> {
+impl Join<'_> {
     pub const fn output_len(&self) -> usize {
         let mut ans = 0;
         let mut i = 0;

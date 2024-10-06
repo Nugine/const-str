@@ -11,7 +11,7 @@ pub struct Utf16Encoder {
 
 pub struct Encode<'a, T>(pub &'a str, pub T);
 
-impl<'a> Encode<'a, Utf8Encoder> {
+impl Encode<'_, Utf8Encoder> {
     pub const fn output_len(&self) -> usize {
         if self.1.nul_terminated {
             self.0.len() + 1
@@ -39,7 +39,7 @@ impl<'a> Encode<'a, Utf8Encoder> {
     }
 }
 
-impl<'a> Encode<'a, Utf16Encoder> {
+impl Encode<'_, Utf16Encoder> {
     pub const fn output_len(&self) -> usize {
         crate::utf16::str_len_utf16(self.0) + (self.1.nul_terminated as usize)
     }

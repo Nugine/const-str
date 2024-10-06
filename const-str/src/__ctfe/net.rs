@@ -143,7 +143,7 @@ macro_rules! parse {
     }};
 }
 
-impl<'a> Parser<'a> {
+impl Parser<'_> {
     const fn read_ipv4(self) -> (Self, Option<Ipv4Addr>) {
         let mut p = self.const_clone();
         let mut nums = [0; 4];

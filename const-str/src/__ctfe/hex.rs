@@ -56,7 +56,7 @@ impl<'a> Iter<'a> {
     }
 }
 
-impl<'a, 'b> Hex<&'b [&'a str]> {
+impl Hex<&[&str]> {
     pub const fn output_len(&self) -> usize {
         let mut i = 0;
         let mut ans = 0;
@@ -91,7 +91,7 @@ impl<'a, 'b> Hex<&'b [&'a str]> {
     }
 }
 
-impl<'a> Hex<&'a str> {
+impl Hex<&str> {
     pub const fn output_len(&self) -> usize {
         let ss: &[&str] = &[self.0];
         Hex(ss).output_len()
@@ -102,7 +102,7 @@ impl<'a> Hex<&'a str> {
     }
 }
 
-impl<'a, const L: usize> Hex<[&'a str; L]> {
+impl<const L: usize> Hex<[&str; L]> {
     pub const fn output_len(&self) -> usize {
         let ss: &[&str] = &self.0;
         Hex(ss).output_len()

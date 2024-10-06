@@ -7,7 +7,7 @@ use super::str::StrBuf;
 
 pub struct Replace<I, P, O>(pub I, pub P, pub O);
 
-impl<'input, 'from, 'to> Replace<&'input str, &'from str, &'to str> {
+impl Replace<&str, &str, &str> {
     pub const fn output_len(&self) -> usize {
         let Self(mut input, replace_from, replace_to) = *self;
 
@@ -92,7 +92,7 @@ impl<'input, 'from, 'to> Replace<&'input str, &'from str, &'to str> {
     }
 }
 
-impl<'input, 'to> Replace<&'input str, char, &'to str> {
+impl Replace<&str, char, &str> {
     pub const fn output_len(&self) -> usize {
         let ch = CharEncodeUtf8::new(self.1);
         Replace(self.0, ch.as_str(), self.2).output_len()

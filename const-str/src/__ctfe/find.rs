@@ -2,13 +2,13 @@ use crate::utf8::CharEncodeUtf8;
 
 pub struct Contains<'a, P>(pub &'a str, pub P);
 
-impl<'a, 'b> Contains<'a, &'b str> {
+impl Contains<'_, &str> {
     pub const fn const_eval(&self) -> bool {
         crate::str::contains(self.0, self.1)
     }
 }
 
-impl<'a> Contains<'a, char> {
+impl Contains<'_, char> {
     pub const fn const_eval(&self) -> bool {
         let haystack = self.0;
         let ch = CharEncodeUtf8::new(self.1);
@@ -45,13 +45,13 @@ macro_rules! contains {
 
 pub struct StartsWith<'a, P>(pub &'a str, pub P);
 
-impl<'a, 'b> StartsWith<'a, &'b str> {
+impl StartsWith<'_, &str> {
     pub const fn const_eval(&self) -> bool {
         crate::str::starts_with(self.0, self.1)
     }
 }
 
-impl<'a> StartsWith<'a, char> {
+impl StartsWith<'_, char> {
     pub const fn const_eval(&self) -> bool {
         let haystack = self.0.as_bytes();
         let ch = CharEncodeUtf8::new(self.1);
@@ -88,13 +88,13 @@ macro_rules! starts_with {
 
 pub struct EndsWith<'a, P>(pub &'a str, pub P);
 
-impl<'a, 'b> EndsWith<'a, &'b str> {
+impl EndsWith<'_, &str> {
     pub const fn const_eval(&self) -> bool {
         crate::str::ends_with(self.0, self.1)
     }
 }
 
-impl<'a> EndsWith<'a, char> {
+impl EndsWith<'_, char> {
     pub const fn const_eval(&self) -> bool {
         let haystack = self.0.as_bytes();
         let ch = CharEncodeUtf8::new(self.1);
@@ -131,7 +131,7 @@ macro_rules! ends_with {
 
 pub struct StripPrefix<'a, P>(pub &'a str, pub P);
 
-impl<'a, 'b> StripPrefix<'a, &'b str> {
+impl<'a> StripPrefix<'a, &str> {
     pub const fn const_eval(&self) -> Option<&'a str> {
         crate::str::strip_prefix(self.0, self.1)
     }
@@ -139,7 +139,7 @@ impl<'a, 'b> StripPrefix<'a, &'b str> {
 
 pub struct StripSuffix<'a, P>(pub &'a str, pub P);
 
-impl<'a, 'b> StripSuffix<'a, &'b str> {
+impl<'a> StripSuffix<'a, &str> {
     pub const fn const_eval(&self) -> Option<&'a str> {
         crate::str::strip_suffix(self.0, self.1)
     }

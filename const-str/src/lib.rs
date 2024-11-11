@@ -10,10 +10,6 @@
 )]
 #![cfg_attr(not(any(test, feature = "std")), no_std)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
-#![cfg_attr(
-    feature = "unstable", 
-    feature(const_align_offset),            // https://github.com/rust-lang/rust/issues/90962
-)]
 
 #[allow(unused_macros)]
 macro_rules! item_group {

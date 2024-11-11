@@ -14,7 +14,7 @@ impl ToCStr<&str> {
 
     pub const fn output_len(&self) -> usize {
         self.check_nul();
-        self.0.as_bytes().len() + 1
+        self.0.len() + 1
     }
 
     pub const fn const_eval<const N: usize>(&self) -> [u8; N] {

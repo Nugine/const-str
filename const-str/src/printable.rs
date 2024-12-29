@@ -54,7 +54,7 @@ const fn check(
     while i < normal.len() {
         let v = normal_next!();
         let len = if v & 0x80 != 0 {
-            ((v & 0x7f) as i32) << 8 | normal_next!() as i32
+            (((v & 0x7f) as i32) << 8) | normal_next!() as i32
         } else {
             v as i32
         };

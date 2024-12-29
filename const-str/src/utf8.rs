@@ -27,18 +27,18 @@ impl CharEncodeUtf8 {
                 buf[0] = code as u8;
             }
             2 => {
-                buf[0] = (code >> 6 & 0x1F) as u8 | TAG_TWO_B;
+                buf[0] = ((code >> 6) & 0x1F) as u8 | TAG_TWO_B;
                 buf[1] = (code & 0x3F) as u8 | TAG_CONT;
             }
             3 => {
-                buf[0] = (code >> 12 & 0x0F) as u8 | TAG_THREE_B;
-                buf[1] = (code >> 6 & 0x3F) as u8 | TAG_CONT;
+                buf[0] = ((code >> 12) & 0x0F) as u8 | TAG_THREE_B;
+                buf[1] = ((code >> 6) & 0x3F) as u8 | TAG_CONT;
                 buf[2] = (code & 0x3F) as u8 | TAG_CONT;
             }
             4 => {
-                buf[0] = (code >> 18 & 0x07) as u8 | TAG_FOUR_B;
-                buf[1] = (code >> 12 & 0x3F) as u8 | TAG_CONT;
-                buf[2] = (code >> 6 & 0x3F) as u8 | TAG_CONT;
+                buf[0] = ((code >> 18) & 0x07) as u8 | TAG_FOUR_B;
+                buf[1] = ((code >> 12) & 0x3F) as u8 | TAG_CONT;
+                buf[2] = ((code >> 6) & 0x3F) as u8 | TAG_CONT;
                 buf[3] = (code & 0x3F) as u8 | TAG_CONT;
             }
             _ => {}
@@ -229,10 +229,10 @@ pub const fn next_char(bytes: &[u8]) -> Option<(char, usize)> {
         if x >= 0xE0 {
             let z = unwrap_or_0(next!());
             let y_z = utf8_acc_cont_byte((y & CONT_MASK) as u32, z);
-            ch = init << 12 | y_z;
+            ch = (init << 12) | y_z;
             if x >= 0xF0 {
                 let w = unwrap_or_0(next!());
-                ch = (init & 7) << 18 | utf8_acc_cont_byte(y_z, w);
+                ch = ((init & 7) << 18) | utf8_acc_cont_byte(y_z, w);
             }
         }
 

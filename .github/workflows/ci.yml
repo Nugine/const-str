@@ -1,44 +1,50 @@
+name: CI
+
 on:
   push:
     branches:
       - main
+      - 'feat/**'
   pull_request:
     branches:
       - main
-  schedule: # https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#onschedule
+      - 'feat/**'
+  schedule:
     - cron: '0 0 * * 0' # at midnight of each sunday
   workflow_dispatch:
-
-name: CI
 
 jobs:
   develop:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: taiki-e/install-action@just
       - uses: dtolnay/rust-toolchain@nightly
         with:
-          components: rustfmt, clippy
-      - run: |
-          cargo fmt --all -- --check
-      - run: |
-          cargo clippy --all-features -- -D warnings
-      - run: |
-          cargo test --workspace --all-features
+          components: rustfmt, clippy, miri, rust-src
+      - uses: Swatinem/rust-cache@v2
+      - run: just ci
 
-  test:
+  msrv:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         toolchain: 
-          - stable
-          - nightly
           - 1.65.0 # MSRV
+          - stable
     steps:
       - uses: actions/checkout@v4
+      - uses: taiki-e/install-action@just
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.toolchain }}
-      - run: |
-          cargo test --workspace --features all
+      - uses: Swatinem/rust-cache@v2
+      - run: just test
+  
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/install-action@cargo-audit
+      - run: cargo audit -D warnings

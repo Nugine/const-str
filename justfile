@@ -28,3 +28,8 @@ sync-version:
 publish:
     cargo publish -p const-str-proc-macro
     cargo publish -p const-str
+
+ci:
+    cargo fmt --all -- --check
+    cargo clippy --all-features -- -D warnings
+    just test

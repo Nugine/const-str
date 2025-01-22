@@ -1,35 +1,38 @@
-fmt:
-    cargo fmt --all
+dev:
+    just fmt
+    just lint
+    just test
+    just unstable-test
+    just miri
 
-check:
-    cargo check --all-features
-    cargo clippy --all-features -- -D warnings
+fmt *ARGS:
+    cargo fmt --all {{ARGS}}
 
-test:
-    cargo test
-    cargo test --all-features
-    cargo test --release
-    cargo test --all-features --release
+lint *ARGS:
+    cargo clippy --all-features --tests --benches {{ARGS}}
 
-dev: fmt check test miri
+test *ARGS:
+    cargo test {{ARGS}}
+    cargo test --features all {{ARGS}}
+    cargo test --release {{ARGS}}
+    cargo test --release --features all {{ARGS}}
 
-doc:
-    RUSTDOCFLAGS='--cfg docsrs' cargo doc --open --no-deps --all-features
+unstable-test *ARGS:
+    cargo test --all-features {{ARGS}}
+    cargo test --all-features --release {{ARGS}}
 
-miri:
-    cargo +nightly miri test
-    cargo +nightly miri test --all-features
+miri *ARGS:
+    cargo +nightly miri test --all-features {{ARGS}}
 
-sync-version:
-    #!/bin/bash -e
-    cargo set-version -p const-str-proc-macro   '0.5.7'
-    cargo set-version -p const-str              '0.5.7'
-
-publish:
-    cargo publish -p const-str-proc-macro
-    cargo publish -p const-str
+doc *ARGS:
+    RUSTDOCFLAGS="--cfg docsrs" cargo +nightly doc --open --no-deps --all-features {{ARGS}}
 
 ci:
-    cargo fmt --all -- --check
-    cargo clippy --all-features -- -D warnings
+    just fmt --check
+    just lint -- -D warnings
     just test
+    just miri
+
+sync-version:
+    cargo set-version -p const-str-proc-macro   '0.5.7'
+    cargo set-version -p const-str              '0.5.7'

@@ -1,6 +1,6 @@
 //! Compile-time string operations
 //!
-//! MSRV: Rust 1.65.0
+//! MSRV: Rust 1.77.0
 //!
 #![deny(unsafe_code, missing_docs, clippy::all, clippy::cargo)]
 #![allow(

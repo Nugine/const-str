@@ -1,4 +1,4 @@
-use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+use core::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 struct Parser<'a> {
     s: &'a [u8],
@@ -293,7 +293,7 @@ pub const fn expect_ip(s: &str) -> IpAddr {
 ///
 /// # Examples
 /// ```
-/// use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+/// use core::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 /// use const_str::ip_addr;
 ///
 /// const LOCALHOST_V4: Ipv4Addr = ip_addr!(v4, "127.0.0.1");
@@ -301,7 +301,6 @@ pub const fn expect_ip(s: &str) -> IpAddr {
 ///
 /// const LOCALHOSTS: [IpAddr;2] = [ip_addr!("127.0.0.1"), ip_addr!("::1")];
 /// ```
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 #[macro_export]
 macro_rules! ip_addr {
     (v4, $s:expr) => {

@@ -1,6 +1,6 @@
 //! Compile-time string operations
 //!
-//! MSRV: Rust 1.65.0
+//! MSRV: Rust 1.77.0
 //!
 #![deny(unsafe_code, missing_docs, clippy::all, clippy::cargo)]
 #![allow(
@@ -80,11 +80,8 @@ pub mod __ctfe {
     mod hex;
     pub use self::hex::*;
 
-    #[cfg(feature = "std")]
-    item_group! {
-        mod net;
-        pub use self::net::*;
-    }
+    mod net;
+    pub use self::net::*;
 
     mod parse;
     pub use self::parse::*;

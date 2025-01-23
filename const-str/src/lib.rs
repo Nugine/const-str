@@ -80,11 +80,8 @@ pub mod __ctfe {
     mod hex;
     pub use self::hex::*;
 
-    #[cfg(feature = "std")]
-    item_group! {
-        mod net;
-        pub use self::net::*;
-    }
+    mod net;
+    pub use self::net::*;
 
     mod parse;
     pub use self::parse::*;

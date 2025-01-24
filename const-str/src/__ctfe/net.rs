@@ -291,6 +291,8 @@ pub const fn expect_ip(s: &str) -> IpAddr {
 
 /// Converts a string slice to an IP address.
 ///
+/// This macro is [const-fn compatible](./index.html#const-fn-compatible).
+///
 /// # Examples
 /// ```
 /// use core::net::{IpAddr, Ipv4Addr, Ipv6Addr};

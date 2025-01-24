@@ -20,6 +20,8 @@ impl Equal<&str, &str> {
 
 /// Checks that two strings are equal.
 ///
+/// This macro is [const-fn compatible](./index.html#const-fn-compatible).
+///
 /// # Examples
 ///
 /// ```

@@ -122,6 +122,7 @@ impl<const L: usize> Hex<[&str; L]> {
 /// - `' '`, `'\r'`, `'\n'`, `'\t'` — formatting characters which will be
 ///     ignored
 ///
+/// This macro is [const-context only](./index.html#const-context-only).
 ///
 /// # Examples
 /// ```

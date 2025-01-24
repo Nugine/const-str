@@ -85,6 +85,8 @@ impl Squish<&'_ str> {
 
 /// Splits the string by ASCII whitespaces, and then joins the parts with a single space.
 ///
+/// This macro is [const-context only](./index.html#const-context-only).
+///
 /// # Examples
 ///
 /// ```rust
@@ -101,8 +103,6 @@ impl Squish<&'_ str> {
 ///     WHERE id = ?"
 /// );
 /// assert_eq!(SQL, "SELECT name, created_at, updated_at FROM users WHERE id = ?");
-///
-///
 /// ```
 ///
 #[macro_export]

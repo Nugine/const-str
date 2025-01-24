@@ -113,6 +113,8 @@ macro_rules! __concat_bytes_part {
 ///
 /// The output type is [`&[u8; _]`](array).
 ///
+/// This macro is [const-context only](./index.html#const-context-only).
+///
 /// # Examples
 ///
 /// ```rust

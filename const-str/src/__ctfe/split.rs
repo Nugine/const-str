@@ -83,6 +83,8 @@ impl<'input> Split<&'input str, char> {
 /// + [`&str`](prim@str)
 /// + [`char`]
 ///
+/// This macro is [const-context only](./index.html#const-context-only).
+///
 /// # Examples
 ///
 /// ```

@@ -33,6 +33,8 @@ impl<const N: usize> IsAscii<&[u8; N]> {
 /// + [`&[u8]`](slice)
 /// + [`&[u8; N]`](array)
 ///
+/// This macro is [const-fn compatible](./index.html#const-fn-compatible).
+///
 /// # Examples
 ///
 /// ```

@@ -75,6 +75,8 @@ impl<'a, const L: usize> Sorted<&[&'a str; L]> {
 /// + [`[&str; N]`](array)
 /// + [`&[&str; N]`](array)
 ///
+/// This macro is [const-context only](./index.html#const-context-only).
+///
 /// # Examples
 ///
 /// ```rust

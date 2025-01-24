@@ -40,6 +40,8 @@ impl ToCStr<&str> {
 /// This trailing nul byte will be appended by this macro.
 /// The provided data should not contain any nul bytes in it.
 ///
+/// This macro is [const-context only](./index.html#const-context-only).
+///
 /// See also [`cstr!`](crate::cstr)
 ///
 /// # Examples
@@ -61,7 +63,14 @@ macro_rules! raw_cstr {
 /// This trailing nul byte will be appended by this macro.
 /// The provided data should not contain any nul bytes in it.
 ///
-/// See also [`raw_cstr!`](crate::raw_cstr)
+/// This macro is [const-context only](./index.html#const-context-only).
+///
+/// See also [`raw_cstr!`](crate::raw_cstr).
+///
+/// Note that Rust has supported [C string literals][c-str-literal] since [1.77.0][rust-1-77-0].
+///
+/// [c-str-literal]: https://doc.rust-lang.org/reference/tokens.html#c-string-and-raw-c-string-literals
+/// [rust-1-77-0]: https://blog.rust-lang.org/2024/03/21/Rust-1.77.0.html#c-string-literals
 ///
 /// # Examples
 ///

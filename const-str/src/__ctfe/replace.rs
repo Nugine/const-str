@@ -112,6 +112,8 @@ impl Replace<&str, char, &str> {
 /// + [`&str`](str)
 /// + [`char`]
 ///
+/// This macro is [const-context only](./index.html#const-context-only).
+///
 /// # Examples
 ///
 /// ```

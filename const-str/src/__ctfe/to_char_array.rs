@@ -12,6 +12,8 @@ impl ToCharArray<&str> {
 
 /// Converts a string slice into an array of its characters.
 ///
+/// This macro is [const-context only](./index.html#const-context-only).
+///
 /// # Examples
 /// ```
 /// const CHARS: [char; 5] = const_str::to_char_array!("Hello");

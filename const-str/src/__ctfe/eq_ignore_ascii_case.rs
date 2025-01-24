@@ -43,6 +43,8 @@ impl<const N1: usize, const N2: usize> EqIgnoreAsciiCase<&[u8; N1], &[u8; N2]> {
 ///
 /// The output type is [`bool`].
 ///
+/// This macro is [const-fn compatible](./index.html#const-fn-compatible).
+///
 /// # Examples
 ///
 /// ```

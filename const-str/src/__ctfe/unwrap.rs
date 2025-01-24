@@ -16,6 +16,7 @@ impl<T: Copy> Unwrap<Option<T>> {
 ///
 /// The [`Copy`] bound may be relaxed in the future.
 ///
+/// This macro is [const-fn compatible](./index.html#const-fn-compatible).
 #[macro_export]
 macro_rules! unwrap {
     ($expr: expr) => {{

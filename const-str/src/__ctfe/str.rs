@@ -30,6 +30,8 @@ impl<const N: usize> StrBuf<N> {
 
 /// Converts a byte string to a string slice
 ///
+/// This macro is [const-context only](./index.html#const-context-only).
+///
 /// # Examples
 /// ```
 /// const BYTE_PATH: &[u8] = b"/tmp/file";

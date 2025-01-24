@@ -31,6 +31,8 @@ const fn bytes_repeat<const N: usize>(bytes: &[u8], n: usize) -> [u8; N] {
 
 /// Creates a new string slice by repeating a string slice n times.
 ///
+/// This macro is [const-context only](./index.html#const-context-only).
+///
 /// # Examples
 ///
 /// ```

@@ -26,6 +26,8 @@ impl Contains<'_, char> {
 /// + [`&str`]
 /// + [`char`]
 ///
+/// This macro is [const-fn compatible](./index.html#const-fn-compatible).
+///
 /// # Examples
 ///
 /// ```
@@ -68,6 +70,8 @@ impl StartsWith<'_, char> {
 ///
 /// + [`&str`]
 /// + [`char`]
+///
+/// This macro is [const-fn compatible](./index.html#const-fn-compatible).
 ///
 /// # Examples
 ///
@@ -112,6 +116,8 @@ impl EndsWith<'_, char> {
 /// + [`&str`]
 /// + [`char`]
 ///
+/// This macro is [const-fn compatible](./index.html#const-fn-compatible).
+///
 /// # Examples
 ///
 /// ```
@@ -147,6 +153,8 @@ impl<'a> StripSuffix<'a, &str> {
 
 /// Returns a string slice with the prefix removed.
 ///
+/// This macro is [const-fn compatible](./index.html#const-fn-compatible).
+///
 /// # Examples
 ///
 /// ```
@@ -167,6 +175,8 @@ macro_rules! strip_prefix {
 }
 
 /// Returns a string slice with the suffix removed.
+///
+/// This macro is [const-fn compatible](./index.html#const-fn-compatible).
 ///
 /// # Examples
 ///

@@ -22,6 +22,10 @@ impl Compare<&str, &str> {
 
 /// Compares two strings lexicographically.
 ///
+/// This macro is [const-fn compatible](./index.html#const-fn-compatible).
+///
+/// See also [`equal!`](crate::equal).
+///
 /// # Examples
 ///
 /// ```

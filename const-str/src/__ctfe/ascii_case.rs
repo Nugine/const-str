@@ -276,6 +276,8 @@ macro_rules! __conv_ascii_case {
 
 /// Converts a string slice to a specified case. Non-ascii characters are not affected.
 ///
+/// This macro is [const-context only](./index.html#const-context-only).
+///
 /// # Examples
 ///
 /// ```

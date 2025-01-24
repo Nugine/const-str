@@ -112,6 +112,8 @@ impl_integer_parse!(i8, i16, i32, i64, i128, isize);
 /// + [`u8`], [`u16`], [`u32`], [`u64`], [`u128`], [`usize`]
 /// + [`i8`], [`i16`], [`i32`], [`i64`], [`i128`], [`isize`]
 ///
+/// This macro is [const-fn compatible](./index.html#const-fn-compatible).
+///
 /// # Examples
 ///
 /// ```

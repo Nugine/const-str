@@ -14,6 +14,8 @@ impl<const L: usize> ToByteArray<&[u8; L]> {
 
 /// Converts a string slice or a byte string to a byte array.
 ///
+/// This macro is [const-context only](./index.html#const-context-only).
+///
 /// # Examples
 /// ```
 /// const S: &str = "hello";

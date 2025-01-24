@@ -46,6 +46,7 @@ impl Concat<'_> {
 /// + [`u8`], [`u16`], [`u32`], [`u64`], [`u128`], [`usize`]
 /// + [`i8`], [`i16`], [`i32`], [`i64`], [`i128`], [`isize`]
 ///
+/// This macro is [const-context only](./index.html#const-context-only).
 ///
 /// # Examples
 ///
@@ -113,6 +114,8 @@ impl Join<'_> {
 }
 
 /// Concatenates string slices into a string slice, separated by a given separator.
+///
+/// This macro is [const-context only](./index.html#const-context-only).
 ///
 /// # Examples
 ///

@@ -2,6 +2,19 @@
 //!
 //! MSRV: Rust 1.77.0
 //!
+//! ## Macro types
+//!
+//! ### const-context only
+//!
+//! These macros can only be used in [const contexts][const-context].
+//!
+//! ### const-fn compatible
+//!
+//! These macros can be used in [const contexts][const-context] and [const functions][const-fn].
+//!
+//! [const-context]: https://doc.rust-lang.org/reference/const_eval.html#const-context
+//! [const-fn]: https://doc.rust-lang.org/reference/const_eval.html#const-functions
+//!
 #![deny(unsafe_code, missing_docs, clippy::all, clippy::cargo)]
 #![allow(
     clippy::missing_docs_in_private_items,

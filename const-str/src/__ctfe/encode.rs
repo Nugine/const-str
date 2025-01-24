@@ -121,6 +121,8 @@ macro_rules! __encode {
 /// + utf8
 /// + utf16
 ///
+/// This macro is [const-context only](./index.html#const-context-only).
+///
 /// # Examples
 /// ``` rust
 /// use const_str::encode;
@@ -147,6 +149,8 @@ macro_rules! encode {
 /// Encode a string slice with a specified encoding and append a nul character.
 ///
 /// The provided data should not contain any nul bytes in it.
+///
+/// This macro is [const-context only](./index.html#const-context-only).
 ///
 /// See also [`const_str::encode!`][crate::encode]
 ///

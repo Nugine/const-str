@@ -12,7 +12,7 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
 #[allow(unused_macros)]
-macro_rules! item_group {
+macro_rules! cfg_group {
     ($($item:item)*) => {
         $($item)*
     }
@@ -36,13 +36,13 @@ pub mod __proc {
     pub use self::fmt::*;
 
     #[cfg(feature = "http")]
-    item_group! {
+    cfg_group! {
         mod http;
         pub use self::http::*;
     }
 
     #[cfg(feature = "regex")]
-    item_group! {
+    cfg_group! {
         mod regex;
         pub use self::regex::*;
     }
@@ -88,6 +88,7 @@ pub mod __ctfe {
 
     mod repeat;
     pub use self::repeat::*;
+
     mod replace;
     pub use self::replace::*;
 

@@ -66,6 +66,9 @@ pub mod __ctfe {
     mod ascii_case;
     pub use self::ascii_case::*;
 
+    mod chain;
+    // pub use self::chain::*;
+
     mod compare;
     pub use self::compare::*;
 

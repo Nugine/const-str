@@ -34,5 +34,5 @@ ci:
     just miri
 
 sync-version:
-    cargo set-version -p const-str-proc-macro   '0.5.7'
-    cargo set-version -p const-str              '0.5.7'
+    cargo set-version -p const-str-proc-macro   '0.6.0'
+    cargo set-version -p const-str              '0.6.0'

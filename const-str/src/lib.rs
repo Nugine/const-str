@@ -1,19 +1,78 @@
-//! Compile-time string operations
+//! Compile-time string operations.
+//! See the [macro list](#macros) for what you need.
 //!
 //! MSRV: Rust 1.77.0
 //!
-//! ## Macro types
+//! ## Troubleshoot
+//!
+//! You don't have to care about this section
+//! unless you come across some compile errors about const evaluation.
+//!
+//! ```txt
+//! error[E0435]: attempt to use a non-constant value in a constant
+//! ```
+//!
+//! There are mainly two kinds of macros in this crate,
+//! which have different requirements for the arguments.
+//! - [const-context only](#const-context-only)
+//! - [const-fn compatible](#const-fn-compatible)
 //!
 //! ### const-context only
 //!
 //! These macros can only be used in [const contexts][const-context].
+//! The expanded code is equivalent to compute new [constant items][const-item].
+//! It implies that the *arguments* of these macros must be constant values,
+//! similar to [`consteval`][consteval] in C++ world.
+//!
+//! The following examples will not work:
+//! ```compile_fail
+//! const fn foo(a: &str, b: &str) -> &str {
+//!    const_str::concat!(a, b)
+//! }
+//! ```
+//! ```compile_fail
+//! const C: &str = {
+//!     let a = "Hello";
+//!     let b = "World";
+//!     const_str::concat!(a, b);
+//! };
+//! ```
+//!
+//! Instead, this way will work:
+//! ```
+//! const A: &str = "Hello";
+//! const B: &str = "World";
+//! const C: &str = const_str::concat!(A, " ", B);
+//! assert_eq!(C, "Hello World");
+//! ```
 //!
 //! ### const-fn compatible
 //!
 //! These macros can be used in [const contexts][const-context] and [const functions][const-fn].
+//! The expanded code is equivalent to calling const functions.
+//! It implies that the *arguments* of these macros can be any expressions,
+//! similar to [`constexpr`][constexpr] in C++ world.
+//!
+//! ```
+//! const fn calc(y: &str, m: &str, d: &str) -> u64 {
+//!     let y = const_str::parse!(y, u64);
+//!     let m = const_str::parse!(m, u64);
+//!     let d = const_str::parse!(d, u64);
+//!     (y * 10000 + m * 100 + d)
+//! }
+//! const TIME: u64 = calc("2025", "01", "26");
+//! assert_eq!(TIME, 20250126);
+//! ```
+//!
+//! You can also use these macros in normal functions,
+//! but they may be much slower than the runtime equivalents.
+//! It's recommended to use them only if you need compile-time evaluation.
 //!
 //! [const-context]: https://doc.rust-lang.org/reference/const_eval.html#const-context
 //! [const-fn]: https://doc.rust-lang.org/reference/const_eval.html#const-functions
+//! [const-item]: https://doc.rust-lang.org/reference/items/constant-items.html
+//! [consteval]: https://en.cppreference.com/w/cpp/language/consteval
+//! [constexpr]: https://en.cppreference.com/w/cpp/language/constexpr
 //!
 #![deny(unsafe_code, missing_docs, clippy::all, clippy::cargo)]
 #![allow(

@@ -118,9 +118,9 @@ impl<const L: usize> Hex<[&str; L]> {
 /// It accepts the following characters in the input string:
 ///
 /// - `'0'...'9'`, `'a'...'f'`, `'A'...'F'` — hex characters which will be used
-///     in construction of the output byte array
+///   in construction of the output byte array
 /// - `' '`, `'\r'`, `'\n'`, `'\t'` — formatting characters which will be
-///     ignored
+///   ignored
 ///
 /// This macro is [const-context only](./index.html#const-context-only).
 ///

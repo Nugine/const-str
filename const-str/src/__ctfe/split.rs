@@ -18,10 +18,17 @@ impl<'input> SplitImpl<'input, '_> {
         if pat.is_empty() {
             crate::utf8::str_count_chars(input) + 2
         } else {
-            let mut ans = 1;
+            let mut ans = 0;
             while let Some((_, remain)) = crate::str::next_match(input, pat) {
                 ans += 1;
                 input = remain
+            }
+            if self.inclusive {
+                if !input.is_empty() {
+                    ans += 1;
+                }
+            } else {
+                ans += 1;
             }
             ans
         }
@@ -64,8 +71,15 @@ impl<'input> SplitImpl<'input, '_> {
                 pos += 1;
                 input = remain;
             }
-            buf[pos] = input;
-            pos += 1;
+            if self.inclusive {
+                if !input.is_empty() {
+                    buf[pos] = input;
+                    pos += 1;
+                }
+            } else {
+                buf[pos] = input;
+                pos += 1;
+            }
         }
         assert!(pos == N);
         buf
@@ -87,7 +101,6 @@ impl<'input, 'pat> Split<&'input str, &'pat str> {
         self.to_impl().output_len()
     }
 
-    #[allow(unsafe_code)]
     pub const fn const_eval<const N: usize>(&self) -> [&'input str; N] {
         self.to_impl().const_eval()
     }
@@ -115,14 +128,14 @@ impl<'input> Split<&'input str, char> {
 
 /// Returns an array of substrings of a string slice, separated by characters matched by a pattern.
 ///
-/// See [`str::split`](https://doc.rust-lang.org/std/primitive.str.html#method.split).
-///
 /// The pattern type must be one of
 ///
 /// + [`&str`](prim@str)
 /// + [`char`]
 ///
 /// This macro is [const-context only](./index.html#const-context-only).
+///
+/// See also [`str::split`](https://doc.rust-lang.org/std/primitive.str.html#method.split).
 ///
 /// # Examples
 ///
@@ -146,9 +159,9 @@ macro_rules! split {
     }};
 }
 
-pub struct SplitInclusive<'input, 'pat>(pub &'input str, pub &'pat str);
+pub struct SplitInclusive<T, P>(pub T, pub P);
 
-impl<'input, 'pat> SplitInclusive<'input, 'pat> {
+impl<'input, 'pat> SplitInclusive<&'input str, &'pat str> {
     const fn to_impl(&self) -> SplitImpl<'input, 'pat> {
         SplitImpl {
             input: self.0,
@@ -166,34 +179,80 @@ impl<'input, 'pat> SplitInclusive<'input, 'pat> {
     }
 }
 
-pub struct LinesMap<'a, const M: usize>(pub [&'a str; M]);
+impl<'input> SplitInclusive<&'input str, char> {
+    const fn to_impl<'pat>(&self, ch: &'pat CharEncodeUtf8) -> SplitImpl<'input, 'pat> {
+        SplitImpl {
+            input: self.0,
+            pattern: ch.as_str(),
+            inclusive: true,
+        }
+    }
 
-impl<const M: usize> LinesMap<'_, M> {
     pub const fn output_len(&self) -> usize {
-        if let Some(s) = self.0.last() {
-            if s.is_empty() {
-                return M - 1;
-            }
-        }
-        M
+        let ch = CharEncodeUtf8::new(self.1);
+        self.to_impl(&ch).output_len()
     }
 
-    pub const fn const_eval<const N: usize>(&self) -> [&str; N] {
-        let mut buf = [""; N];
-        let mut i = 0;
-        while i < N {
-            let s = self.0[i];
-            match crate::str::strip_suffix(s, "\r\n") {
-                Some(s) => buf[i] = s,
-                None => match crate::str::strip_suffix(s, "\n") {
-                    Some(s) => buf[i] = s,
-                    None => buf[i] = s,
-                },
-            }
-            i += 1;
-        }
-        buf
+    pub const fn const_eval<const N: usize>(&self) -> [&'input str; N] {
+        let ch = CharEncodeUtf8::new(self.1);
+        self.to_impl(&ch).const_eval()
     }
+}
+
+/// Returns an array of substrings of a string slice, separated by characters matched by a pattern.
+///
+/// Differs from the array produced by [`split!`] in that
+/// [`split_inclusive!`](crate::split_inclusive) leaves the matched part as the terminator of the substring.
+///
+/// If the last element of the string is matched,
+/// that element will be considered the terminator of the preceding substring.
+/// That substring will be the last item returned by the iterator.
+///
+/// The pattern type must be one of
+///
+/// + [`&str`](prim@str)
+/// + [`char`]
+///
+/// This macro is [const-context only](./index.html#const-context-only).
+///
+/// See also [`str::split_inclusive`](https://doc.rust-lang.org/std/primitive.str.html#method.split_inclusive).
+///
+/// # Examples
+/// ```
+/// const TEXT: &str = "Mary had a little lamb\nlittle lamb\nlittle lamb.";
+/// const ANSWER:&[&str] = &const_str::split_inclusive!(TEXT, "\n");
+/// assert_eq!(ANSWER, &["Mary had a little lamb\n", "little lamb\n", "little lamb."]);
+/// ```
+/// ```
+/// const TEXT: &str = "\nA\nB\nC\n";
+/// const ANSWER:&[&str] = &const_str::split_inclusive!(TEXT, "\n");
+/// assert_eq!(ANSWER, &["\n", "A\n", "B\n", "C\n"]);
+/// ```
+#[macro_export]
+macro_rules! split_inclusive {
+    ($s: expr, $pat: expr) => {{
+        const INPUT: &str = $s;
+        const OUTPUT_LEN: usize = $crate::__ctfe::SplitInclusive(INPUT, $pat).output_len();
+        const OUTPUT_BUF: [&str; OUTPUT_LEN] =
+            $crate::__ctfe::SplitInclusive(INPUT, $pat).const_eval();
+        OUTPUT_BUF
+    }};
+}
+
+pub const fn map_lines<const N: usize>(mut lines: [&str; N]) -> [&str; N] {
+    let mut i = 0;
+    while i < N {
+        let s = lines[i];
+        match crate::str::strip_suffix(s, "\r\n") {
+            Some(s) => lines[i] = s,
+            None => match crate::str::strip_suffix(s, "\n") {
+                Some(s) => lines[i] = s,
+                None => lines[i] = s,
+            },
+        }
+        i += 1;
+    }
+    lines
 }
 
 /// Returns an array of the lines in a string.
@@ -232,12 +291,7 @@ impl<const M: usize> LinesMap<'_, M> {
 #[macro_export]
 macro_rules! split_lines {
     ($s: expr) => {{
-        const INPUT: &str = $s;
-        const M: usize = $crate::__ctfe::SplitInclusive(INPUT, "\n").output_len();
-        const BUF: [&str; M] = $crate::__ctfe::SplitInclusive(INPUT, "\n").const_eval();
-        const N: usize = $crate::__ctfe::LinesMap(BUF).output_len();
-        const ANS: [&str; N] = $crate::__ctfe::LinesMap(BUF).const_eval();
-        ANS
+        $crate::__ctfe::map_lines($crate::split_inclusive!($s, "\n"))
     }};
 }
 

@@ -1,7 +1,14 @@
 //! Compile-time string operations.
 //! See the [macro list](#macros) for what you need.
 //!
-//! MSRV: Rust 1.77.0
+//! ## MSRV history
+//!
+//! Current: Rust 1.77.0
+//!
+//! - `v0.6.0`: Rust 1.77.0
+//! - `v0.5.7`: Rust 1.65.0
+//! - `v0.5.0`: Rust 1.64.0
+//! - `v0.4.0`: Rust 1.61.0
 //!
 //! ## Troubleshoot
 //!

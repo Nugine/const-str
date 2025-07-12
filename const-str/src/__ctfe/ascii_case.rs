@@ -127,6 +127,7 @@ pub enum AsciiCase {
     Upper,
     LowerCamel,
     UpperCamel,
+    Title,
     Snake,
     Kebab,
     ShoutySnake,
@@ -136,6 +137,7 @@ pub enum AsciiCase {
 impl AsciiCase {
     const fn get_seperator(&self) -> Option<u8> {
         match self {
+            Self::Title => Some(b' '),
             Self::Snake | Self::ShoutySnake => Some(b'_'),
             Self::Kebab | Self::ShoutyKebab => Some(b'-'),
             _ => None,
@@ -152,7 +154,7 @@ impl ConvAsciiCase<&str> {
         use AsciiCase::*;
         match self.1 {
             Lower | Upper => self.0.len(),
-            LowerCamel | UpperCamel | Snake | Kebab | ShoutySnake | ShoutyKebab => {
+            LowerCamel | UpperCamel | Title | Snake | Kebab | ShoutySnake | ShoutyKebab => {
                 let mut ans = 0;
 
                 let has_sep = self.1.get_seperator().is_some();
@@ -208,7 +210,7 @@ impl ConvAsciiCase<&str> {
                     push!(s[pos].to_ascii_uppercase());
                 }
             }
-            LowerCamel | UpperCamel | Snake | Kebab | ShoutySnake | ShoutyKebab => {
+            LowerCamel | UpperCamel | Title | Snake | Kebab | ShoutySnake | ShoutyKebab => {
                 let sep = self.1.get_seperator();
 
                 let boundaries = Boundaries::<M>::new(self.0);
@@ -230,10 +232,10 @@ impl ConvAsciiCase<&str> {
                             let b = match self.1 {
                                 Snake | Kebab => word[j].to_ascii_lowercase(),
                                 ShoutySnake | ShoutyKebab => word[j].to_ascii_uppercase(),
-                                LowerCamel | UpperCamel => {
+                                LowerCamel | UpperCamel | Title => {
                                     let is_upper = match self.1 {
                                         LowerCamel => !is_starting_boundary && j == 0,
-                                        UpperCamel => j == 0,
+                                        UpperCamel | Title => j == 0,
                                         _ => unreachable!(),
                                     };
                                     if is_upper {
@@ -287,19 +289,21 @@ macro_rules! __conv_ascii_case {
 /// const S2: &str = convert_ascii_case!(upper, "Upper Case");
 /// const S3: &str = convert_ascii_case!(lower_camel, "lower camel case");
 /// const S4: &str = convert_ascii_case!(upper_camel, "upper camel case");
-/// const S5: &str = convert_ascii_case!(snake, "snake case");
-/// const S6: &str = convert_ascii_case!(kebab, "kebab case");
-/// const S7: &str = convert_ascii_case!(shouty_snake, "shouty snake case");
-/// const S8: &str = convert_ascii_case!(shouty_kebab, "shouty kebab case");
+/// const S5: &str = convert_ascii_case!(title, "title case");
+/// const S6: &str = convert_ascii_case!(snake, "snake case");
+/// const S7: &str = convert_ascii_case!(kebab, "kebab case");
+/// const S8: &str = convert_ascii_case!(shouty_snake, "shouty snake case");
+/// const S9: &str = convert_ascii_case!(shouty_kebab, "shouty kebab case");
 ///
 /// assert_eq!(S1, "lower case");
 /// assert_eq!(S2, "UPPER CASE");
 /// assert_eq!(S3, "lowerCamelCase");
 /// assert_eq!(S4, "UpperCamelCase");
-/// assert_eq!(S5, "snake_case");
-/// assert_eq!(S6, "kebab-case");
-/// assert_eq!(S7, "SHOUTY_SNAKE_CASE");
-/// assert_eq!(S8, "SHOUTY-KEBAB-CASE");
+/// assert_eq!(S5, "Title Case");
+/// assert_eq!(S6, "snake_case");
+/// assert_eq!(S7, "kebab-case");
+/// assert_eq!(S8, "SHOUTY_SNAKE_CASE");
+/// assert_eq!(S9, "SHOUTY-KEBAB-CASE");
 /// ```
 #[macro_export]
 macro_rules! convert_ascii_case {
@@ -314,6 +318,9 @@ macro_rules! convert_ascii_case {
     };
     (upper_camel, $s: expr) => {
         $crate::__conv_ascii_case!($s, $crate::__ctfe::AsciiCase::UpperCamel)
+    };
+    (title, $s: expr) => {
+        $crate::__conv_ascii_case!($s, $crate::__ctfe::AsciiCase::Title)
     };
     (snake, $s: expr) => {
         $crate::__conv_ascii_case!($s, $crate::__ctfe::AsciiCase::Snake)
@@ -355,6 +362,11 @@ mod tests {
                 let c: String = $a.to_upper_camel_case();
                 test_conv_ascii_case!(heck, assert_eq, c.as_str(), $b);
             }};
+            (heck, title, $a: expr, $b: expr) => {{
+                use heck::ToTitleCase;
+                let c: String = $a.to_title_case();
+                test_conv_ascii_case!(heck, assert_eq, c.as_str(), $b);
+            }};
             (heck, snake, $a: expr, $b: expr) => {{
                 use heck::ToSnakeCase;
                 let c: String = $a.to_snake_case();
@@ -381,6 +393,7 @@ mod tests {
             const S: &str = "b.8";
             test_conv_ascii_case!(lower_camel, S, "b8");
             test_conv_ascii_case!(upper_camel, S, "B8");
+            test_conv_ascii_case!(title, S, "B 8");
             test_conv_ascii_case!(snake, S, "b_8");
             test_conv_ascii_case!(kebab, S, "b-8");
             test_conv_ascii_case!(shouty_snake, S, "B_8");
@@ -391,6 +404,7 @@ mod tests {
             const S: &str = "Hello World123!XMLHttp我4t5.c6.7b.8";
             test_conv_ascii_case!(lower_camel, S, "helloWorld123XmlHttp我4t5C67b8");
             test_conv_ascii_case!(upper_camel, S, "HelloWorld123XmlHttp我4t5C67b8");
+            test_conv_ascii_case!(title, S, "Hello World123 Xml Http 我 4t5 C6 7b 8");
             test_conv_ascii_case!(snake, S, "hello_world123_xml_http_我_4t5_c6_7b_8");
             test_conv_ascii_case!(kebab, S, "hello-world123-xml-http-我-4t5-c6-7b-8");
             test_conv_ascii_case!(shouty_snake, S, "HELLO_WORLD123_XML_HTTP_我_4T5_C6_7B_8");
@@ -400,6 +414,7 @@ mod tests {
             const S: &str = "XMLHttpRequest";
             test_conv_ascii_case!(lower_camel, S, "xmlHttpRequest");
             test_conv_ascii_case!(upper_camel, S, "XmlHttpRequest");
+            test_conv_ascii_case!(title, S, "Xml Http Request");
             test_conv_ascii_case!(snake, S, "xml_http_request");
             test_conv_ascii_case!(kebab, S, "xml-http-request");
             test_conv_ascii_case!(shouty_snake, S, "XML_HTTP_REQUEST");
@@ -409,6 +424,7 @@ mod tests {
             const S: &str = "  hello world  ";
             test_conv_ascii_case!(lower_camel, S, "helloWorld");
             test_conv_ascii_case!(upper_camel, S, "HelloWorld");
+            test_conv_ascii_case!(title, S, "Hello World");
             test_conv_ascii_case!(snake, S, "hello_world");
             test_conv_ascii_case!(kebab, S, "hello-world");
             test_conv_ascii_case!(shouty_snake, S, "HELLO_WORLD");
@@ -418,6 +434,7 @@ mod tests {
             const S: &str = "";
             test_conv_ascii_case!(lower_camel, S, "");
             test_conv_ascii_case!(upper_camel, S, "");
+            test_conv_ascii_case!(title, S, "");
             test_conv_ascii_case!(snake, S, "");
             test_conv_ascii_case!(kebab, S, "");
             test_conv_ascii_case!(shouty_snake, S, "");
@@ -427,6 +444,7 @@ mod tests {
             const S: &str = "_";
             test_conv_ascii_case!(lower_camel, S, "");
             test_conv_ascii_case!(upper_camel, S, "");
+            test_conv_ascii_case!(title, S, "");
             test_conv_ascii_case!(snake, S, "");
             test_conv_ascii_case!(kebab, S, "");
             test_conv_ascii_case!(shouty_snake, S, "");
@@ -436,6 +454,7 @@ mod tests {
             const S: &str = "1.2E3";
             test_conv_ascii_case!(lower_camel, S, "12e3");
             test_conv_ascii_case!(upper_camel, S, "12e3");
+            test_conv_ascii_case!(title, S, "1 2e3");
             test_conv_ascii_case!(snake, S, "1_2e3");
             test_conv_ascii_case!(kebab, S, "1-2e3");
             test_conv_ascii_case!(shouty_snake, S, "1_2E3");

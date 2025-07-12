@@ -14,7 +14,7 @@ pub const fn compare(lhs: &str, rhs: &str) -> Ordering {
 
 pub const unsafe fn char_from_u32(x: u32) -> char {
     #[cfg(not(feature = "unstable"))]
-    #[allow(clippy::transmute_int_to_char)]
+    #[allow(unnecessary_transmutes)]
     {
         core::mem::transmute(x)
     }

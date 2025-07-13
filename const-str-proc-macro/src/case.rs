@@ -13,6 +13,8 @@ enum Case {
     #[cfg(feature = "heck")]
     Title,
     #[cfg(feature = "heck")]
+    Train,
+    #[cfg(feature = "heck")]
     Snake,
     #[cfg(feature = "heck")]
     Kebab,
@@ -32,6 +34,7 @@ impl Case {
             ToShoutySnakeCase, //
             ToSnakeCase,       //
             ToTitleCase,       //
+            ToTrainCase,       //
             ToUpperCamelCase,  //
         };
         match self {
@@ -43,6 +46,8 @@ impl Case {
             Case::UpperCamel => s.to_upper_camel_case(),
             #[cfg(feature = "heck")]
             Case::Title => s.to_title_case(),
+            #[cfg(feature = "heck")]
+            Case::Train => s.to_train_case(),
             #[cfg(feature = "heck")]
             Case::Snake => s.to_snake_case(),
             #[cfg(feature = "heck")]
@@ -73,6 +78,8 @@ impl Parse for ConvertCase {
             "upper_camel" => Case::UpperCamel,
             #[cfg(feature = "heck")]
             "title" => Case::Title,
+            #[cfg(feature = "heck")]
+            "train" => Case::Train,
             #[cfg(feature = "heck")]
             "snake" => Case::Snake,
             #[cfg(feature = "heck")]

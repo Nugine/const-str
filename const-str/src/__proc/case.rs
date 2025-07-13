@@ -10,6 +10,7 @@ These variants require the feature `case`.
 + lower_camel
 + upper_camel
 + title
++ train
 + kebab
 + snake
 + shouty_snake
@@ -28,13 +29,15 @@ const S4: &str = convert_case!(upper_camel, "upper camel case");
 # #[cfg(feature = "case")]
 const S5: &str = convert_case!(title, "title case");
 # #[cfg(feature = "case")]
-const S6: &str = convert_case!(snake, "snake case");
+const S6: &str = convert_case!(train, "train case");
 # #[cfg(feature = "case")]
-const S7: &str = convert_case!(kebab, "kebab case");
+const S7: &str = convert_case!(snake, "snake case");
 # #[cfg(feature = "case")]
-const S8: &str = convert_case!(shouty_snake, "shouty snake case");
+const S8: &str = convert_case!(kebab, "kebab case");
 # #[cfg(feature = "case")]
-const S9: &str = convert_case!(shouty_kebab, "shouty kebab case");
+const S9: &str = convert_case!(shouty_snake, "shouty snake case");
+# #[cfg(feature = "case")]
+const S10: &str = convert_case!(shouty_kebab, "shouty kebab case");
 
 assert_eq!(S1, "lower case");
 assert_eq!(S2, "UPPER CASE");
@@ -45,13 +48,15 @@ assert_eq!(S4, "UpperCamelCase");
 # #[cfg(feature = "case")]
 assert_eq!(S5, "Title Case");
 # #[cfg(feature = "case")]
-assert_eq!(S6, "snake_case");
+assert_eq!(S6, "Train-Case");
 # #[cfg(feature = "case")]
-assert_eq!(S7, "kebab-case");
+assert_eq!(S7, "snake_case");
 # #[cfg(feature = "case")]
-assert_eq!(S8, "SHOUTY_SNAKE_CASE");
+assert_eq!(S8, "kebab-case");
 # #[cfg(feature = "case")]
-assert_eq!(S9, "SHOUTY-KEBAB-CASE");
+assert_eq!(S9, "SHOUTY_SNAKE_CASE");
+# #[cfg(feature = "case")]
+assert_eq!(S10, "SHOUTY-KEBAB-CASE");
 ```
 "#
     };
@@ -88,6 +93,9 @@ macro_rules! convert_case {
     };
     (title, $s: literal) => {
         $crate::__proc::convert_case!(title, $s)
+    };
+    (train, $s: literal) => {
+        $crate::__proc::convert_case!(train, $s)
     };
     (snake, $s: literal) => {
         $crate::__proc::convert_case!(snake, $s)

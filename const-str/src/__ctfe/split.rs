@@ -4,81 +4,141 @@ use crate::utf8::CharEncodeUtf8;
 
 use core::str;
 
+enum Pattern<'pat> {
+    Str(&'pat str),
+    CharSlice(&'pat [char]),
+}
+
 struct SplitImpl<'input, 'pat> {
     input: &'input str,
-    pattern: &'pat str,
+    pattern: Pattern<'pat>,
     inclusive: bool,
 }
 
 impl<'input> SplitImpl<'input, '_> {
     const fn output_len(&self) -> usize {
         let mut input = self.input;
-        let pat = self.pattern;
 
-        if pat.is_empty() {
-            crate::utf8::str_count_chars(input) + 2
-        } else {
-            let mut ans = 0;
-            while let Some((_, remain)) = crate::str::next_match(input, pat) {
-                ans += 1;
-                input = remain
-            }
-            if self.inclusive {
-                if !input.is_empty() {
-                    ans += 1;
+        match self.pattern {
+            Pattern::Str(pat) => {
+                if pat.is_empty() {
+                    crate::utf8::str_count_chars(input) + 2
+                } else {
+                    let mut ans = 0;
+                    while let Some((_, remain)) = crate::str::next_match(input, pat) {
+                        ans += 1;
+                        input = remain
+                    }
+                    if self.inclusive {
+                        if !input.is_empty() {
+                            ans += 1;
+                        }
+                    } else {
+                        ans += 1;
+                    }
+                    ans
                 }
-            } else {
-                ans += 1;
             }
-            ans
+            Pattern::CharSlice(chars) => {
+                if chars.is_empty() {
+                    1  // If no chars to split on, return the whole string
+                } else {
+                    let mut ans = 0;
+                    while let Some((_, remain)) = crate::str::next_match_char_slice(input, chars) {
+                        ans += 1;
+                        input = remain
+                    }
+                    if self.inclusive {
+                        if !input.is_empty() {
+                            ans += 1;
+                        }
+                    } else {
+                        ans += 1;
+                    }
+                    ans
+                }
+            }
         }
     }
 
     #[allow(unsafe_code)]
     const fn const_eval<const N: usize>(&self) -> [&'input str; N] {
         let mut input = self.input;
-        let pat = self.pattern;
 
         let mut buf: [&str; N] = [""; N];
         let mut pos = 0;
 
-        if pat.is_empty() {
-            let mut input = input.as_bytes();
+        match self.pattern {
+            Pattern::Str(pat) => {
+                if pat.is_empty() {
+                    let mut input = input.as_bytes();
 
-            {
-                buf[pos] = unsafe { str::from_utf8_unchecked(subslice(input, 0..0)) };
-                pos += 1;
-            }
+                    {
+                        buf[pos] = unsafe { str::from_utf8_unchecked(subslice(input, 0..0)) };
+                        pos += 1;
+                    }
 
-            while let Some((_, count)) = crate::utf8::next_char(input) {
-                buf[pos] = unsafe { str::from_utf8_unchecked(subslice(input, 0..count)) };
-                pos += 1;
-                input = advance(input, count);
-            }
+                    while let Some((_, count)) = crate::utf8::next_char(input) {
+                        buf[pos] = unsafe { str::from_utf8_unchecked(subslice(input, 0..count)) };
+                        pos += 1;
+                        input = advance(input, count);
+                    }
 
-            {
-                buf[pos] = unsafe { str::from_utf8_unchecked(subslice(input, 0..0)) };
-                pos += 1;
-            }
-        } else {
-            while let Some((m, remain)) = crate::str::next_match(input, pat) {
-                let substr = if self.inclusive {
-                    subslice(input.as_bytes(), 0..m + pat.len())
+                    {
+                        buf[pos] = unsafe { str::from_utf8_unchecked(subslice(input, 0..0)) };
+                        pos += 1;
+                    }
                 } else {
-                    subslice(input.as_bytes(), 0..m)
-                };
-                buf[pos] = unsafe { str::from_utf8_unchecked(substr) };
-                pos += 1;
-                input = remain;
+                    while let Some((m, remain)) = crate::str::next_match(input, pat) {
+                        let substr = if self.inclusive {
+                            subslice(input.as_bytes(), 0..m + pat.len())
+                        } else {
+                            subslice(input.as_bytes(), 0..m)
+                        };
+                        buf[pos] = unsafe { str::from_utf8_unchecked(substr) };
+                        pos += 1;
+                        input = remain;
+                    }
+                    if self.inclusive {
+                        if !input.is_empty() {
+                            buf[pos] = input;
+                            pos += 1;
+                        }
+                    } else {
+                        buf[pos] = input;
+                        pos += 1;
+                    }
+                }
             }
-            if self.inclusive {
-                if !input.is_empty() {
+            Pattern::CharSlice(chars) => {
+                if chars.is_empty() {
                     buf[pos] = input;
                     pos += 1;
+                } else {
+                    while let Some((m, remain)) = crate::str::next_match_char_slice(input, chars) {
+                        let substr = if self.inclusive {
+                            // For char slice, we need to determine how many bytes the matched char takes
+                            let original_len = input.len();
+                            let remain_len = remain.len();
+                            let matched_char_len = original_len - remain_len - m;
+                            subslice(input.as_bytes(), 0..m + matched_char_len)
+                        } else {
+                            subslice(input.as_bytes(), 0..m)
+                        };
+                        buf[pos] = unsafe { str::from_utf8_unchecked(substr) };
+                        pos += 1;
+                        input = remain;
+                    }
+                    if self.inclusive {
+                        if !input.is_empty() {
+                            buf[pos] = input;
+                            pos += 1;
+                        }
+                    } else {
+                        buf[pos] = input;
+                        pos += 1;
+                    }
                 }
-            } else {
-                buf[pos] = input;
-                pos += 1;
             }
         }
         assert!(pos == N);
@@ -92,7 +152,7 @@ impl<'input, 'pat> Split<&'input str, &'pat str> {
     const fn to_impl(&self) -> SplitImpl<'input, 'pat> {
         SplitImpl {
             input: self.0,
-            pattern: self.1,
+            pattern: Pattern::Str(self.1),
             inclusive: false,
         }
     }
@@ -110,7 +170,7 @@ impl<'input> Split<&'input str, char> {
     const fn to_impl<'pat>(&self, ch: &'pat CharEncodeUtf8) -> SplitImpl<'input, 'pat> {
         SplitImpl {
             input: self.0,
-            pattern: ch.as_str(),
+            pattern: Pattern::Str(ch.as_str()),
             inclusive: false,
         }
     }
@@ -126,12 +186,49 @@ impl<'input> Split<&'input str, char> {
     }
 }
 
+impl<'input, 'pat> Split<&'input str, &'pat [char]> {
+    const fn to_impl(&self) -> SplitImpl<'input, 'pat> {
+        SplitImpl {
+            input: self.0,
+            pattern: Pattern::CharSlice(self.1),
+            inclusive: false,
+        }
+    }
+
+    pub const fn output_len(&self) -> usize {
+        self.to_impl().output_len()
+    }
+
+    pub const fn const_eval<const N: usize>(&self) -> [&'input str; N] {
+        self.to_impl().const_eval()
+    }
+}
+
+impl<'input, 'pat, const LEN: usize> Split<&'input str, &'pat [char; LEN]> {
+    const fn to_impl(&self) -> SplitImpl<'input, 'pat> {
+        SplitImpl {
+            input: self.0,
+            pattern: Pattern::CharSlice(self.1.as_slice()),
+            inclusive: false,
+        }
+    }
+
+    pub const fn output_len(&self) -> usize {
+        self.to_impl().output_len()
+    }
+
+    pub const fn const_eval<const N: usize>(&self) -> [&'input str; N] {
+        self.to_impl().const_eval()
+    }
+}
+
 /// Returns an array of substrings of a string slice, separated by characters matched by a pattern.
 ///
 /// The pattern type must be one of
 ///
 /// + [`&str`](prim@str)
 /// + [`char`]
+/// + [`&[char]`][slice]
 ///
 /// This macro is [const-context only](./index.html#const-context-only).
 ///
@@ -149,6 +246,15 @@ impl<'input> Split<&'input str, char> {
 /// assert_eq!(ANIMALS_ARRAY, ANIMALS_SLICE);
 /// assert_eq!(ANIMALS_SLICE, &["lion", "tiger", "leopard"]);
 /// ```
+///
+/// Split by any character in a slice:
+/// ```
+/// const TEXT: &str = "hello,world;foo:bar";
+/// const DELIMITERS: &[char] = &[',', ';', ':'];
+/// const PARTS: &[&str] = &const_str::split!(TEXT, DELIMITERS);
+/// 
+/// assert_eq!(PARTS, &["hello", "world", "foo", "bar"]);
+/// ```
 #[macro_export]
 macro_rules! split {
     ($s: expr, $pat: expr) => {{
@@ -165,7 +271,7 @@ impl<'input, 'pat> SplitInclusive<&'input str, &'pat str> {
     const fn to_impl(&self) -> SplitImpl<'input, 'pat> {
         SplitImpl {
             input: self.0,
-            pattern: self.1,
+            pattern: Pattern::Str(self.1),
             inclusive: true,
         }
     }
@@ -183,7 +289,7 @@ impl<'input> SplitInclusive<&'input str, char> {
     const fn to_impl<'pat>(&self, ch: &'pat CharEncodeUtf8) -> SplitImpl<'input, 'pat> {
         SplitImpl {
             input: self.0,
-            pattern: ch.as_str(),
+            pattern: Pattern::Str(ch.as_str()),
             inclusive: true,
         }
     }
@@ -196,6 +302,42 @@ impl<'input> SplitInclusive<&'input str, char> {
     pub const fn const_eval<const N: usize>(&self) -> [&'input str; N] {
         let ch = CharEncodeUtf8::new(self.1);
         self.to_impl(&ch).const_eval()
+    }
+}
+
+impl<'input, 'pat> SplitInclusive<&'input str, &'pat [char]> {
+    const fn to_impl(&self) -> SplitImpl<'input, 'pat> {
+        SplitImpl {
+            input: self.0,
+            pattern: Pattern::CharSlice(self.1),
+            inclusive: true,
+        }
+    }
+
+    pub const fn output_len(&self) -> usize {
+        self.to_impl().output_len()
+    }
+
+    pub const fn const_eval<const N: usize>(&self) -> [&'input str; N] {
+        self.to_impl().const_eval()
+    }
+}
+
+impl<'input, 'pat, const LEN: usize> SplitInclusive<&'input str, &'pat [char; LEN]> {
+    const fn to_impl(&self) -> SplitImpl<'input, 'pat> {
+        SplitImpl {
+            input: self.0,
+            pattern: Pattern::CharSlice(self.1.as_slice()),
+            inclusive: true,
+        }
+    }
+
+    pub const fn output_len(&self) -> usize {
+        self.to_impl().output_len()
+    }
+
+    pub const fn const_eval<const N: usize>(&self) -> [&'input str; N] {
+        self.to_impl().const_eval()
     }
 }
 
@@ -212,6 +354,7 @@ impl<'input> SplitInclusive<&'input str, char> {
 ///
 /// + [`&str`](prim@str)
 /// + [`char`]
+/// + [`&[char]`][slice]
 ///
 /// This macro is [const-context only](./index.html#const-context-only).
 ///
@@ -227,6 +370,15 @@ impl<'input> SplitInclusive<&'input str, char> {
 /// const TEXT: &str = "\nA\nB\nC\n";
 /// const ANSWER:&[&str] = &const_str::split_inclusive!(TEXT, "\n");
 /// assert_eq!(ANSWER, &["\n", "A\n", "B\n", "C\n"]);
+/// ```
+/// 
+/// Split inclusive by any character in a slice:
+/// ```
+/// const TEXT: &str = "a,b;c:d";
+/// const DELIMITERS: &[char] = &[',', ';', ':'];
+/// const PARTS: &[&str] = &const_str::split_inclusive!(TEXT, DELIMITERS);
+/// 
+/// assert_eq!(PARTS, &["a,", "b;", "c:", "d"]);
 /// ```
 #[macro_export]
 macro_rules! split_inclusive {
@@ -329,5 +481,47 @@ mod tests {
         testcase!("a中1😂1!", '1');
         testcase!("a中1😂1!", '😂');
         testcase!("a中1😂1!", '!');
+        
+        // Test with char slice
+        macro_rules! testcase_char_slice {
+            ($input: expr, $pat: expr) => {{
+                const OUTPUT: &[&str] = &$crate::split!($input, $pat);
+
+                let ans = $input.split($pat as &[char]).collect::<Vec<_>>();
+                assert_eq!(OUTPUT.len(), ans.len());
+                assert_eq!(OUTPUT, &*ans, "ans = {:?}", ans);
+            }};
+        }
+
+        testcase_char_slice!("hello,world;test", &[',', ';']);
+        testcase_char_slice!("a中1😂1!", &['a', '1']);
+        testcase_char_slice!("a中1😂1!", &['中', '😂']);
+        testcase_char_slice!("no match", &['x', 'y']);
+        testcase_char_slice!("", &['a', 'b']);
+        testcase_char_slice!("abc", &[]);
+        testcase_char_slice!("aaa", &['a']);
+        testcase_char_slice!("a,b;c:d", &[',', ';', ':']);
+    }
+    
+    #[test]
+    fn test_split_inclusive_char_slice() {
+        macro_rules! testcase {
+            ($input: expr, $pat: expr) => {{
+                const OUTPUT: &[&str] = &$crate::split_inclusive!($input, $pat);
+
+                let ans = $input.split_inclusive($pat as &[char]).collect::<Vec<_>>();
+                assert_eq!(OUTPUT.len(), ans.len());
+                assert_eq!(OUTPUT, &*ans, "ans = {:?}", ans);
+            }};
+        }
+
+        testcase!("hello,world;test", &[',', ';']);
+        testcase!("a中1😂1!", &['a', '1']);
+        testcase!("a中1😂1!", &['中', '😂']);
+        testcase!("no match", &['x', 'y']);
+        testcase!("", &['a', 'b']);
+        testcase!("abc", &[]);
+        testcase!("aaa", &['a']);
+        testcase!("a,b;c:d", &[',', ';', ':']);
     }
 }

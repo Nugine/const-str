@@ -77,6 +77,34 @@ pub const fn next_match<'h>(haystack: &'h str, needle: &str) -> Option<(usize, &
     None
 }
 
+pub const fn next_match_char_slice<'h>(haystack: &'h str, chars: &[char]) -> Option<(usize, &'h str)> {
+    let mut input_bytes = haystack.as_bytes();
+    let mut byte_offset = 0;
+
+    while !input_bytes.is_empty() {
+        if let Some((ch, char_byte_len)) = crate::utf8::next_char(input_bytes) {
+            // Check if this character matches any in the slice
+            let mut i = 0;
+            while i < chars.len() {
+                if ch == chars[i] {
+                    let remain = advance(haystack.as_bytes(), byte_offset + char_byte_len);
+                    let remain = unsafe { core::str::from_utf8_unchecked(remain) };
+                    return Some((byte_offset, remain));
+                }
+                i += 1;
+            }
+
+            input_bytes = advance(input_bytes, char_byte_len);
+            byte_offset += char_byte_len;
+        } else {
+            // Invalid UTF-8 or end of string
+            break;
+        }
+    }
+
+    None
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -87,5 +115,18 @@ mod tests {
         assert_eq!(next_match("abc", "bc"), Some((1, "")));
         assert_eq!(next_match("abc", "c"), Some((2, "")));
         assert_eq!(next_match("abc", "d"), None);
+    }
+
+    #[test]
+    fn test_next_match_char_slice() {
+        assert_eq!(next_match_char_slice("abc", &['a']), Some((0, "bc")));
+        assert_eq!(next_match_char_slice("abc", &['b']), Some((1, "c")));
+        assert_eq!(next_match_char_slice("abc", &['c']), Some((2, "")));
+        assert_eq!(next_match_char_slice("abc", &['d']), None);
+        assert_eq!(next_match_char_slice("abc", &['a', 'c']), Some((0, "bc")));
+        assert_eq!(next_match_char_slice("abc", &['b', 'c']), Some((1, "c")));
+        assert_eq!(next_match_char_slice("hello,world;test", &[',', ';']), Some((5, "world;test")));
+        assert_eq!(next_match_char_slice("hello,world;test", &[';', ',']), Some((5, "world;test")));
+        assert_eq!(next_match_char_slice("无字符", &['字']), Some((3, "符")));
     }
 }

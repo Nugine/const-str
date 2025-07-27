@@ -391,6 +391,70 @@ macro_rules! split_inclusive {
     }};
 }
 
+pub struct SplitAsciiWhitespace<T>(pub T);
+
+impl SplitAsciiWhitespace<&'_ str> {
+    pub const fn output_len(&self) -> usize {
+        let bytes = self.0.as_bytes();
+        let mut count = 0;
+        let mut i = 0;
+        let mut in_word = false;
+
+        while i < bytes.len() {
+            if bytes[i].is_ascii_whitespace() {
+                if in_word {
+                    count += 1;
+                    in_word = false;
+                }
+            } else {
+                in_word = true;
+            }
+            i += 1;
+        }
+
+        if in_word {
+            count += 1;
+        }
+
+        count
+    }
+
+    #[allow(unsafe_code)]
+    pub const fn const_eval<const N: usize>(&self) -> [&'_ str; N] {
+        let bytes = self.0.as_bytes();
+        let mut buf: [&str; N] = [""; N];
+        let mut pos = 0;
+        let mut i = 0;
+
+        while i < bytes.len() {
+            // Skip leading whitespace
+            while i < bytes.len() && bytes[i].is_ascii_whitespace() {
+                i += 1;
+            }
+
+            if i >= bytes.len() {
+                break;
+            }
+
+            // Mark start of word
+            let start = i;
+
+            // Find end of word
+            while i < bytes.len() && !bytes[i].is_ascii_whitespace() {
+                i += 1;
+            }
+
+            // Extract word
+            let word_bytes = subslice(bytes, start..i);
+            buf[pos] = unsafe { core::str::from_utf8_unchecked(word_bytes) };
+            pos += 1;
+        }
+
+        assert!(pos == N);
+        buf
+    }
+}
+
 pub const fn map_lines<const N: usize>(mut lines: [&str; N]) -> [&str; N] {
     let mut i = 0;
     while i < N {
@@ -444,6 +508,45 @@ pub const fn map_lines<const N: usize>(mut lines: [&str; N]) -> [&str; N] {
 macro_rules! split_lines {
     ($s: expr) => {{
         $crate::__ctfe::map_lines($crate::split_inclusive!($s, "\n"))
+    }};
+}
+
+/// Returns an array of substrings of a string slice, separated by ASCII whitespace.
+///
+/// ASCII whitespace characters are: space (` `), tab (`\t`), newline (`\n`),
+/// carriage return (`\r`), and form feed (`\f`).
+///
+/// Consecutive whitespace characters are treated as a single separator.
+/// Leading and trailing whitespace is ignored.
+///
+/// This macro is [const-context only](./index.html#const-context-only).
+///
+/// See also [`str::split_ascii_whitespace`](https://doc.rust-lang.org/std/primitive.str.html#method.split_ascii_whitespace).
+///
+/// # Examples
+///
+/// ```
+/// const TEXT: &str = "  hello   world  ";
+/// const WORDS_ARRAY: [&str; 2] = const_str::split_ascii_whitespace!(TEXT);
+/// const WORDS_SLICE: &[&str] = &const_str::split_ascii_whitespace!(TEXT);
+///
+/// assert_eq!(WORDS_ARRAY, WORDS_SLICE);
+/// assert_eq!(WORDS_SLICE, &["hello", "world"]);
+/// ```
+///
+/// ```
+/// const TEXT: &str = "word1\t\tword2\n\nword3";
+/// const WORDS: &[&str] = &const_str::split_ascii_whitespace!(TEXT);
+/// assert_eq!(WORDS, &["word1", "word2", "word3"]);
+/// ```
+#[macro_export]
+macro_rules! split_ascii_whitespace {
+    ($s: expr) => {{
+        const INPUT: &str = $s;
+        const OUTPUT_LEN: usize = $crate::__ctfe::SplitAsciiWhitespace(INPUT).output_len();
+        const OUTPUT_BUF: [&str; OUTPUT_LEN] =
+            $crate::__ctfe::SplitAsciiWhitespace(INPUT).const_eval();
+        OUTPUT_BUF
     }};
 }
 
@@ -523,5 +626,55 @@ mod tests {
         testcase!("abc", &[]);
         testcase!("aaa", &['a']);
         testcase!("a,b;c:d", &[',', ';', ':']);
+    }
+
+    #[test]
+    fn test_split_ascii_whitespace() {
+        macro_rules! testcase {
+            ($input: expr) => {{
+                const OUTPUT: &[&str] = &$crate::split_ascii_whitespace!($input);
+
+                let ans = $input.split_ascii_whitespace().collect::<Vec<_>>();
+                assert_eq!(
+                    OUTPUT.len(),
+                    ans.len(),
+                    "Length mismatch for input: {:?}",
+                    $input
+                );
+                assert_eq!(
+                    OUTPUT, &*ans,
+                    "Content mismatch for input: {:?}, expected: {:?}",
+                    $input, ans
+                );
+            }};
+        }
+
+        // Basic cases
+        testcase!("");
+        testcase!(" ");
+        testcase!("  ");
+        testcase!("hello");
+        testcase!(" hello ");
+        testcase!("  hello  ");
+        testcase!("hello world");
+        testcase!(" hello world ");
+        testcase!("  hello   world  ");
+
+        // Different whitespace types
+        testcase!("a\tb\nc\rd\x0Cf");
+        testcase!(" \t\n\r\x0C ");
+        testcase!("word1\t\t\tword2\n\n\nword3");
+
+        // Mixed content
+        testcase!("foo bar baz");
+        testcase!("\tfoo\nbar\rbaz\x0C");
+        testcase!("   a   b   c   ");
+        testcase!("\t\n\r\x0C");
+
+        // Edge cases
+        testcase!("single");
+        testcase!("a");
+        testcase!("a b");
+        testcase!("  a  b  ");
     }
 }

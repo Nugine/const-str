@@ -89,6 +89,7 @@
 )]
 #![cfg_attr(not(any(test, feature = "std")), no_std)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
+#![cfg_attr(feature = "unstable", allow(clippy::incompatible_msrv))]
 
 #[allow(unused_macros)]
 macro_rules! cfg_group {

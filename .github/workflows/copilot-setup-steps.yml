@@ -1,0 +1,110 @@
+name: Copilot Setup Steps
+
+# This workflow defines the setup steps for GitHub Copilot's environment
+# to work effectively with the const-str repository
+
+on:
+  workflow_dispatch:
+  # This workflow is primarily for Copilot agent environment setup
+  # It can be triggered manually for testing the setup process
+
+env:
+  RUST_BACKTRACE: 1
+  CARGO_TERM_COLOR: always
+
+jobs:
+  copilot-setup:
+    runs-on: ubuntu-latest
+    name: Setup Copilot Environment for const-str
+    
+    steps:
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Install the just command runner (essential for this project)
+      - name: Install just command runner
+        uses: taiki-e/install-action@just
+
+      # Install Rust toolchain with required components
+      - name: Install Rust toolchain (stable)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      # Install Rust nightly for advanced features
+      - name: Install Rust toolchain (nightly)
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt, clippy, miri, rust-src
+
+      # Set up Rust cache for faster builds
+      - name: Setup Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          # Cache key includes Cargo.lock content
+          key: copilot-setup-${{ hashFiles('**/Cargo.lock') }}
+
+      # Install cargo-audit for security checking
+      - name: Install cargo-audit
+        uses: taiki-e/install-action@cargo-audit
+
+      # Verify installation by running development checks
+      - name: Verify toolchain setup
+        run: |
+          rustc --version
+          cargo --version
+          just --version
+          cargo audit --version
+          echo "✅ All tools installed successfully"
+
+      # Download dependencies and build the project
+      - name: Build project and download dependencies
+        run: |
+          cargo check --all-targets --all-features
+          cargo build --all-targets
+          echo "✅ Project builds successfully"
+
+      # Run basic tests to ensure everything works
+      - name: Run basic tests
+        run: |
+          just test
+          echo "✅ Tests pass successfully"
+
+      # Install additional tools that might be useful
+      - name: Install additional development tools
+        run: |
+          # Install cargo-expand for macro debugging (useful for proc-macro development)
+          cargo install cargo-expand --locked
+          
+          # Install cargo-outdated for dependency management
+          cargo install cargo-outdated --locked
+          
+          echo "✅ Additional tools installed"
+
+      # Warm up caches
+      - name: Warm up caches
+        run: |
+          # Pre-compile commonly used dependencies
+          cargo build --release
+          cargo doc --no-deps
+          echo "✅ Caches warmed up"
+
+      # Final verification
+      - name: Final verification
+        run: |
+          echo "🚀 Copilot environment setup complete!"
+          echo "Available tools:"
+          echo "  - Rust stable: $(rustc +stable --version)"
+          echo "  - Rust nightly: $(rustc +nightly --version)"
+          echo "  - just: $(just --version)"
+          echo "  - cargo-audit: $(cargo audit --version)"
+          echo "  - cargo-expand: $(cargo expand --version)"
+          echo "  - cargo-outdated: $(cargo outdated --version)"
+          echo ""
+          echo "To work with this project:"
+          echo "  - Use 'just dev' for the full development cycle"
+          echo "  - Use 'just test' for running tests"
+          echo "  - Use 'just lint' for code linting"
+          echo "  - Use 'just fmt' for code formatting"
+          echo "  - See justfile for all available commands"

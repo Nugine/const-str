@@ -204,4 +204,7 @@ pub mod __ctfe {
 
     mod unwrap;
     pub use self::unwrap::*;
+
+    mod trim_ascii;
+    pub use self::trim_ascii::*;
 }

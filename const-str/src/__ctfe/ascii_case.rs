@@ -87,9 +87,11 @@ impl<const N: usize> Boundaries<N> {
                     if k1 as u8 != k0 as u8 {
                         match (k1, k0) {
                             (Upper, Lower) => push!(i - 1),
-                            (NonAscii, Digit) => push!(i),
-                            (Lower | Upper, Digit) => {} // or-pattens stable since 1.53
+                            (NonAscii, Digit) => {} // Don't create boundary between NonAscii and Digit
+                            (NonAscii, Lower | Upper) => {} // Don't create boundary between NonAscii and alphabetic
+                            (Lower | Upper, Digit) => {}    // or-pattens stable since 1.53
                             (Digit, Lower | Upper | NonAscii) => {}
+                            (Lower | Upper, NonAscii) => {} // Don't create boundary between alphabetic and NonAscii
                             (_, Dot) => {}
                             (Dot, _) => match (k2, k0) {
                                 (None, _) => push!(i),
@@ -416,12 +418,12 @@ mod tests {
             const S: &str = "Hello World123!XMLHttp我4t5.c6.7b.8";
             test_conv_ascii_case!(lower_camel, S, "helloWorld123XmlHttp我4t5C67b8");
             test_conv_ascii_case!(upper_camel, S, "HelloWorld123XmlHttp我4t5C67b8");
-            test_conv_ascii_case!(title, S, "Hello World123 Xml Http 我 4t5 C6 7b 8");
-            test_conv_ascii_case!(train, S, "Hello-World123-Xml-Http-我-4t5-C6-7b-8");
-            test_conv_ascii_case!(snake, S, "hello_world123_xml_http_我_4t5_c6_7b_8");
-            test_conv_ascii_case!(kebab, S, "hello-world123-xml-http-我-4t5-c6-7b-8");
-            test_conv_ascii_case!(shouty_snake, S, "HELLO_WORLD123_XML_HTTP_我_4T5_C6_7B_8");
-            test_conv_ascii_case!(shouty_kebab, S, "HELLO-WORLD123-XML-HTTP-我-4T5-C6-7B-8");
+            test_conv_ascii_case!(title, S, "Hello World123 Xml Http我4t5 C6 7b 8");
+            test_conv_ascii_case!(train, S, "Hello-World123-Xml-Http我4t5-C6-7b-8");
+            test_conv_ascii_case!(snake, S, "hello_world123_xml_http我4t5_c6_7b_8");
+            test_conv_ascii_case!(kebab, S, "hello-world123-xml-http我4t5-c6-7b-8");
+            test_conv_ascii_case!(shouty_snake, S, "HELLO_WORLD123_XML_HTTP我4T5_C6_7B_8");
+            test_conv_ascii_case!(shouty_kebab, S, "HELLO-WORLD123-XML-HTTP我4T5-C6-7B-8");
         }
         {
             const S: &str = "XMLHttpRequest";

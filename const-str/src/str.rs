@@ -77,6 +77,64 @@ pub const fn next_match<'h>(haystack: &'h str, needle: &str) -> Option<(usize, &
     None
 }
 
+/// Returns true if the byte is an ASCII whitespace character.
+/// ASCII whitespace: space (0x20), tab (0x09), newline (0x0A),
+/// vertical tab (0x0B), form feed (0x0C), carriage return (0x0D).
+const fn is_ascii_whitespace(b: u8) -> bool {
+    matches!(b, b' ' | b'\t' | b'\n' | b'\x0B' | b'\x0C' | b'\r')
+}
+
+/// Trims ASCII whitespace from both ends of a string slice.
+pub const fn trim_ascii<'s>(s: &'s str) -> &'s str {
+    let bytes = s.as_bytes();
+    let len = bytes.len();
+    
+    // Find start
+    let mut start = 0;
+    while start < len && is_ascii_whitespace(bytes[start]) {
+        start += 1;
+    }
+    
+    // Find end
+    let mut end = len;
+    while end > start && is_ascii_whitespace(bytes[end - 1]) {
+        end -= 1;
+    }
+    
+    let trimmed_bytes = crate::slice::subslice(bytes, start..end);
+    unsafe { core::str::from_utf8_unchecked(trimmed_bytes) }
+}
+
+/// Trims ASCII whitespace from the start of a string slice.
+pub const fn trim_ascii_start<'s>(s: &'s str) -> &'s str {
+    let bytes = s.as_bytes();
+    let len = bytes.len();
+    
+    // Find start
+    let mut start = 0;
+    while start < len && is_ascii_whitespace(bytes[start]) {
+        start += 1;
+    }
+    
+    let trimmed_bytes = crate::slice::advance(bytes, start);
+    unsafe { core::str::from_utf8_unchecked(trimmed_bytes) }
+}
+
+/// Trims ASCII whitespace from the end of a string slice.
+pub const fn trim_ascii_end<'s>(s: &'s str) -> &'s str {
+    let bytes = s.as_bytes();
+    let len = bytes.len();
+    
+    // Find end
+    let mut end = len;
+    while end > 0 && is_ascii_whitespace(bytes[end - 1]) {
+        end -= 1;
+    }
+    
+    let trimmed_bytes = crate::slice::subslice(bytes, 0..end);
+    unsafe { core::str::from_utf8_unchecked(trimmed_bytes) }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -87,5 +145,32 @@ mod tests {
         assert_eq!(next_match("abc", "bc"), Some((1, "")));
         assert_eq!(next_match("abc", "c"), Some((2, "")));
         assert_eq!(next_match("abc", "d"), None);
+    }
+
+    #[test]
+    fn test_trim_ascii() {
+        assert_eq!(trim_ascii("  hello world  "), "hello world");
+        assert_eq!(trim_ascii("\t\n  hello\tworld\n  \r"), "hello\tworld");
+        assert_eq!(trim_ascii("   "), "");
+        assert_eq!(trim_ascii("hello"), "hello");
+        assert_eq!(trim_ascii(""), "");
+    }
+
+    #[test]
+    fn test_trim_ascii_start() {
+        assert_eq!(trim_ascii_start("  hello world  "), "hello world  ");
+        assert_eq!(trim_ascii_start("\t\n  hello\tworld"), "hello\tworld");
+        assert_eq!(trim_ascii_start("hello"), "hello");
+        assert_eq!(trim_ascii_start(""), "");
+        assert_eq!(trim_ascii_start("   "), "");
+    }
+
+    #[test]
+    fn test_trim_ascii_end() {
+        assert_eq!(trim_ascii_end("  hello world  "), "  hello world");
+        assert_eq!(trim_ascii_end("hello\tworld\n  \r"), "hello\tworld");
+        assert_eq!(trim_ascii_end("hello"), "hello");
+        assert_eq!(trim_ascii_end(""), "");
+        assert_eq!(trim_ascii_end("   "), "");
     }
 }

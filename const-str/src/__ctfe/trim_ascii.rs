@@ -1,114 +1,24 @@
-#![allow(unsafe_code)]
-
-use crate::__ctfe::StrBuf;
-
-/// Returns true if the byte is an ASCII whitespace character.
-/// ASCII whitespace: space (0x20), tab (0x09), newline (0x0A),
-/// vertical tab (0x0B), form feed (0x0C), carriage return (0x0D).
-const fn is_ascii_whitespace(b: u8) -> bool {
-    matches!(b, b' ' | b'\t' | b'\n' | b'\x0B' | b'\x0C' | b'\r')
-}
-
-/// Finds the start index after trimming ASCII whitespace from the beginning.
-const fn find_trim_start(bytes: &[u8]) -> usize {
-    let mut start = 0;
-    while start < bytes.len() && is_ascii_whitespace(bytes[start]) {
-        start += 1;
-    }
-    start
-}
-
-/// Finds the end index after trimming ASCII whitespace from the end.
-const fn find_trim_end(bytes: &[u8]) -> usize {
-    let mut end = bytes.len();
-    while end > 0 && is_ascii_whitespace(bytes[end - 1]) {
-        end -= 1;
-    }
-    end
-}
-
-/// Trims ASCII whitespace from both ends of a string slice.
-pub const fn trim_ascii_str(s: &str) -> (usize, usize) {
-    let bytes = s.as_bytes();
-    let start = find_trim_start(bytes);
-    let end = find_trim_end(bytes);
-
-    // Ensure start <= end
-    let end = if start > end { start } else { end };
-
-    (start, end)
-}
-
-/// Trims ASCII whitespace from the start of a string slice.
-pub const fn trim_ascii_start_str(s: &str) -> (usize, usize) {
-    let bytes = s.as_bytes();
-    let start = find_trim_start(bytes);
-    (start, bytes.len())
-}
-
-/// Trims ASCII whitespace from the end of a string slice.
-pub const fn trim_ascii_end_str(s: &str) -> (usize, usize) {
-    let bytes = s.as_bytes();
-    let end = find_trim_end(bytes);
-    (0, end)
-}
-
-/// Creates a StrBuf from a substring defined by start and end indices.
-const fn create_str_buf<const N: usize>(s: &str, start: usize, end: usize) -> StrBuf<N> {
-    let bytes = s.as_bytes();
-    assert!(start <= end);
-    assert!(end <= bytes.len());
-    assert!(end - start == N);
-
-    let mut buf = [0; N];
-    let mut i = 0;
-    while i < N {
-        buf[i] = bytes[start + i];
-        i += 1;
-    }
-
-    unsafe { StrBuf::new_unchecked(buf) }
-}
-
 pub struct TrimAscii<T>(pub T);
 
-impl TrimAscii<&str> {
-    pub const fn output_len(&self) -> usize {
-        let (start, end) = trim_ascii_str(self.0);
-        end - start
-    }
-
-    pub const fn const_eval<const N: usize>(&self) -> StrBuf<N> {
-        let (start, end) = trim_ascii_str(self.0);
-        create_str_buf::<N>(self.0, start, end)
+impl<'a> TrimAscii<&'a str> {
+    pub const fn const_eval(&self) -> &'a str {
+        crate::str::trim_ascii(self.0)
     }
 }
 
 pub struct TrimAsciiStart<T>(pub T);
 
-impl TrimAsciiStart<&str> {
-    pub const fn output_len(&self) -> usize {
-        let (start, end) = trim_ascii_start_str(self.0);
-        end - start
-    }
-
-    pub const fn const_eval<const N: usize>(&self) -> StrBuf<N> {
-        let (start, end) = trim_ascii_start_str(self.0);
-        create_str_buf::<N>(self.0, start, end)
+impl<'a> TrimAsciiStart<&'a str> {
+    pub const fn const_eval(&self) -> &'a str {
+        crate::str::trim_ascii_start(self.0)
     }
 }
 
 pub struct TrimAsciiEnd<T>(pub T);
 
-impl TrimAsciiEnd<&str> {
-    pub const fn output_len(&self) -> usize {
-        let (start, end) = trim_ascii_end_str(self.0);
-        end - start
-    }
-
-    pub const fn const_eval<const N: usize>(&self) -> StrBuf<N> {
-        let (start, end) = trim_ascii_end_str(self.0);
-        create_str_buf::<N>(self.0, start, end)
+impl<'a> TrimAsciiEnd<&'a str> {
+    pub const fn const_eval(&self) -> &'a str {
+        crate::str::trim_ascii_end(self.0)
     }
 }
 
@@ -117,7 +27,7 @@ impl TrimAsciiEnd<&str> {
 /// ASCII whitespace characters are space (0x20), tab (0x09), newline (0x0A),
 /// vertical tab (0x0B), form feed (0x0C), and carriage return (0x0D).
 ///
-/// This macro is [const-context only](./index.html#const-context-only).
+/// This macro is [const-fn compatible](./index.html#const-fn-compatible).
 ///
 /// # Examples
 ///
@@ -130,16 +40,18 @@ impl TrimAsciiEnd<&str> {
 ///
 /// const EMPTY: &str = const_str::trim_ascii!("   ");
 /// assert_eq!(EMPTY, "");
+///
+/// // Works in const functions too
+/// const fn process_string(s: &str) -> &str {
+///     const_str::trim_ascii!(s)
+/// }
+/// assert_eq!(process_string("  test  "), "test");
 /// ```
 #[macro_export]
 macro_rules! trim_ascii {
-    ($s: expr) => {{
-        const INPUT: &str = $s;
-        const N: usize = $crate::__ctfe::TrimAscii(INPUT).output_len();
-        const OUTPUT_BUF: $crate::__ctfe::StrBuf<N> =
-            $crate::__ctfe::TrimAscii(INPUT).const_eval::<N>();
-        OUTPUT_BUF.as_str()
-    }};
+    ($s: expr) => {
+        $crate::__ctfe::TrimAscii($s).const_eval()
+    };
 }
 
 /// Trims ASCII whitespace from the start of a string.
@@ -147,7 +59,7 @@ macro_rules! trim_ascii {
 /// ASCII whitespace characters are space (0x20), tab (0x09), newline (0x0A),
 /// vertical tab (0x0B), form feed (0x0C), and carriage return (0x0D).
 ///
-/// This macro is [const-context only](./index.html#const-context-only).
+/// This macro is [const-fn compatible](./index.html#const-fn-compatible).
 ///
 /// # Examples
 ///
@@ -160,16 +72,18 @@ macro_rules! trim_ascii {
 ///
 /// const NO_WHITESPACE: &str = const_str::trim_ascii_start!("hello");
 /// assert_eq!(NO_WHITESPACE, "hello");
+///
+/// // Works in const functions too
+/// const fn process_string(s: &str) -> &str {
+///     const_str::trim_ascii_start!(s)
+/// }
+/// assert_eq!(process_string("  test"), "test");
 /// ```
 #[macro_export]
 macro_rules! trim_ascii_start {
-    ($s: expr) => {{
-        const INPUT: &str = $s;
-        const N: usize = $crate::__ctfe::TrimAsciiStart(INPUT).output_len();
-        const OUTPUT_BUF: $crate::__ctfe::StrBuf<N> =
-            $crate::__ctfe::TrimAsciiStart(INPUT).const_eval::<N>();
-        OUTPUT_BUF.as_str()
-    }};
+    ($s: expr) => {
+        $crate::__ctfe::TrimAsciiStart($s).const_eval()
+    };
 }
 
 /// Trims ASCII whitespace from the end of a string.
@@ -177,7 +91,7 @@ macro_rules! trim_ascii_start {
 /// ASCII whitespace characters are space (0x20), tab (0x09), newline (0x0A),
 /// vertical tab (0x0B), form feed (0x0C), and carriage return (0x0D).
 ///
-/// This macro is [const-context only](./index.html#const-context-only).
+/// This macro is [const-fn compatible](./index.html#const-fn-compatible).
 ///
 /// # Examples
 ///
@@ -190,37 +104,22 @@ macro_rules! trim_ascii_start {
 ///
 /// const NO_WHITESPACE: &str = const_str::trim_ascii_end!("hello");
 /// assert_eq!(NO_WHITESPACE, "hello");
+///
+/// // Works in const functions too
+/// const fn process_string(s: &str) -> &str {
+///     const_str::trim_ascii_end!(s)
+/// }
+/// assert_eq!(process_string("test  "), "test");
 /// ```
 #[macro_export]
 macro_rules! trim_ascii_end {
-    ($s: expr) => {{
-        const INPUT: &str = $s;
-        const N: usize = $crate::__ctfe::TrimAsciiEnd(INPUT).output_len();
-        const OUTPUT_BUF: $crate::__ctfe::StrBuf<N> =
-            $crate::__ctfe::TrimAsciiEnd(INPUT).const_eval::<N>();
-        OUTPUT_BUF.as_str()
-    }};
+    ($s: expr) => {
+        $crate::__ctfe::TrimAsciiEnd($s).const_eval()
+    };
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-
-    #[test]
-    fn test_is_ascii_whitespace() {
-        assert!(is_ascii_whitespace(b' '));
-        assert!(is_ascii_whitespace(b'\t'));
-        assert!(is_ascii_whitespace(b'\n'));
-        assert!(is_ascii_whitespace(b'\x0B')); // vertical tab
-        assert!(is_ascii_whitespace(b'\x0C')); // form feed
-        assert!(is_ascii_whitespace(b'\r'));
-
-        assert!(!is_ascii_whitespace(b'a'));
-        assert!(!is_ascii_whitespace(b'0'));
-        assert!(!is_ascii_whitespace(b'!'));
-        assert!(!is_ascii_whitespace(b'\x00'));
-    }
-
     #[test]
     fn test_trim_ascii() {
         const S1: &str = trim_ascii!("  hello world  ");
@@ -292,5 +191,24 @@ mod tests {
         // Test with only end whitespace
         const END_WS: &str = trim_ascii!("hello  ");
         assert_eq!(END_WS, "hello");
+    }
+
+    #[test]
+    fn test_const_fn_compatibility() {
+        const fn process_trim(s: &str) -> &str {
+            trim_ascii!(s)
+        }
+        
+        const fn process_trim_start(s: &str) -> &str {
+            trim_ascii_start!(s)
+        }
+        
+        const fn process_trim_end(s: &str) -> &str {
+            trim_ascii_end!(s)
+        }
+
+        assert_eq!(process_trim("  test  "), "test");
+        assert_eq!(process_trim_start("  test  "), "test  ");
+        assert_eq!(process_trim_end("  test  "), "  test");
     }
 }

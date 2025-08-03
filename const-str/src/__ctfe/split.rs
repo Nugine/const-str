@@ -178,14 +178,14 @@ impl<'input> Split<&'input str, &[char]> {
                 let substr_bytes = subslice(input_str.as_bytes(), start_byte_pos..current_byte_pos);
                 buf[pos] = unsafe { core::str::from_utf8_unchecked(substr_bytes) };
                 pos += 1;
-                
+
                 // Update start position for next substring (skip the split character)
                 start_byte_pos = current_byte_pos + count;
             }
             current_byte_pos += count;
             input = advance(input, count);
         }
-        
+
         // Add the final segment
         let substr_bytes = subslice(input_str.as_bytes(), start_byte_pos..input_str.len());
         buf[pos] = unsafe { core::str::from_utf8_unchecked(substr_bytes) };
@@ -220,13 +220,13 @@ impl<'input> Split<&'input str, &[char]> {
 /// assert_eq!(ANIMALS_ARRAY, ANIMALS_SLICE);
 /// assert_eq!(ANIMALS_SLICE, &["lion", "tiger", "leopard"]);
 /// ```
-/// 
+///
 /// Split by any character in a slice:
 /// ```
 /// const TEXT: &str = "one:two;three,four";
 /// const SEPARATORS: &[char] = &[':', ';', ','];
 /// const WORDS: &[&str] = &const_str::split!(TEXT, SEPARATORS);
-/// 
+///
 /// assert_eq!(WORDS, &["one", "two", "three", "four"]);
 /// ```
 #[macro_export]
@@ -312,15 +312,15 @@ impl<'input> SplitInclusive<&'input str, &[char]> {
             }
             input = advance(input, count);
         }
-        
+
         if !found_any_split {
             return 1; // If no splits, return whole string
         }
-        
+
         // Check if the last character was a split character
         let mut input_check = self.0.as_bytes();
         let mut last_was_split = false;
-        
+
         while let Some((ch, count)) = crate::utf8::next_char(input_check) {
             let remaining = advance(input_check, count);
             if remaining.is_empty() {
@@ -330,11 +330,11 @@ impl<'input> SplitInclusive<&'input str, &[char]> {
             }
             input_check = remaining;
         }
-        
+
         if !last_was_split {
             ans += 1;
         }
-        
+
         ans
     }
 
@@ -368,13 +368,13 @@ impl<'input> SplitInclusive<&'input str, &[char]> {
                 let substr_bytes = subslice(input_str.as_bytes(), start_byte_pos..current_byte_pos);
                 buf[pos] = unsafe { core::str::from_utf8_unchecked(substr_bytes) };
                 pos += 1;
-                
+
                 // Update start position for next substring
                 start_byte_pos = current_byte_pos;
             }
             input = advance(input, count);
         }
-        
+
         // Add the final segment if there's remaining content
         if start_byte_pos < input_str.len() {
             let substr_bytes = subslice(input_str.as_bytes(), start_byte_pos..input_str.len());
@@ -417,13 +417,13 @@ impl<'input> SplitInclusive<&'input str, &[char]> {
 /// const ANSWER:&[&str] = &const_str::split_inclusive!(TEXT, "\n");
 /// assert_eq!(ANSWER, &["\n", "A\n", "B\n", "C\n"]);
 /// ```
-/// 
+///
 /// Split by any character in a slice (inclusive):
 /// ```
 /// const TEXT: &str = "one:two;three,four";
 /// const SEPARATORS: &[char] = &[':', ';', ','];
 /// const WORDS: &[&str] = &const_str::split_inclusive!(TEXT, SEPARATORS);
-/// 
+///
 /// assert_eq!(WORDS, &["one:", "two;", "three,", "four"]);
 /// ```
 #[macro_export]
@@ -640,8 +640,18 @@ mod tests {
                 const OUTPUT: &[&str] = &$crate::split!($input, CHARS);
 
                 let ans = $input.split(CHARS).collect::<Vec<_>>();
-                assert_eq!(OUTPUT.len(), ans.len(), "Length mismatch for input: {:?}, chars: {:?}", $input, CHARS);
-                assert_eq!(OUTPUT, &*ans, "Content mismatch for input: {:?}, chars: {:?}, expected: {:?}", $input, CHARS, ans);
+                assert_eq!(
+                    OUTPUT.len(),
+                    ans.len(),
+                    "Length mismatch for input: {:?}, chars: {:?}",
+                    $input,
+                    CHARS
+                );
+                assert_eq!(
+                    OUTPUT, &*ans,
+                    "Content mismatch for input: {:?}, chars: {:?}, expected: {:?}",
+                    $input, CHARS, ans
+                );
             }};
         }
 
@@ -650,17 +660,17 @@ mod tests {
         testcase_char_slice!("hello", &[]);
         testcase_char_slice!("", &[]);
         testcase_char_slice!("", &[',']);
-        
+
         // More complex cases
         testcase_char_slice!("hello,world;test", &[',', ';']);
         testcase_char_slice!("hello", &['x', 'y', 'z']);
         testcase_char_slice!("a,b,,c,", &[',']);
         testcase_char_slice!(";;;", &[';']);
-        
+
         // Unicode characters
         testcase_char_slice!("a中1😂1!", &['中', '😂']);
         testcase_char_slice!("hello世界test", &['世', '界']);
-        
+
         // Complex patterns
         testcase_char_slice!("one:two;three,four", &[':', ';', ',']);
     }
@@ -673,26 +683,36 @@ mod tests {
                 const OUTPUT: &[&str] = &$crate::split_inclusive!($input, CHARS);
 
                 let ans = $input.split_inclusive(CHARS).collect::<Vec<_>>();
-                assert_eq!(OUTPUT.len(), ans.len(), "Length mismatch for input: {:?}, chars: {:?}", $input, CHARS);
-                assert_eq!(OUTPUT, &*ans, "Content mismatch for input: {:?}, chars: {:?}, expected: {:?}", $input, CHARS, ans);
+                assert_eq!(
+                    OUTPUT.len(),
+                    ans.len(),
+                    "Length mismatch for input: {:?}, chars: {:?}",
+                    $input,
+                    CHARS
+                );
+                assert_eq!(
+                    OUTPUT, &*ans,
+                    "Content mismatch for input: {:?}, chars: {:?}, expected: {:?}",
+                    $input, CHARS, ans
+                );
             }};
         }
 
-        // Start with basic cases  
+        // Start with basic cases
         testcase_inclusive_char_slice!("a,b,c", &[',']);
         testcase_inclusive_char_slice!("hello", &[]);
         testcase_inclusive_char_slice!("", &[]);
-        
+
         // More cases
         testcase_inclusive_char_slice!("hello,world;test", &[',', ';']);
         testcase_inclusive_char_slice!("hello", &['x', 'y', 'z']);
         testcase_inclusive_char_slice!("a,b,,c,", &[',']);
         testcase_inclusive_char_slice!(";;;", &[';']);
-        
+
         // Unicode characters
         testcase_inclusive_char_slice!("a中1😂1!", &['中', '😂']);
         testcase_inclusive_char_slice!("hello世界test", &['世', '界']);
-        
+
         // Complex patterns
         testcase_inclusive_char_slice!("one:two;three,four", &[':', ';', ',']);
     }

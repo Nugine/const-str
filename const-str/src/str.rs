@@ -85,52 +85,52 @@ const fn is_ascii_whitespace(b: u8) -> bool {
 }
 
 /// Trims ASCII whitespace from both ends of a string slice.
-pub const fn trim_ascii<'s>(s: &'s str) -> &'s str {
+pub const fn trim_ascii(s: &str) -> &str {
     let bytes = s.as_bytes();
     let len = bytes.len();
-    
+
     // Find start
     let mut start = 0;
     while start < len && is_ascii_whitespace(bytes[start]) {
         start += 1;
     }
-    
+
     // Find end
     let mut end = len;
     while end > start && is_ascii_whitespace(bytes[end - 1]) {
         end -= 1;
     }
-    
+
     let trimmed_bytes = crate::slice::subslice(bytes, start..end);
     unsafe { core::str::from_utf8_unchecked(trimmed_bytes) }
 }
 
 /// Trims ASCII whitespace from the start of a string slice.
-pub const fn trim_ascii_start<'s>(s: &'s str) -> &'s str {
+pub const fn trim_ascii_start(s: &str) -> &str {
     let bytes = s.as_bytes();
     let len = bytes.len();
-    
+
     // Find start
     let mut start = 0;
     while start < len && is_ascii_whitespace(bytes[start]) {
         start += 1;
     }
-    
+
     let trimmed_bytes = crate::slice::advance(bytes, start);
     unsafe { core::str::from_utf8_unchecked(trimmed_bytes) }
 }
 
 /// Trims ASCII whitespace from the end of a string slice.
-pub const fn trim_ascii_end<'s>(s: &'s str) -> &'s str {
+pub const fn trim_ascii_end(s: &str) -> &str {
     let bytes = s.as_bytes();
     let len = bytes.len();
-    
+
     // Find end
     let mut end = len;
     while end > 0 && is_ascii_whitespace(bytes[end - 1]) {
         end -= 1;
     }
-    
+
     let trimmed_bytes = crate::slice::subslice(bytes, 0..end);
     unsafe { core::str::from_utf8_unchecked(trimmed_bytes) }
 }

@@ -198,11 +198,11 @@ mod tests {
         const fn process_trim(s: &str) -> &str {
             trim_ascii!(s)
         }
-        
+
         const fn process_trim_start(s: &str) -> &str {
             trim_ascii_start!(s)
         }
-        
+
         const fn process_trim_end(s: &str) -> &str {
             trim_ascii_end!(s)
         }

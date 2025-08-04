@@ -1,3 +1,11 @@
+#[rustversion::before(1.77)]
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+
+#[rustversion::before(1.77)]
+#[cfg(not(feature = "std"))]
+compile_error!("The `std` feature is required when using Rust versions before 1.77.0 for IP address functionality");
+
+#[rustversion::since(1.77)]
 use core::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 struct Parser<'a> {
@@ -293,9 +301,20 @@ pub const fn expect_ip(s: &str) -> IpAddr {
 ///
 /// This macro is [const-fn compatible](./index.html#const-fn-compatible).
 ///
+/// ## Rust Version Compatibility
+///
+/// - **Rust >= 1.77.0**: Uses `core::net` types (no-std compatible)
+/// - **Rust < 1.77.0**: Uses `std::net` types (requires `std` feature)
+///
+/// When using Rust versions prior to 1.77.0, you must enable the `std` feature
+/// for this macro to work, as `core::net` was not available before Rust 1.77.0.
+///
 /// # Examples
 /// ```
+/// # #[rustversion::since(1.77)]
 /// use core::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+/// # #[rustversion::before(1.77)]
+/// # use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 /// use const_str::ip_addr;
 ///
 /// const LOCALHOST_V4: Ipv4Addr = ip_addr!(v4, "127.0.0.1");

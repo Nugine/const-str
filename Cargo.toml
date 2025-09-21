@@ -1,6 +1,3 @@
 [workspace]
-members = [
-    "const-str",
-    "const-str-proc-macro",
-]
+members = ["crates/*"]
 resolver = "2"

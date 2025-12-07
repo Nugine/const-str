@@ -26,6 +26,8 @@ macro_rules! unwrap {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn test_unwrap_some() {
         const X: Option<i32> = Some(42);
@@ -39,5 +41,18 @@ mod tests {
         let b: Option<bool> = Some(true);
         let c: bool = unwrap!(b);
         assert!(c);
+    }
+
+    #[test]
+    fn test_unwrap_runtime() {
+        // Runtime tests for Unwrap
+        let unwrap_some = Unwrap(Some(42));
+        assert_eq!(unwrap_some.const_eval(), 42);
+
+        let unwrap_str = Unwrap(Some("test"));
+        assert_eq!(unwrap_str.const_eval(), "test");
+
+        let unwrap_bool = Unwrap(Some(false));
+        assert!(!unwrap_bool.const_eval());
     }
 }

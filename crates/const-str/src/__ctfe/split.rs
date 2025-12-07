@@ -766,4 +766,32 @@ mod tests {
         testcase!("a b");
         testcase!("  a  b  ");
     }
+
+    #[test]
+    fn test_split_runtime() {
+        use super::*;
+
+        // Runtime tests for Split
+        let split1 = Split("a,b,c", ",");
+        assert_eq!(split1.output_len(), 3);
+        let result1: [&str; 3] = split1.const_eval();
+        assert_eq!(result1, ["a", "b", "c"]);
+
+        let split2 = Split("hello", ",");
+        assert_eq!(split2.output_len(), 1);
+        let result2: [&str; 1] = split2.const_eval();
+        assert_eq!(result2, ["hello"]);
+
+        // Runtime tests for SplitInclusive
+        let split_inc = SplitInclusive("a,b,c", ",");
+        assert_eq!(split_inc.output_len(), 3);
+        let result_inc: [&str; 3] = split_inc.const_eval();
+        assert_eq!(result_inc, ["a,", "b,", "c"]);
+
+        // Runtime tests for SplitAsciiWhitespace
+        let split_ws = SplitAsciiWhitespace("  hello  world  ");
+        assert_eq!(split_ws.output_len(), 2);
+        let result_ws: [&str; 2] = split_ws.const_eval();
+        assert_eq!(result_ws, ["hello", "world"]);
+    }
 }

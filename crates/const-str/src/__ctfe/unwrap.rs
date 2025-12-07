@@ -23,3 +23,21 @@ macro_rules! unwrap {
         $crate::__ctfe::Unwrap($expr).const_eval()
     }};
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_unwrap_some() {
+        const X: Option<i32> = Some(42);
+        const Y: i32 = unwrap!(X);
+        assert_eq!(Y, 42);
+        
+        const S: Option<&str> = Some("hello");
+        const T: &str = unwrap!(S);
+        assert_eq!(T, "hello");
+        
+        const B: Option<bool> = Some(true);
+        const C: bool = unwrap!(B);
+        assert_eq!(C, true);
+    }
+}

@@ -38,3 +38,49 @@ macro_rules! equal {
         $crate::__ctfe::Equal($lhs, $rhs).const_eval()
     };
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_equal_str() {
+        const A: &str = "hello";
+        const B: &str = "world";
+        const C: &str = "hello";
+        const D: &str = "";
+        const E: &str = "";
+        
+        const EQ1: bool = equal!(A, B);
+        const EQ2: bool = equal!(A, C);
+        const EQ3: bool = equal!(D, E);
+        
+        assert_eq!(EQ1, false);
+        assert_eq!(EQ2, true);
+        assert_eq!(EQ3, true);
+    }
+    
+    #[test]
+    fn test_equal_bytes() {
+        const A: &[u8] = b"hello";
+        const B: &[u8] = b"world";
+        const C: &[u8] = b"hello";
+        
+        const EQ1: bool = equal!(A, B);
+        const EQ2: bool = equal!(A, C);
+        
+        assert_eq!(EQ1, false);
+        assert_eq!(EQ2, true);
+    }
+    
+    #[test]
+    fn test_equal_byte_arrays() {
+        const A: &[u8; 5] = b"hello";
+        const B: &[u8; 5] = b"world";
+        const C: &[u8; 5] = b"hello";
+        
+        const EQ1: bool = equal!(A, B);
+        const EQ2: bool = equal!(A, C);
+        
+        assert_eq!(EQ1, false);
+        assert_eq!(EQ2, true);
+    }
+}

@@ -52,3 +52,29 @@ macro_rules! repeat {
         OUTPUT_BUF.as_str()
     }};
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_repeat() {
+        const S1: &str = "abc";
+        const R1: &str = repeat!(S1, 4);
+        assert_eq!(R1, "abcabcabcabc");
+        
+        const S2: &str = "x";
+        const R2: &str = repeat!(S2, 5);
+        assert_eq!(R2, "xxxxx");
+        
+        const S3: &str = "hello";
+        const R3: &str = repeat!(S3, 2);
+        assert_eq!(R3, "hellohello");
+        
+        const S4: &str = "test";
+        const R4: &str = repeat!(S4, 0);
+        assert_eq!(R4, "");
+        
+        const S5: &str = "test";
+        const R5: &str = repeat!(S5, 1);
+        assert_eq!(R5, "test");
+    }
+}

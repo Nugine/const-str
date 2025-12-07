@@ -78,3 +78,69 @@ macro_rules! compare {
         $crate::__ctfe::Compare($lhs, $rhs).const_eval()
     };
 }
+
+#[cfg(test)]
+mod tests {
+    use core::cmp::Ordering;
+
+    #[test]
+    fn test_compare_str() {
+        const A: &str = "apple";
+        const B: &str = "banana";
+        const C: &str = "apple";
+        
+        const ORD1: Ordering = compare!(A, B);
+        const ORD2: Ordering = compare!(B, A);
+        const ORD3: Ordering = compare!(A, C);
+        
+        assert_eq!(ORD1, Ordering::Less);
+        assert_eq!(ORD2, Ordering::Greater);
+        assert_eq!(ORD3, Ordering::Equal);
+        
+        const LT: bool = compare!(<, A, B);
+        const GT: bool = compare!(>, B, A);
+        const EQ: bool = compare!(==, A, C);
+        const LE1: bool = compare!(<=, A, B);
+        const LE2: bool = compare!(<=, A, C);
+        const GE1: bool = compare!(>=, B, A);
+        const GE2: bool = compare!(>=, A, C);
+        
+        assert!(LT);
+        assert!(GT);
+        assert!(EQ);
+        assert!(LE1);
+        assert!(LE2);
+        assert!(GE1);
+        assert!(GE2);
+    }
+    
+    #[test]
+    fn test_compare_bytes() {
+        const A: &[u8] = b"apple";
+        const B: &[u8] = b"banana";
+        const C: &[u8] = b"apple";
+        
+        const ORD1: Ordering = compare!(A, B);
+        const ORD2: Ordering = compare!(B, A);
+        const ORD3: Ordering = compare!(A, C);
+        
+        assert_eq!(ORD1, Ordering::Less);
+        assert_eq!(ORD2, Ordering::Greater);
+        assert_eq!(ORD3, Ordering::Equal);
+    }
+    
+    #[test]
+    fn test_compare_byte_arrays() {
+        const A: &[u8; 5] = b"apple";
+        const B: &[u8; 6] = b"banana";
+        const C: &[u8; 5] = b"apple";
+        
+        const ORD1: Ordering = compare!(A, B);
+        const ORD2: Ordering = compare!(B, A);
+        const ORD3: Ordering = compare!(A, C);
+        
+        assert_eq!(ORD1, Ordering::Less);
+        assert_eq!(ORD2, Ordering::Greater);
+        assert_eq!(ORD3, Ordering::Equal);
+    }
+}

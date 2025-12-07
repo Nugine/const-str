@@ -40,3 +40,44 @@ pub const fn str_len_utf16(s: &str) -> usize {
     }
     ans
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_char_encode_utf16() {
+        const E1: CharEncodeUtf16 = CharEncodeUtf16::new('A');
+        assert_eq!(E1.first(), 'A' as u16);
+        assert!(!E1.has_second());
+        
+        const E2: CharEncodeUtf16 = CharEncodeUtf16::new('我');
+        assert_eq!(E2.first(), '我' as u16);
+        assert!(!E2.has_second());
+        
+        // Test a character that requires a surrogate pair
+        const E3: CharEncodeUtf16 = CharEncodeUtf16::new('𐍈'); // Gothic letter
+        assert!(E3.has_second());
+        assert_eq!(E3.first(), 0xD800);
+        assert_eq!(E3.second(), 0xDF48);
+    }
+    
+    #[test]
+    fn test_str_len_utf16() {
+        const LEN1: usize = str_len_utf16("hello");
+        assert_eq!(LEN1, 5);
+        
+        const LEN2: usize = str_len_utf16("你好");
+        assert_eq!(LEN2, 2);
+        
+        const LEN3: usize = str_len_utf16("");
+        assert_eq!(LEN3, 0);
+        
+        // Emoji and characters requiring surrogate pairs
+        const LEN4: usize = str_len_utf16("𐍈");
+        assert_eq!(LEN4, 2); // Requires surrogate pair
+        
+        const LEN5: usize = str_len_utf16("A𐍈B");
+        assert_eq!(LEN5, 4); // A(1) + 𐍈(2) + B(1)
+    }
+}

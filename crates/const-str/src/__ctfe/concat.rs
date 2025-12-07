@@ -143,3 +143,55 @@ macro_rules! join {
         OUTPUT_BUF.as_str()
     }};
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_concat() {
+        const PROMPT: &str = "The answer is";
+        const ANSWER: usize = 42;
+        const MESSAGE: &str = concat!(PROMPT, " ", ANSWER);
+        assert_eq!(MESSAGE, "The answer is 42");
+        
+        const S1: &str = concat!("hello", " ", "world");
+        assert_eq!(S1, "hello world");
+        
+        const S2: &str = concat!("a", "b", "c");
+        assert_eq!(S2, "abc");
+        
+        const S3: &str = concat!("single");
+        assert_eq!(S3, "single");
+        
+        const S4: &str = concat!("");
+        assert_eq!(S4, "");
+        
+        const S5: &str = concat!(true, " ", false);
+        assert_eq!(S5, "true false");
+        
+        const S6: &str = concat!('a', 'b', 'c');
+        assert_eq!(S6, "abc");
+    }
+    
+    #[test]
+    fn test_join() {
+        const WORDS: &[&str] = &["hello", "world"];
+        const MESSAGE1: &str = join!(WORDS, " ");
+        assert_eq!(MESSAGE1, "hello world");
+        
+        const NUMS: &[&str] = &["1", "2", "3"];
+        const MESSAGE2: &str = join!(NUMS, ", ");
+        assert_eq!(MESSAGE2, "1, 2, 3");
+        
+        const EMPTY: &[&str] = &[];
+        const MESSAGE3: &str = join!(EMPTY, ", ");
+        assert_eq!(MESSAGE3, "");
+        
+        const SINGLE: &[&str] = &["alone"];
+        const MESSAGE4: &str = join!(SINGLE, ", ");
+        assert_eq!(MESSAGE4, "alone");
+        
+        const MULTI: &[&str] = &["a", "b", "c", "d"];
+        const MESSAGE5: &str = join!(MULTI, "-");
+        assert_eq!(MESSAGE5, "a-b-c-d");
+    }
+}

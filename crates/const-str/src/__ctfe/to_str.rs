@@ -266,5 +266,21 @@ mod tests {
         let to_str_i8_min = ToStr(i8::MIN);
         let buf_min = to_str_i8_min.const_eval::<4>();
         assert_eq!(buf_min.as_str(), "-128");
+
+        // Test output_len for str, bool, char
+        let to_str_str = ToStr("test");
+        assert_eq!(to_str_str.output_len(), 4);
+
+        let to_str_bool_true = ToStr(true);
+        assert_eq!(to_str_bool_true.output_len(), 4);
+
+        let to_str_bool_false = ToStr(false);
+        assert_eq!(to_str_bool_false.output_len(), 5);
+
+        let to_str_char = ToStr('A');
+        assert_eq!(to_str_char.output_len(), 1);
+
+        let to_str_char_utf8 = ToStr('你');
+        assert_eq!(to_str_char_utf8.output_len(), 3);
     }
 }

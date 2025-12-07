@@ -383,3 +383,107 @@ macro_rules! __fmt_binary {
         OUTPUT_BUF.as_str()
     }};
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_display_runtime() {
+        let spec = FmtSpec { alternate: false };
+
+        // Test Display for various types
+        let display_str = Display("hello", spec);
+        assert_eq!(display_str.output_len(), 5);
+        let buf: StrBuf<5> = display_str.const_eval();
+        assert_eq!(buf.as_str(), "hello");
+
+        let display_char = Display('A', spec);
+        assert_eq!(display_char.output_len(), 1);
+
+        let display_bool = Display(true, spec);
+        assert_eq!(display_bool.output_len(), 4);
+
+        let display_u8 = Display(42u8, spec);
+        assert_eq!(display_u8.output_len(), 2);
+
+        let display_i32 = Display(-123i32, spec);
+        assert_eq!(display_i32.output_len(), 4);
+    }
+
+    #[test]
+    fn test_debug_runtime() {
+        let spec = FmtSpec { alternate: false };
+
+        // Test Debug for str
+        let debug_str = Debug("test", spec);
+        let buf: StrBuf<6> = debug_str.const_eval();
+        assert_eq!(buf.as_str(), "\"test\"");
+
+        // Test Debug for char
+        let debug_char = Debug('a', spec);
+        let buf2: StrBuf<3> = debug_char.const_eval();
+        assert_eq!(buf2.as_str(), "'a'");
+
+        // Test Debug for numbers
+        let debug_u8 = Debug(42u8, spec);
+        assert_eq!(debug_u8.output_len(), 2);
+    }
+
+    #[test]
+    fn test_lower_hex_runtime() {
+        let spec = FmtSpec { alternate: false };
+        let spec_alt = FmtSpec { alternate: true };
+
+        // Test LowerHex for unsigned
+        let hex_u8 = LowerHex(255u8, spec);
+        let buf: StrBuf<2> = hex_u8.const_eval();
+        assert_eq!(buf.as_str(), "ff");
+
+        let hex_u8_alt = LowerHex(255u8, spec_alt);
+        let buf_alt: StrBuf<4> = hex_u8_alt.const_eval();
+        assert_eq!(buf_alt.as_str(), "0xff");
+
+        // Test LowerHex for signed
+        let hex_i32 = LowerHex(-1i32, spec);
+        let _len = hex_i32.output_len();
+    }
+
+    #[test]
+    fn test_upper_hex_runtime() {
+        let spec = FmtSpec { alternate: false };
+        let spec_alt = FmtSpec { alternate: true };
+
+        // Test UpperHex for unsigned
+        let hex_u8 = UpperHex(255u8, spec);
+        let buf: StrBuf<2> = hex_u8.const_eval();
+        assert_eq!(buf.as_str(), "FF");
+
+        let hex_u8_alt = UpperHex(255u8, spec_alt);
+        let buf_alt: StrBuf<4> = hex_u8_alt.const_eval();
+        assert_eq!(buf_alt.as_str(), "0xFF");
+
+        // Test UpperHex for signed
+        let hex_i32 = UpperHex(-1i32, spec);
+        let _len = hex_i32.output_len();
+    }
+
+    #[test]
+    fn test_binary_runtime() {
+        let spec = FmtSpec { alternate: false };
+        let spec_alt = FmtSpec { alternate: true };
+
+        // Test Binary for unsigned
+        let bin_u8 = Binary(5u8, spec);
+        let buf: StrBuf<3> = bin_u8.const_eval();
+        assert_eq!(buf.as_str(), "101");
+
+        let bin_u8_alt = Binary(5u8, spec_alt);
+        let buf_alt: StrBuf<5> = bin_u8_alt.const_eval();
+        assert_eq!(buf_alt.as_str(), "0b101");
+
+        // Test Binary for signed
+        let bin_i32 = Binary(-1i32, spec);
+        let _len = bin_i32.output_len();
+    }
+}

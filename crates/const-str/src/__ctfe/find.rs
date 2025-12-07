@@ -319,5 +319,24 @@ mod tests {
         let strip_suf_none = StripSuffix("hello", "world");
         let result_suf_none = strip_suf_none.const_eval();
         assert_eq!(result_suf_none, None);
+
+        // Test char patterns
+        let contains_char = Contains("hello", 'e');
+        assert!(contains_char.const_eval());
+
+        let contains_char_none = Contains("hello", 'x');
+        assert!(!contains_char_none.const_eval());
+
+        let starts_char = StartsWith("hello", 'h');
+        assert!(starts_char.const_eval());
+
+        let starts_char_false = StartsWith("hello", 'e');
+        assert!(!starts_char_false.const_eval());
+
+        let ends_char = EndsWith("hello", 'o');
+        assert!(ends_char.const_eval());
+
+        let ends_char_false = EndsWith("hello", 'h');
+        assert!(!ends_char_false.const_eval());
     }
 }

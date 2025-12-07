@@ -88,57 +88,57 @@ mod tests {
         const A: &str = "apple";
         const B: &str = "banana";
         const C: &str = "apple";
-        
+
         const ORD1: Ordering = compare!(A, B);
         const ORD2: Ordering = compare!(B, A);
         const ORD3: Ordering = compare!(A, C);
-        
+
         assert_eq!(ORD1, Ordering::Less);
         assert_eq!(ORD2, Ordering::Greater);
         assert_eq!(ORD3, Ordering::Equal);
-        
-        const LT: bool = compare!(<, A, B);
-        const GT: bool = compare!(>, B, A);
-        const EQ: bool = compare!(==, A, C);
-        const LE1: bool = compare!(<=, A, B);
-        const LE2: bool = compare!(<=, A, C);
-        const GE1: bool = compare!(>=, B, A);
-        const GE2: bool = compare!(>=, A, C);
-        
-        assert!(LT);
-        assert!(GT);
-        assert!(EQ);
-        assert!(LE1);
-        assert!(LE2);
-        assert!(GE1);
-        assert!(GE2);
+
+        let lt = compare!(<, A, B);
+        let gt = compare!(>, B, A);
+        let eq = compare!(==, A, C);
+        let le1 = compare!(<=, A, B);
+        let le2 = compare!(<=, A, C);
+        let ge1 = compare!(>=, B, A);
+        let ge2 = compare!(>=, A, C);
+
+        assert!(lt);
+        assert!(gt);
+        assert!(eq);
+        assert!(le1);
+        assert!(le2);
+        assert!(ge1);
+        assert!(ge2);
     }
-    
+
     #[test]
     fn test_compare_bytes() {
         const A: &[u8] = b"apple";
         const B: &[u8] = b"banana";
         const C: &[u8] = b"apple";
-        
+
         const ORD1: Ordering = compare!(A, B);
         const ORD2: Ordering = compare!(B, A);
         const ORD3: Ordering = compare!(A, C);
-        
+
         assert_eq!(ORD1, Ordering::Less);
         assert_eq!(ORD2, Ordering::Greater);
         assert_eq!(ORD3, Ordering::Equal);
     }
-    
+
     #[test]
     fn test_compare_byte_arrays() {
         const A: &[u8; 5] = b"apple";
         const B: &[u8; 6] = b"banana";
         const C: &[u8; 5] = b"apple";
-        
+
         const ORD1: Ordering = compare!(A, B);
         const ORD2: Ordering = compare!(B, A);
         const ORD3: Ordering = compare!(A, C);
-        
+
         assert_eq!(ORD1, Ordering::Less);
         assert_eq!(ORD2, Ordering::Greater);
         assert_eq!(ORD3, Ordering::Equal);

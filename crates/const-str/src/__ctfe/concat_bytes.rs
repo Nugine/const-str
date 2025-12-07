@@ -142,16 +142,16 @@ mod tests {
         const S2: &[u8] = concat_bytes!(S1, "/123", 0u8);
         assert_eq!(S1, b"ABCDEFG");
         assert_eq!(S2, b"ABCDEFG/123\x00");
-        
+
         const S3: &[u8] = concat_bytes!(b"hello", b" ", b"world");
         assert_eq!(S3, b"hello world");
-        
+
         const S4: &[u8] = concat_bytes!(b'x');
         assert_eq!(S4, b"x");
-        
+
         const S5: &[u8] = concat_bytes!("test", b"123");
         assert_eq!(S5, b"test123");
-        
+
         const ARR: [u8; 3] = [1, 2, 3];
         const S6: &[u8] = concat_bytes!(ARR, [4, 5]);
         assert_eq!(S6, &[1, 2, 3, 4, 5]);

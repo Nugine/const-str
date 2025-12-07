@@ -31,13 +31,13 @@ mod tests {
         const X: Option<i32> = Some(42);
         const Y: i32 = unwrap!(X);
         assert_eq!(Y, 42);
-        
+
         const S: Option<&str> = Some("hello");
         const T: &str = unwrap!(S);
         assert_eq!(T, "hello");
-        
-        const B: Option<bool> = Some(true);
-        const C: bool = unwrap!(B);
-        assert_eq!(C, true);
+
+        let b: Option<bool> = Some(true);
+        let c: bool = unwrap!(b);
+        assert!(c);
     }
 }

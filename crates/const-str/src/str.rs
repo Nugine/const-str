@@ -173,7 +173,7 @@ mod tests {
         assert_eq!(trim_ascii_end(""), "");
         assert_eq!(trim_ascii_end("   "), "");
     }
-    
+
     #[test]
     fn test_equal() {
         assert!(equal("hello", "hello"));
@@ -182,18 +182,18 @@ mod tests {
         assert!(!equal("a", ""));
         assert!(!equal("", "a"));
     }
-    
+
     #[test]
     fn test_compare() {
         use core::cmp::Ordering;
-        
+
         assert_eq!(compare("a", "b"), Ordering::Less);
         assert_eq!(compare("b", "a"), Ordering::Greater);
         assert_eq!(compare("a", "a"), Ordering::Equal);
         assert_eq!(compare("", ""), Ordering::Equal);
         assert_eq!(compare("abc", "abcd"), Ordering::Less);
     }
-    
+
     #[test]
     fn test_contains() {
         assert!(contains("hello", "ell"));
@@ -201,7 +201,7 @@ mod tests {
         assert!(!contains("hello", "world"));
         assert!(!contains("", "a"));
     }
-    
+
     #[test]
     fn test_starts_with() {
         assert!(starts_with("hello", "he"));
@@ -209,7 +209,7 @@ mod tests {
         assert!(!starts_with("hello", "lo"));
         assert!(!starts_with("", "a"));
     }
-    
+
     #[test]
     fn test_ends_with() {
         assert!(ends_with("hello", "lo"));
@@ -217,7 +217,7 @@ mod tests {
         assert!(!ends_with("hello", "he"));
         assert!(!ends_with("", "a"));
     }
-    
+
     #[test]
     fn test_strip_prefix() {
         assert_eq!(strip_prefix("hello", "he"), Some("llo"));
@@ -225,7 +225,7 @@ mod tests {
         assert_eq!(strip_prefix("hello", "hello"), Some(""));
         assert_eq!(strip_prefix("hello", "world"), None);
     }
-    
+
     #[test]
     fn test_strip_suffix() {
         assert_eq!(strip_suffix("hello", "lo"), Some("hel"));

@@ -332,79 +332,88 @@ mod tests {
         let ans = X.chars().collect::<Vec<_>>();
         assert_eq!(OUTPUT_BUF, ans.as_slice());
     }
-    
+
     #[test]
     fn test_next_char() {
         // Test ASCII character
         const BYTES_A: &[u8] = b"abc";
         const NEXT_A: Option<(char, usize)> = next_char(BYTES_A);
         assert_eq!(NEXT_A, Some(('a', 1)));
-        
+
         // Test multi-byte UTF-8
         const BYTES_UTF8: &[u8] = "我好".as_bytes();
         const NEXT_UTF8: Option<(char, usize)> = next_char(BYTES_UTF8);
         assert_eq!(NEXT_UTF8, Some(('我', 3)));
-        
+
         // Test empty
         const BYTES_EMPTY: &[u8] = b"";
         const NEXT_EMPTY: Option<(char, usize)> = next_char(BYTES_EMPTY);
         assert_eq!(NEXT_EMPTY, None);
     }
-    
+
     #[test]
     fn test_str_count_chars() {
         const COUNT1: usize = str_count_chars("hello");
         assert_eq!(COUNT1, 5);
-        
+
         const COUNT2: usize = str_count_chars("你好");
         assert_eq!(COUNT2, 2);
-        
+
         const COUNT3: usize = str_count_chars("");
         assert_eq!(COUNT3, 0);
-        
+
         const COUNT4: usize = str_count_chars("a𐍈b");
         assert_eq!(COUNT4, 3);
     }
-    
+
     #[test]
     fn test_char_escape_debug_args() {
         // Test with escape_single_quote only
-        let e1 = CharEscapeDebug::new('\'', CharEscapeDebugArgs {
-            escape_single_quote: true,
-            escape_double_quote: false,
-        });
+        let e1 = CharEscapeDebug::new(
+            '\'',
+            CharEscapeDebugArgs {
+                escape_single_quote: true,
+                escape_double_quote: false,
+            },
+        );
         assert_eq!(e1.as_str(), "\\'");
-        
+
         // Test with escape_double_quote only
-        let e2 = CharEscapeDebug::new('"', CharEscapeDebugArgs {
-            escape_single_quote: false,
-            escape_double_quote: true,
-        });
+        let e2 = CharEscapeDebug::new(
+            '"',
+            CharEscapeDebugArgs {
+                escape_single_quote: false,
+                escape_double_quote: true,
+            },
+        );
         assert_eq!(e2.as_str(), "\\\"");
-        
+
         // Test with neither escaped
-        let e3 = CharEscapeDebug::new('\'', CharEscapeDebugArgs {
-            escape_single_quote: false,
-            escape_double_quote: false,
-        });
+        let e3 = CharEscapeDebug::new(
+            '\'',
+            CharEscapeDebugArgs {
+                escape_single_quote: false,
+                escape_double_quote: false,
+            },
+        );
         assert_eq!(e3.as_str(), "'");
     }
-    
+
     #[test]
     fn test_char_encode_utf8_edge_cases() {
         // Test 1-byte UTF-8 (ASCII)
         const E1: CharEncodeUtf8 = CharEncodeUtf8::new('A');
         assert_eq!(E1.len, 1);
         assert_eq!(E1.buf[0], b'A');
-        
+
         // Test 2-byte UTF-8
         const E2: CharEncodeUtf8 = CharEncodeUtf8::new('\u{00A9}'); // © copyright symbol
         assert_eq!(E2.len, 2);
-        
+
         // Test 3-byte UTF-8
         const E3: CharEncodeUtf8 = CharEncodeUtf8::new('€');
         assert_eq!(E3.len, 3);
-        
+
         // Test 4-byte UTF-8
         const E4: CharEncodeUtf8 = CharEncodeUtf8::new('𝄞'); // Musical symbol
         assert_eq!(E4.len, 4);

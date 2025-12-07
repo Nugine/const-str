@@ -76,56 +76,56 @@ mod tests {
         const S2: &str = "FERRIS";
         const S3: &str = "ferris";
         const S4: &str = "FERRI";
-        
-        const R1: bool = eq_ignore_ascii_case!(S1, S2);
-        const R2: bool = eq_ignore_ascii_case!(S1, S3);
-        const R3: bool = eq_ignore_ascii_case!(S1, S4);
-        
-        assert!(R1);
-        assert!(R2);
-        assert!(!R3);
-        
+
+        let r1 = eq_ignore_ascii_case!(S1, S2);
+        let r2 = eq_ignore_ascii_case!(S1, S3);
+        let r3 = eq_ignore_ascii_case!(S1, S4);
+
+        assert!(r1);
+        assert!(r2);
+        assert!(!r3);
+
         const S5: &str = "Hello";
         const S6: &str = "hello";
-        const R4: bool = eq_ignore_ascii_case!(S5, S6);
-        assert!(R4);
-        
+        let r4 = eq_ignore_ascii_case!(S5, S6);
+        assert!(r4);
+
         // Non-ASCII characters should match themselves
         const S7: &str = "Ferrös";
         const S8: &str = "FERRöS";
-        const R5: bool = eq_ignore_ascii_case!(S7, S8);
-        assert!(R5);
-        
+        let r5 = eq_ignore_ascii_case!(S7, S8);
+        assert!(r5);
+
         // Non-ASCII characters won't match their "uppercase" versions
         const S9: &str = "Ferrös";
         const S10: &str = "FERRÖS";
-        const R6: bool = eq_ignore_ascii_case!(S9, S10);
-        assert!(!R6);
+        let r6 = eq_ignore_ascii_case!(S9, S10);
+        assert!(!r6);
     }
-    
+
     #[test]
     fn test_eq_ignore_ascii_case_bytes() {
         const B1: &[u8] = b"Ferris";
         const B2: &[u8] = b"FERRIS";
         const B3: &[u8] = b"FERRI";
-        
-        const R1: bool = eq_ignore_ascii_case!(B1, B2);
-        const R2: bool = eq_ignore_ascii_case!(B1, B3);
-        
-        assert!(R1);
-        assert!(!R2);
+
+        let r1 = eq_ignore_ascii_case!(B1, B2);
+        let r2 = eq_ignore_ascii_case!(B1, B3);
+
+        assert!(r1);
+        assert!(!r2);
     }
-    
+
     #[test]
     fn test_eq_ignore_ascii_case_byte_arrays() {
         const A1: &[u8; 6] = b"Ferris";
         const A2: &[u8; 6] = b"FERRIS";
         const A3: &[u8; 5] = b"FERRI";
-        
-        const R1: bool = eq_ignore_ascii_case!(A1, A2);
-        const R2: bool = eq_ignore_ascii_case!(A1, A3);
-        
-        assert!(R1);
-        assert!(!R2);
+
+        let r1 = eq_ignore_ascii_case!(A1, A2);
+        let r2 = eq_ignore_ascii_case!(A1, A3);
+
+        assert!(r1);
+        assert!(!r2);
     }
 }

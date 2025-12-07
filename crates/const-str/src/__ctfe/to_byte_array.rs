@@ -40,14 +40,14 @@ mod tests {
         const B: &[u8; 6] = b"hello\0";
         const R1: [u8; 5] = to_byte_array!(S);
         const R2: [u8; 6] = to_byte_array!(B);
-        
+
         assert_eq!(R1, [b'h', b'e', b'l', b'l', b'o']);
         assert_eq!(R2, [b'h', b'e', b'l', b'l', b'o', b'\0']);
-        
+
         const EMPTY: &str = "";
         const R3: [u8; 0] = to_byte_array!(EMPTY);
         assert_eq!(R3, []);
-        
+
         const BYTES: &[u8; 3] = b"abc";
         const R4: [u8; 3] = to_byte_array!(BYTES);
         assert_eq!(R4, [b'a', b'b', b'c']);

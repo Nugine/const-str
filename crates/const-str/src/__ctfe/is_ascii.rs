@@ -63,35 +63,35 @@ mod tests {
         const S2: &str = "你好！";
         const S3: &str = "";
         const S4: &str = "ASCII123";
-        
-        const R1: bool = is_ascii!(S1);
-        const R2: bool = is_ascii!(S2);
-        const R3: bool = is_ascii!(S3);
-        const R4: bool = is_ascii!(S4);
-        
-        assert!(R1);
-        assert!(!R2);
-        assert!(R3); // empty string is ASCII
-        assert!(R4);
-        
+
+        let r1 = is_ascii!(S1);
+        let r2 = is_ascii!(S2);
+        let r3 = is_ascii!(S3);
+        let r4 = is_ascii!(S4);
+
+        assert!(r1);
+        assert!(!r2);
+        assert!(r3); // empty string is ASCII
+        assert!(r4);
+
         // Test with byte slices
         const B1: &[u8] = b"hello";
         const B2: &[u8] = b"\x80\x00";
-        
-        const RB1: bool = is_ascii!(B1);
-        const RB2: bool = is_ascii!(B2);
-        
-        assert!(RB1);
-        assert!(!RB2);
-        
+
+        let rb1 = is_ascii!(B1);
+        let rb2 = is_ascii!(B2);
+
+        assert!(rb1);
+        assert!(!rb2);
+
         // Test with byte arrays
         const A1: &[u8; 5] = b"hello";
         const A2: &[u8; 2] = b"\x80\x00";
-        
-        const RA1: bool = is_ascii!(A1);
-        const RA2: bool = is_ascii!(A2);
-        
-        assert!(RA1);
-        assert!(!RA2);
+
+        let ra1 = is_ascii!(A1);
+        let ra2 = is_ascii!(A2);
+
+        assert!(ra1);
+        assert!(!ra2);
     }
 }

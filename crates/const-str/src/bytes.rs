@@ -208,18 +208,18 @@ mod tests {
         assert!(!ends_with(b"", b"a"));
         assert!(!ends_with(b"ab", b"a"));
     }
-    
+
     #[test]
     fn test_clone() {
         const BYTES: &[u8] = b"hello";
         const CLONED: [u8; 5] = clone(BYTES);
         assert_eq!(CLONED, [b'h', b'e', b'l', b'l', b'o']);
-        
+
         const EMPTY: &[u8] = b"";
         const CLONED_EMPTY: [u8; 0] = clone(EMPTY);
         assert_eq!(CLONED_EMPTY, []);
     }
-    
+
     #[test]
     fn test_equal() {
         assert!(equal(b"hello", b"hello"));
@@ -229,11 +229,11 @@ mod tests {
         assert!(!equal(b"", b"a"));
         assert!(!equal(b"hello", b"hello!"));
     }
-    
+
     #[test]
     fn test_compare() {
         use core::cmp::Ordering;
-        
+
         assert_eq!(compare(b"a", b"b"), Ordering::Less);
         assert_eq!(compare(b"b", b"a"), Ordering::Greater);
         assert_eq!(compare(b"a", b"a"), Ordering::Equal);
@@ -242,20 +242,20 @@ mod tests {
         assert_eq!(compare(b"a", b""), Ordering::Greater);
         assert_eq!(compare(b"ab", b"abc"), Ordering::Less);
     }
-    
+
     #[test]
     fn test_merge() {
         const BUF: [u8; 6] = [1, 2, 3, 0, 0, 0];
         const BYTES: &[u8] = &[4, 5, 6, 7, 8, 9];
         const MERGED: [u8; 6] = merge(BUF, BYTES);
         assert_eq!(MERGED, [4, 5, 6, 7, 8, 9]);
-        
+
         const BUF2: [u8; 3] = [0, 0, 0];
         const BYTES2: &[u8] = &[1, 2, 3];
         const MERGED2: [u8; 3] = merge(BUF2, BYTES2);
         assert_eq!(MERGED2, [1, 2, 3]);
     }
-    
+
     #[test]
     fn test_strip_prefix() {
         assert_eq!(strip_prefix(b"hello", b"he"), Some(&b"llo"[..]));
@@ -265,7 +265,7 @@ mod tests {
         assert_eq!(strip_prefix(b"", b""), Some(&b""[..]));
         assert_eq!(strip_prefix(b"", b"a"), None);
     }
-    
+
     #[test]
     fn test_strip_suffix() {
         assert_eq!(strip_suffix(b"hello", b"lo"), Some(&b"hel"[..]));

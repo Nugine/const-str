@@ -36,13 +36,13 @@ mod tests {
     fn test_to_char_array() {
         const CHARS: [char; 5] = to_char_array!("Hello");
         assert_eq!(CHARS, ['H', 'e', 'l', 'l', 'o']);
-        
+
         const EMPTY: [char; 0] = to_char_array!("");
         assert_eq!(EMPTY, []);
-        
+
         const UNICODE: [char; 3] = to_char_array!("你好！");
         assert_eq!(UNICODE, ['你', '好', '！']);
-        
+
         const SINGLE: [char; 1] = to_char_array!("A");
         assert_eq!(SINGLE, ['A']);
     }

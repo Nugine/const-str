@@ -200,7 +200,7 @@ macro_rules! strip_suffix {
 #[cfg(test)]
 mod tests {
     use crate::unwrap;
-    
+
     #[test]
     fn test_contains() {
         const BANANAS: &str = "bananas";
@@ -208,13 +208,13 @@ mod tests {
         const B: bool = contains!(BANANAS, "apples");
         const C: bool = contains!(BANANAS, 'c');
         const D: bool = contains!(BANANAS, 'a');
-        
+
         assert_eq!([A, B, C, D], [true, false, false, true]);
-        
-        const F: bool = contains!("hello", "");
-        assert!(F);
+
+        let f = contains!("hello", "");
+        assert!(f);
     }
-    
+
     #[test]
     fn test_starts_with() {
         const BANANAS: &str = "bananas";
@@ -222,13 +222,13 @@ mod tests {
         const B: bool = starts_with!(BANANAS, "nana");
         const C: bool = starts_with!(BANANAS, 'b');
         const D: bool = starts_with!(BANANAS, 'n');
-        
+
         assert_eq!([A, B, C, D], [true, false, true, false]);
-        
-        const F: bool = starts_with!("hello", "");
-        assert!(F);
+
+        let f = starts_with!("hello", "");
+        assert!(f);
     }
-    
+
     #[test]
     fn test_ends_with() {
         const BANANAS: &str = "bananas";
@@ -236,42 +236,42 @@ mod tests {
         const B: bool = ends_with!(BANANAS, "nana");
         const C: bool = ends_with!(BANANAS, 's');
         const D: bool = ends_with!(BANANAS, 'b');
-        
+
         assert_eq!([A, B, C, D], [true, false, true, false]);
-        
-        const F: bool = ends_with!("hello", "");
-        assert!(F);
+
+        let f = ends_with!("hello", "");
+        assert!(f);
     }
-    
+
     #[test]
     fn test_strip_prefix() {
         const R1: Option<&str> = strip_prefix!("foo:bar", "foo:");
         const R2: Option<&str> = strip_prefix!("foo:bar", "bar");
         const R3: Option<&str> = strip_prefix!("foofoo", "foo");
         const R4: Option<&str> = strip_prefix!("", "");
-        
+
         assert_eq!(R1, Some("bar"));
         assert_eq!(R2, None);
         assert_eq!(R3, Some("foo"));
         assert_eq!(R4, Some(""));
-        
+
         const FOO_BAR: &str = "foo:bar";
         const BAR: &str = unwrap!(strip_prefix!(FOO_BAR, "foo:"));
         assert_eq!(BAR, "bar");
     }
-    
+
     #[test]
     fn test_strip_suffix() {
         const R1: Option<&str> = strip_suffix!("bar:foo", ":foo");
         const R2: Option<&str> = strip_suffix!("bar:foo", "bar");
         const R3: Option<&str> = strip_suffix!("foofoo", "foo");
         const R4: Option<&str> = strip_suffix!("", "");
-        
+
         assert_eq!(R1, Some("bar"));
         assert_eq!(R2, None);
         assert_eq!(R3, Some("foo"));
         assert_eq!(R4, Some(""));
-        
+
         const FOO_BAR: &str = "foo:bar";
         const FOO: &str = unwrap!(strip_suffix!(FOO_BAR, ":bar"));
         assert_eq!(FOO, "foo");

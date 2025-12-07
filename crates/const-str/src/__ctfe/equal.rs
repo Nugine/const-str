@@ -48,39 +48,39 @@ mod tests {
         const C: &str = "hello";
         const D: &str = "";
         const E: &str = "";
-        
-        const EQ1: bool = equal!(A, B);
-        const EQ2: bool = equal!(A, C);
-        const EQ3: bool = equal!(D, E);
-        
-        assert_eq!(EQ1, false);
-        assert_eq!(EQ2, true);
-        assert_eq!(EQ3, true);
+
+        let eq1 = equal!(A, B);
+        let eq2 = equal!(A, C);
+        let eq3 = equal!(D, E);
+
+        assert!(!eq1);
+        assert!(eq2);
+        assert!(eq3);
     }
-    
+
     #[test]
     fn test_equal_bytes() {
         const A: &[u8] = b"hello";
         const B: &[u8] = b"world";
         const C: &[u8] = b"hello";
-        
-        const EQ1: bool = equal!(A, B);
-        const EQ2: bool = equal!(A, C);
-        
-        assert_eq!(EQ1, false);
-        assert_eq!(EQ2, true);
+
+        let eq1 = equal!(A, B);
+        let eq2 = equal!(A, C);
+
+        assert!(!eq1);
+        assert!(eq2);
     }
-    
+
     #[test]
     fn test_equal_byte_arrays() {
         const A: &[u8; 5] = b"hello";
         const B: &[u8; 5] = b"world";
         const C: &[u8; 5] = b"hello";
-        
-        const EQ1: bool = equal!(A, B);
-        const EQ2: bool = equal!(A, C);
-        
-        assert_eq!(EQ1, false);
-        assert_eq!(EQ2, true);
+
+        let eq1 = equal!(A, B);
+        let eq2 = equal!(A, C);
+
+        assert!(!eq1);
+        assert!(eq2);
     }
 }

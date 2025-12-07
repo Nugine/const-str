@@ -28,6 +28,19 @@ just dev
 just doc
 ```
 
+### Generate test coverage
+
+```bash
+just coverage
+```
+
+This will generate an HTML coverage report in `target/llvm-cov/html/index.html`.
+
+Note: This requires [cargo-llvm-cov](https://github.com/taiki-e/cargo-llvm-cov) to be installed:
+```bash
+cargo install cargo-llvm-cov
+```
+
 ### Run CI checks locally
 
 ```bash

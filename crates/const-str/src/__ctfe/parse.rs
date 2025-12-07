@@ -138,6 +138,8 @@ macro_rules! parse {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn test_parse() {
         macro_rules! test_parse {
@@ -157,5 +159,48 @@ mod tests {
         test_parse!("-1", i8);
         test_parse!("+42000", u32);
         test_parse!("-42000", i32);
+    }
+
+    #[test]
+    fn test_parse_runtime() {
+        // Runtime tests for Parse<&str, bool>
+        let parse_true = Parse::<&str, bool>::new("true");
+        assert!(parse_true.const_eval());
+
+        let parse_false = Parse::<&str, bool>::new("false");
+        assert!(!parse_false.const_eval());
+
+        // Runtime tests for Parse<&str, &str>
+        let parse_str = Parse::<&str, &str>::new("hello");
+        assert_eq!(parse_str.const_eval(), "hello");
+
+        // Runtime tests for Parse<&str, char>
+        let parse_char = Parse::<&str, char>::new("a");
+        assert_eq!(parse_char.const_eval(), 'a');
+
+        let parse_unicode = Parse::<&str, char>::new("你");
+        assert_eq!(parse_unicode.const_eval(), '你');
+
+        // Runtime tests for Parse<&str, u8>
+        let parse_u8 = Parse::<&str, u8>::new("42");
+        assert_eq!(parse_u8.const_eval(), 42);
+
+        let parse_u8_zero = Parse::<&str, u8>::new("0");
+        assert_eq!(parse_u8_zero.const_eval(), 0);
+
+        // Runtime tests for Parse<&str, i8>
+        let parse_i8_pos = Parse::<&str, i8>::new("42");
+        assert_eq!(parse_i8_pos.const_eval(), 42);
+
+        let parse_i8_neg = Parse::<&str, i8>::new("-42");
+        assert_eq!(parse_i8_neg.const_eval(), -42);
+
+        // Runtime tests for Parse<&str, u64>
+        let parse_u64 = Parse::<&str, u64>::new("1234567890");
+        assert_eq!(parse_u64.const_eval(), 1234567890);
+
+        // Runtime tests for Parse<&str, i64>
+        let parse_i64 = Parse::<&str, i64>::new("-1234567890");
+        assert_eq!(parse_i64.const_eval(), -1234567890);
     }
 }

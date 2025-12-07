@@ -179,6 +179,8 @@ macro_rules! encode_z {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn test_encode() {
         {
@@ -201,5 +203,69 @@ mod tests {
             ans.push(0);
             assert_eq!(B2, ans.as_slice());
         }
+    }
+
+    #[test]
+    fn test_encode_runtime() {
+        // Runtime tests for Utf8Encoder
+        let encoder_utf8 = Encode(
+            "test",
+            Utf8Encoder {
+                nul_terminated: false,
+            },
+        );
+        assert_eq!(encoder_utf8.output_len(), 4);
+        let buf: [u8; 4] = encoder_utf8.const_eval();
+        assert_eq!(&buf, b"test");
+
+        let encoder_utf8_z = Encode(
+            "hello",
+            Utf8Encoder {
+                nul_terminated: true,
+            },
+        );
+        assert_eq!(encoder_utf8_z.output_len(), 6);
+        let buf2: [u8; 6] = encoder_utf8_z.const_eval();
+        assert_eq!(&buf2, b"hello\0");
+
+        // Runtime tests for Utf16Encoder
+        let encoder_utf16 = Encode(
+            "abc",
+            Utf16Encoder {
+                nul_terminated: false,
+            },
+        );
+        assert_eq!(encoder_utf16.output_len(), 3);
+        let buf3: [u16; 3] = encoder_utf16.const_eval();
+        assert_eq!(buf3, [b'a' as u16, b'b' as u16, b'c' as u16]);
+
+        let encoder_utf16_z = Encode(
+            "hi",
+            Utf16Encoder {
+                nul_terminated: true,
+            },
+        );
+        assert_eq!(encoder_utf16_z.output_len(), 3);
+        let buf4: [u16; 3] = encoder_utf16_z.const_eval();
+        assert_eq!(buf4, [b'h' as u16, b'i' as u16, 0]);
+
+        // Test with unicode
+        let encoder_unicode = Encode(
+            "你好",
+            Utf16Encoder {
+                nul_terminated: false,
+            },
+        );
+        let len = encoder_unicode.output_len();
+        assert_eq!(len, 2);
+
+        // Test empty string
+        let encoder_empty = Encode(
+            "",
+            Utf8Encoder {
+                nul_terminated: false,
+            },
+        );
+        assert_eq!(encoder_empty.output_len(), 0);
     }
 }

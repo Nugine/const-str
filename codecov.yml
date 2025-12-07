@@ -17,6 +17,6 @@ coverage:
         threshold: 1%
 
 comment:
-  layout: "reach,diff,flags,tree"
+  layout: "header,diff,flags,tree"
   behavior: default
   require_changes: false

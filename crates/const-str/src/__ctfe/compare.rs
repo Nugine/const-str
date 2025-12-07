@@ -143,4 +143,29 @@ mod tests {
         assert_eq!(ORD2, Ordering::Greater);
         assert_eq!(ORD3, Ordering::Equal);
     }
+
+    #[test]
+    fn test_compare_runtime() {
+        use super::*;
+
+        // Runtime tests for Compare with &str
+        let cmp_str = Compare("apple", "banana");
+        assert_eq!(cmp_str.const_eval(), Ordering::Less);
+
+        let cmp_str2 = Compare("zebra", "apple");
+        assert_eq!(cmp_str2.const_eval(), Ordering::Greater);
+
+        let cmp_str3 = Compare("test", "test");
+        assert_eq!(cmp_str3.const_eval(), Ordering::Equal);
+
+        // Runtime tests for Compare with bytes
+        let cmp_bytes = Compare(b"hello".as_slice(), b"world".as_slice());
+        assert_eq!(cmp_bytes.const_eval(), Ordering::Less);
+
+        // Runtime tests for Compare with byte arrays
+        let arr1: &[u8; 3] = b"abc";
+        let arr2: &[u8; 3] = b"xyz";
+        let cmp_arr = Compare(arr1, arr2);
+        assert_eq!(cmp_arr.const_eval(), Ordering::Less);
+    }
 }

@@ -225,4 +225,46 @@ mod tests {
         test_to_str!(i128, i128::MAX);
         test_to_str!(i128, i128::MIN);
     }
+
+    #[test]
+    fn test_to_str_runtime() {
+        // Runtime tests for ToStr with various types
+        let to_str_bool = ToStr(true);
+        let buf = to_str_bool.const_eval::<4>();
+        assert_eq!(buf.as_str(), "true");
+
+        let to_str_char = ToStr('A');
+        let buf2 = to_str_char.const_eval::<1>();
+        assert_eq!(buf2.as_str(), "A");
+
+        let to_str_str = ToStr("hello");
+        let buf3 = to_str_str.const_eval::<5>();
+        assert_eq!(buf3.as_str(), "hello");
+
+        // Test various integer types
+        let to_str_u8 = ToStr(42u8);
+        let len = to_str_u8.output_len();
+        assert_eq!(len, 2);
+
+        let to_str_i8 = ToStr(-42i8);
+        let len2 = to_str_i8.output_len();
+        assert_eq!(len2, 3);
+
+        let to_str_u64 = ToStr(12345u64);
+        let len3 = to_str_u64.output_len();
+        assert_eq!(len3, 5);
+
+        let to_str_i64 = ToStr(-9876i64);
+        let len4 = to_str_i64.output_len();
+        assert_eq!(len4, 5);
+
+        // Test max/min values
+        let to_str_u8_max = ToStr(u8::MAX);
+        let buf_max = to_str_u8_max.const_eval::<3>();
+        assert_eq!(buf_max.as_str(), "255");
+
+        let to_str_i8_min = ToStr(i8::MIN);
+        let buf_min = to_str_i8_min.const_eval::<4>();
+        assert_eq!(buf_min.as_str(), "-128");
+    }
 }

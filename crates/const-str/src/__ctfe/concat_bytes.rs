@@ -170,17 +170,25 @@ mod tests {
         let arr: &[u8; 3] = b"abc";
         let part_arr = ConcatBytesPart(arr);
         assert_eq!(part_arr.output_len(), 3);
+        let buf_arr: [u8; 3] = part_arr.const_eval();
+        assert_eq!(buf_arr, [b'a', b'b', b'c']);
 
         let slice: &[u8] = b"hello";
         let part_slice = ConcatBytesPart(slice);
         assert_eq!(part_slice.output_len(), 5);
+        let buf_slice: [u8; 5] = part_slice.const_eval();
+        assert_eq!(buf_slice, *b"hello");
 
         let owned_arr: [u8; 2] = [1, 2];
         let part_owned = ConcatBytesPart(owned_arr);
         assert_eq!(part_owned.output_len(), 2);
+        let buf_owned: [u8; 2] = part_owned.const_eval();
+        assert_eq!(buf_owned, [1, 2]);
 
         let str_part = ConcatBytesPart("test");
         assert_eq!(str_part.output_len(), 4);
+        let buf_str: [u8; 4] = str_part.const_eval();
+        assert_eq!(buf_str, *b"test");
 
         // Runtime tests for ConcatBytes
         let parts: &[&[u8]] = &[b"hello", b"world"];
@@ -192,5 +200,14 @@ mod tests {
         let empty_parts: &[&[u8]] = &[];
         let concat_empty = ConcatBytes(empty_parts);
         assert_eq!(concat_empty.output_len(), 0);
+        let buf_empty: [u8; 0] = concat_empty.const_eval();
+        assert_eq!(&buf_empty, b"");
+
+        // Test multiple parts
+        let multi_parts: &[&[u8]] = &[b"a", b"b", b"c"];
+        let concat_multi = ConcatBytes(multi_parts);
+        assert_eq!(concat_multi.output_len(), 3);
+        let buf_multi: [u8; 3] = concat_multi.const_eval();
+        assert_eq!(&buf_multi, b"abc");
     }
 }

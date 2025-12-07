@@ -276,4 +276,48 @@ mod tests {
         const FOO: &str = unwrap!(strip_suffix!(FOO_BAR, ":bar"));
         assert_eq!(FOO, "foo");
     }
+
+    #[test]
+    fn test_find_runtime() {
+        use super::*;
+
+        // Runtime tests for Contains
+        let contains1 = Contains("hello world", "world");
+        assert!(contains1.const_eval());
+
+        let contains2 = Contains("hello", "x");
+        assert!(!contains2.const_eval());
+
+        // Runtime tests for StartsWith
+        let starts1 = StartsWith("hello", "he");
+        assert!(starts1.const_eval());
+
+        let starts2 = StartsWith("hello", "lo");
+        assert!(!starts2.const_eval());
+
+        // Runtime tests for EndsWith
+        let ends1 = EndsWith("hello", "lo");
+        assert!(ends1.const_eval());
+
+        let ends2 = EndsWith("hello", "he");
+        assert!(!ends2.const_eval());
+
+        // Runtime tests for StripPrefix
+        let strip_pre = StripPrefix("hello world", "hello ");
+        let result = strip_pre.const_eval();
+        assert_eq!(result, Some("world"));
+
+        let strip_pre_none = StripPrefix("hello", "world");
+        let result_none = strip_pre_none.const_eval();
+        assert_eq!(result_none, None);
+
+        // Runtime tests for StripSuffix
+        let strip_suf = StripSuffix("hello world", " world");
+        let result_suf = strip_suf.const_eval();
+        assert_eq!(result_suf, Some("hello"));
+
+        let strip_suf_none = StripSuffix("hello", "world");
+        let result_suf_none = strip_suf_none.const_eval();
+        assert_eq!(result_suf_none, None);
+    }
 }

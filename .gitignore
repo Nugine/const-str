@@ -2,3 +2,9 @@
 Cargo.lock
 /.vscode
 /rust-toolchain
+
+# Coverage artifacts
+*.profraw
+*.profdata
+/coverage
+/lcov.info

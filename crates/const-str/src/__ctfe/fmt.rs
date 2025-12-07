@@ -422,12 +422,22 @@ mod tests {
 
         // Test Debug for char
         let debug_char = Debug('a', spec);
+        assert_eq!(debug_char.output_len(), 3); // 'a' with quotes
         let buf2: StrBuf<3> = debug_char.const_eval();
         assert_eq!(buf2.as_str(), "'a'");
+
+        // Test Debug for special chars
+        let debug_newline = Debug('\n', spec);
+        assert!(debug_newline.output_len() > 2);
 
         // Test Debug for numbers
         let debug_u8 = Debug(42u8, spec);
         assert_eq!(debug_u8.output_len(), 2);
+
+        // Test Debug with alternate formatting
+        let spec_alt = FmtSpec { alternate: true };
+        let debug_alt = Debug(42u8, spec_alt);
+        assert_eq!(debug_alt.output_len(), 2);
     }
 
     #[test]
@@ -466,6 +476,14 @@ mod tests {
         // Test UpperHex for signed
         let hex_i32 = UpperHex(-1i32, spec);
         let _len = hex_i32.output_len();
+
+        // Test more integer types
+        let hex_u16 = UpperHex(0xABCDu16, spec);
+        let buf_u16: StrBuf<4> = hex_u16.const_eval();
+        assert_eq!(buf_u16.as_str(), "ABCD");
+
+        let hex_u64 = UpperHex(0x123456u64, spec);
+        assert!(hex_u64.output_len() > 0);
     }
 
     #[test]
@@ -485,5 +503,17 @@ mod tests {
         // Test Binary for signed
         let bin_i32 = Binary(-1i32, spec);
         let _len = bin_i32.output_len();
+
+        // Test more types
+        let bin_u16 = Binary(7u16, spec);
+        let buf_u16: StrBuf<3> = bin_u16.const_eval();
+        assert_eq!(buf_u16.as_str(), "111");
+
+        let bin_u64 = Binary(15u64, spec);
+        let buf_u64: StrBuf<4> = bin_u64.const_eval();
+        assert_eq!(buf_u64.as_str(), "1111");
+
+        let bin_u128 = Binary(3u128, spec_alt);
+        assert!(bin_u128.output_len() > 0);
     }
 }

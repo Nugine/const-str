@@ -154,3 +154,80 @@ macro_rules! hex {
         OUTPUT_BUF
     }};
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_hex() {
+        const DATA: [u8; 4] = hex!("01020304");
+        assert_eq!(DATA, [1, 2, 3, 4]);
+
+        const DATA2: [u8; 4] = hex!("a1 b2 c3 d4");
+        assert_eq!(DATA2, [0xA1, 0xB2, 0xC3, 0xD4]);
+
+        const DATA3: [u8; 4] = hex!("E5 E6 90 92");
+        assert_eq!(DATA3, [0xE5, 0xE6, 0x90, 0x92]);
+
+        const DATA4: [u8; 4] = hex!(["0a0B", "0C0d"]);
+        assert_eq!(DATA4, [10, 11, 12, 13]);
+
+        const S1: &str = "00010203 04050607 08090a0b 0c0d0e0f";
+        const B1: &[u8] = &hex!(S1);
+        const B2: &[u8] = &hex!([
+            "00010203 04050607", // first half
+            "08090a0b 0c0d0e0f", // second half
+        ]);
+
+        assert_eq!(B1, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
+        assert_eq!(B2, B1);
+
+        const EMPTY: [u8; 0] = hex!("");
+        assert_eq!(EMPTY, []);
+
+        const WITH_NEWLINE: [u8; 2] = hex!("0A\n0B");
+        assert_eq!(WITH_NEWLINE, [10, 11]);
+
+        const WITH_TAB: [u8; 2] = hex!("0C\t0D");
+        assert_eq!(WITH_TAB, [12, 13]);
+    }
+
+    #[test]
+    fn test_hex_runtime() {
+        // Runtime tests for Hex with &[&str]
+        let strs: &[&str] = &["01", "02", "03"];
+        let hex_slice = Hex(strs);
+        assert_eq!(hex_slice.output_len(), 3);
+        let buf: [u8; 3] = hex_slice.const_eval();
+        assert_eq!(buf, [1, 2, 3]);
+
+        // Test with single string
+        let single = "FF00";
+        let hex_str = Hex(single);
+        assert_eq!(hex_str.output_len(), 2);
+        let buf2: [u8; 2] = hex_str.const_eval();
+        assert_eq!(buf2, [0xFF, 0x00]);
+
+        // Test with array
+        let arr = ["AB", "CD"];
+        let hex_arr = Hex(arr);
+        assert_eq!(hex_arr.output_len(), 2);
+        let buf3: [u8; 2] = hex_arr.const_eval();
+        assert_eq!(buf3, [0xAB, 0xCD]);
+
+        // Test with whitespace
+        let with_space = "12 34\t56\n78";
+        let hex_ws = Hex(with_space);
+        assert_eq!(hex_ws.output_len(), 4);
+        let buf4: [u8; 4] = hex_ws.const_eval();
+        assert_eq!(buf4, [0x12, 0x34, 0x56, 0x78]);
+
+        // Test uppercase and lowercase
+        let mixed = "aAbBcC";
+        let hex_mixed = Hex(mixed);
+        assert_eq!(hex_mixed.output_len(), 3);
+        let buf5: [u8; 3] = hex_mixed.const_eval();
+        assert_eq!(buf5, [0xAA, 0xBB, 0xCC]);
+    }
+}

@@ -173,4 +173,33 @@ mod tests {
         testcase!("v4 / udp", ' ', "");
         testcase!("我", '我', "");
     }
+
+    #[test]
+    fn test_replace_runtime() {
+        // Runtime tests for Replace
+        let replace1 = Replace("hello world", "world", "rust");
+        assert_eq!(replace1.output_len(), 10);
+        let buf1: StrBuf<10> = replace1.const_eval();
+        assert_eq!(buf1.as_str(), "hello rust");
+
+        let replace2 = Replace("aaa", "a", "bb");
+        assert_eq!(replace2.output_len(), 6);
+        let buf2: StrBuf<6> = replace2.const_eval();
+        assert_eq!(buf2.as_str(), "bbbbbb");
+
+        let replace3 = Replace("test", "x", "y");
+        assert_eq!(replace3.output_len(), 4);
+        let buf3: StrBuf<4> = replace3.const_eval();
+        assert_eq!(buf3.as_str(), "test");
+
+        let replace_empty = Replace("", "a", "b");
+        let len_empty = replace_empty.output_len();
+        assert_eq!(len_empty, 0);
+
+        // Test with char pattern
+        let replace_char = Replace("hello", 'l', "L");
+        assert_eq!(replace_char.output_len(), 5);
+        let buf_char: StrBuf<5> = replace_char.const_eval();
+        assert_eq!(buf_char.as_str(), "heLLo");
+    }
 }

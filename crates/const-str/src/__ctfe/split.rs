@@ -766,4 +766,80 @@ mod tests {
         testcase!("a b");
         testcase!("  a  b  ");
     }
+
+    #[test]
+    fn test_split_runtime() {
+        use super::*;
+
+        // Runtime tests for Split with &str pattern
+        let split1 = Split("a,b,c", ",");
+        assert_eq!(split1.output_len(), 3);
+        let result1: [&str; 3] = split1.const_eval();
+        assert_eq!(result1, ["a", "b", "c"]);
+
+        let split2 = Split("hello", ",");
+        assert_eq!(split2.output_len(), 1);
+        let result2: [&str; 1] = split2.const_eval();
+        assert_eq!(result2, ["hello"]);
+
+        // Test split with empty pattern (splits into chars)
+        let split_empty_pat = Split("ab", "");
+        assert_eq!(split_empty_pat.output_len(), 4); // "", "a", "b", ""
+        let result_empty: [&str; 4] = split_empty_pat.const_eval();
+        assert_eq!(result_empty, ["", "a", "b", ""]);
+
+        // Runtime tests for Split with char pattern
+        let split_char = Split("a,b,c", ',');
+        assert_eq!(split_char.output_len(), 3);
+        let result_char: [&str; 3] = split_char.const_eval();
+        assert_eq!(result_char, ["a", "b", "c"]);
+
+        let split_char2 = Split("hello", 'x');
+        assert_eq!(split_char2.output_len(), 1);
+        let result_char2: [&str; 1] = split_char2.const_eval();
+        assert_eq!(result_char2, ["hello"]);
+
+        // Runtime tests for Split with &[char] pattern
+        const CHARS: &[char] = &[',', ';'];
+        let split_chars = Split("a,b;c", CHARS);
+        assert_eq!(split_chars.output_len(), 3);
+        let result_chars: [&str; 3] = split_chars.const_eval();
+        assert_eq!(result_chars, ["a", "b", "c"]);
+
+        const CHARS2: &[char] = &['x', 'y'];
+        let split_chars2 = Split("hello", CHARS2);
+        assert_eq!(split_chars2.output_len(), 1);
+        let result_chars2: [&str; 1] = split_chars2.const_eval();
+        assert_eq!(result_chars2, ["hello"]);
+
+        // Runtime tests for SplitInclusive with &str pattern
+        let split_inc = SplitInclusive("a,b,c", ",");
+        assert_eq!(split_inc.output_len(), 3);
+        let result_inc: [&str; 3] = split_inc.const_eval();
+        assert_eq!(result_inc, ["a,", "b,", "c"]);
+
+        // Test split inclusive with empty pattern
+        let split_inc_empty = SplitInclusive("xy", "");
+        assert_eq!(split_inc_empty.output_len(), 4);
+        let result_inc_empty: [&str; 4] = split_inc_empty.const_eval();
+        assert_eq!(result_inc_empty, ["", "x", "y", ""]);
+
+        // Runtime tests for SplitInclusive with char pattern
+        let split_inc_char = SplitInclusive("a,b,c", ',');
+        assert_eq!(split_inc_char.output_len(), 3);
+        let result_inc_char: [&str; 3] = split_inc_char.const_eval();
+        assert_eq!(result_inc_char, ["a,", "b,", "c"]);
+
+        // Runtime tests for SplitInclusive with &[char] pattern
+        let split_inc_chars = SplitInclusive("a,b;c", CHARS);
+        assert_eq!(split_inc_chars.output_len(), 3);
+        let result_inc_chars: [&str; 3] = split_inc_chars.const_eval();
+        assert_eq!(result_inc_chars, ["a,", "b;", "c"]);
+
+        // Runtime tests for SplitAsciiWhitespace
+        let split_ws = SplitAsciiWhitespace("  hello  world  ");
+        assert_eq!(split_ws.output_len(), 2);
+        let result_ws: [&str; 2] = split_ws.const_eval();
+        assert_eq!(result_ws, ["hello", "world"]);
+    }
 }

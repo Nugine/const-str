@@ -52,3 +52,30 @@ macro_rules! from_utf8 {
         OUTPUT
     }};
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_strbuf_runtime() {
+        // Test StrBuf::from_str
+        let buf: StrBuf<5> = StrBuf::from_str("hello");
+        assert_eq!(buf.as_str(), "hello");
+        assert_eq!(buf.as_bytes(), b"hello");
+
+        // Test empty
+        let buf_empty: StrBuf<0> = StrBuf::from_str("");
+        assert_eq!(buf_empty.as_str(), "");
+        assert_eq!(buf_empty.as_bytes(), b"");
+
+        // Test with unicode
+        let buf_unicode: StrBuf<9> = StrBuf::from_str("你好！");
+        assert_eq!(buf_unicode.as_str(), "你好！");
+
+        // Test new_unchecked
+        let raw_buf = [b'a', b'b', b'c'];
+        let buf_unsafe: StrBuf<3> = unsafe { StrBuf::new_unchecked(raw_buf) };
+        assert_eq!(buf_unsafe.as_str(), "abc");
+    }
+}

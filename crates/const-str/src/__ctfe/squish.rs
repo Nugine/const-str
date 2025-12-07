@@ -172,4 +172,34 @@ mod tessts {
             WHERE id = ?"
         );
     }
+
+    #[test]
+    fn test_squish_runtime() {
+        use super::*;
+
+        // Runtime tests for Squish
+        let squish1 = Squish("  hello   world  ");
+        assert_eq!(squish1.output_len(), 11);
+        let buf1: StrBuf<11> = squish1.const_eval();
+        assert_eq!(buf1.as_str(), "hello world");
+
+        let squish2 = Squish("\t\n  test  \r\n");
+        assert_eq!(squish2.output_len(), 4);
+        let buf2: StrBuf<4> = squish2.const_eval();
+        assert_eq!(buf2.as_str(), "test");
+
+        let squish_empty = Squish("   ");
+        let len_empty = squish_empty.output_len();
+        assert_eq!(len_empty, 0);
+
+        let squish_single = Squish("word");
+        assert_eq!(squish_single.output_len(), 4);
+        let buf_single: StrBuf<4> = squish_single.const_eval();
+        assert_eq!(buf_single.as_str(), "word");
+
+        let squish_multi = Squish("  a  b  c  ");
+        assert_eq!(squish_multi.output_len(), 5);
+        let buf_multi: StrBuf<5> = squish_multi.const_eval();
+        assert_eq!(buf_multi.as_str(), "a b c");
+    }
 }

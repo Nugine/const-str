@@ -91,6 +91,8 @@ macro_rules! cstr {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn test_raw_cstr() {
         const FMT: &str = "%d\n";
@@ -98,5 +100,27 @@ mod tests {
         let len = FMT.len() + 1;
         let bytes: &[u8] = unsafe { core::slice::from_raw_parts(fmt.cast(), len) };
         assert_eq!(bytes, b"%d\n\0");
+    }
+
+    #[test]
+    fn test_cstr_runtime() {
+        // Runtime tests for ToCStr
+        let to_cstr = ToCStr("hello");
+        assert_eq!(to_cstr.output_len(), 6); // "hello" + '\0'
+
+        let buf: [u8; 6] = to_cstr.const_eval();
+        assert_eq!(&buf, b"hello\0");
+
+        // Test empty string
+        let to_cstr_empty = ToCStr("");
+        assert_eq!(to_cstr_empty.output_len(), 1);
+        let buf2: [u8; 1] = to_cstr_empty.const_eval();
+        assert_eq!(&buf2, b"\0");
+
+        // Test longer string
+        let to_cstr_long = ToCStr("test string");
+        assert_eq!(to_cstr_long.output_len(), 12);
+        let buf3: [u8; 12] = to_cstr_long.const_eval();
+        assert_eq!(&buf3, b"test string\0");
     }
 }

@@ -196,3 +196,147 @@ macro_rules! strip_suffix {
         $crate::__ctfe::StripSuffix($s, $suffix).const_eval()
     }};
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::unwrap;
+
+    #[test]
+    fn test_contains() {
+        const BANANAS: &str = "bananas";
+        const A: bool = contains!(BANANAS, "nana");
+        const B: bool = contains!(BANANAS, "apples");
+        const C: bool = contains!(BANANAS, 'c');
+        const D: bool = contains!(BANANAS, 'a');
+
+        assert_eq!([A, B, C, D], [true, false, false, true]);
+
+        let f = contains!("hello", "");
+        assert!(f);
+    }
+
+    #[test]
+    fn test_starts_with() {
+        const BANANAS: &str = "bananas";
+        const A: bool = starts_with!(BANANAS, "bana");
+        const B: bool = starts_with!(BANANAS, "nana");
+        const C: bool = starts_with!(BANANAS, 'b');
+        const D: bool = starts_with!(BANANAS, 'n');
+
+        assert_eq!([A, B, C, D], [true, false, true, false]);
+
+        let f = starts_with!("hello", "");
+        assert!(f);
+    }
+
+    #[test]
+    fn test_ends_with() {
+        const BANANAS: &str = "bananas";
+        const A: bool = ends_with!(BANANAS, "anas");
+        const B: bool = ends_with!(BANANAS, "nana");
+        const C: bool = ends_with!(BANANAS, 's');
+        const D: bool = ends_with!(BANANAS, 'b');
+
+        assert_eq!([A, B, C, D], [true, false, true, false]);
+
+        let f = ends_with!("hello", "");
+        assert!(f);
+    }
+
+    #[test]
+    fn test_strip_prefix() {
+        const R1: Option<&str> = strip_prefix!("foo:bar", "foo:");
+        const R2: Option<&str> = strip_prefix!("foo:bar", "bar");
+        const R3: Option<&str> = strip_prefix!("foofoo", "foo");
+        const R4: Option<&str> = strip_prefix!("", "");
+
+        assert_eq!(R1, Some("bar"));
+        assert_eq!(R2, None);
+        assert_eq!(R3, Some("foo"));
+        assert_eq!(R4, Some(""));
+
+        const FOO_BAR: &str = "foo:bar";
+        const BAR: &str = unwrap!(strip_prefix!(FOO_BAR, "foo:"));
+        assert_eq!(BAR, "bar");
+    }
+
+    #[test]
+    fn test_strip_suffix() {
+        const R1: Option<&str> = strip_suffix!("bar:foo", ":foo");
+        const R2: Option<&str> = strip_suffix!("bar:foo", "bar");
+        const R3: Option<&str> = strip_suffix!("foofoo", "foo");
+        const R4: Option<&str> = strip_suffix!("", "");
+
+        assert_eq!(R1, Some("bar"));
+        assert_eq!(R2, None);
+        assert_eq!(R3, Some("foo"));
+        assert_eq!(R4, Some(""));
+
+        const FOO_BAR: &str = "foo:bar";
+        const FOO: &str = unwrap!(strip_suffix!(FOO_BAR, ":bar"));
+        assert_eq!(FOO, "foo");
+    }
+
+    #[test]
+    fn test_find_runtime() {
+        use super::*;
+
+        // Runtime tests for Contains
+        let contains1 = Contains("hello world", "world");
+        assert!(contains1.const_eval());
+
+        let contains2 = Contains("hello", "x");
+        assert!(!contains2.const_eval());
+
+        // Runtime tests for StartsWith
+        let starts1 = StartsWith("hello", "he");
+        assert!(starts1.const_eval());
+
+        let starts2 = StartsWith("hello", "lo");
+        assert!(!starts2.const_eval());
+
+        // Runtime tests for EndsWith
+        let ends1 = EndsWith("hello", "lo");
+        assert!(ends1.const_eval());
+
+        let ends2 = EndsWith("hello", "he");
+        assert!(!ends2.const_eval());
+
+        // Runtime tests for StripPrefix
+        let strip_pre = StripPrefix("hello world", "hello ");
+        let result = strip_pre.const_eval();
+        assert_eq!(result, Some("world"));
+
+        let strip_pre_none = StripPrefix("hello", "world");
+        let result_none = strip_pre_none.const_eval();
+        assert_eq!(result_none, None);
+
+        // Runtime tests for StripSuffix
+        let strip_suf = StripSuffix("hello world", " world");
+        let result_suf = strip_suf.const_eval();
+        assert_eq!(result_suf, Some("hello"));
+
+        let strip_suf_none = StripSuffix("hello", "world");
+        let result_suf_none = strip_suf_none.const_eval();
+        assert_eq!(result_suf_none, None);
+
+        // Test char patterns
+        let contains_char = Contains("hello", 'e');
+        assert!(contains_char.const_eval());
+
+        let contains_char_none = Contains("hello", 'x');
+        assert!(!contains_char_none.const_eval());
+
+        let starts_char = StartsWith("hello", 'h');
+        assert!(starts_char.const_eval());
+
+        let starts_char_false = StartsWith("hello", 'e');
+        assert!(!starts_char_false.const_eval());
+
+        let ends_char = EndsWith("hello", 'o');
+        assert!(ends_char.const_eval());
+
+        let ends_char_false = EndsWith("hello", 'h');
+        assert!(!ends_char_false.const_eval());
+    }
+}

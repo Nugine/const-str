@@ -123,4 +123,32 @@ mod tests {
         testcase!(["c", "b", "a"]);
         testcase!(["1", "2", "10", "20", "3"]);
     }
+
+    #[test]
+    fn test_sorted_runtime() {
+        use super::*;
+
+        // Runtime tests for Sorted
+        let sorted1 = Sorted(&["c", "a", "b"]);
+        assert_eq!(sorted1.output_len(), 3);
+        let result1: [&str; 3] = sorted1.const_eval();
+        assert_eq!(result1, ["a", "b", "c"]);
+
+        let sorted2 = Sorted(&["z", "a", "m", "b"]);
+        assert_eq!(sorted2.output_len(), 4);
+        let result2: [&str; 4] = sorted2.const_eval();
+        assert_eq!(result2, ["a", "b", "m", "z"]);
+
+        let empty: &[&str] = &[];
+        let sorted_empty = Sorted(empty);
+        assert_eq!(sorted_empty.output_len(), 0);
+
+        let sorted_single = Sorted(&["only"]);
+        let result_single: [&str; 1] = sorted_single.const_eval();
+        assert_eq!(result_single, ["only"]);
+
+        let sorted_duplicates = Sorted(&["x", "x", "y"]);
+        let result_dup: [&str; 3] = sorted_duplicates.const_eval();
+        assert_eq!(result_dup, ["x", "x", "y"]);
+    }
 }

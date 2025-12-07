@@ -78,3 +78,94 @@ macro_rules! compare {
         $crate::__ctfe::Compare($lhs, $rhs).const_eval()
     };
 }
+
+#[cfg(test)]
+mod tests {
+    use core::cmp::Ordering;
+
+    #[test]
+    fn test_compare_str() {
+        const A: &str = "apple";
+        const B: &str = "banana";
+        const C: &str = "apple";
+
+        const ORD1: Ordering = compare!(A, B);
+        const ORD2: Ordering = compare!(B, A);
+        const ORD3: Ordering = compare!(A, C);
+
+        assert_eq!(ORD1, Ordering::Less);
+        assert_eq!(ORD2, Ordering::Greater);
+        assert_eq!(ORD3, Ordering::Equal);
+
+        let lt = compare!(<, A, B);
+        let gt = compare!(>, B, A);
+        let eq = compare!(==, A, C);
+        let le1 = compare!(<=, A, B);
+        let le2 = compare!(<=, A, C);
+        let ge1 = compare!(>=, B, A);
+        let ge2 = compare!(>=, A, C);
+
+        assert!(lt);
+        assert!(gt);
+        assert!(eq);
+        assert!(le1);
+        assert!(le2);
+        assert!(ge1);
+        assert!(ge2);
+    }
+
+    #[test]
+    fn test_compare_bytes() {
+        const A: &[u8] = b"apple";
+        const B: &[u8] = b"banana";
+        const C: &[u8] = b"apple";
+
+        const ORD1: Ordering = compare!(A, B);
+        const ORD2: Ordering = compare!(B, A);
+        const ORD3: Ordering = compare!(A, C);
+
+        assert_eq!(ORD1, Ordering::Less);
+        assert_eq!(ORD2, Ordering::Greater);
+        assert_eq!(ORD3, Ordering::Equal);
+    }
+
+    #[test]
+    fn test_compare_byte_arrays() {
+        const A: &[u8; 5] = b"apple";
+        const B: &[u8; 6] = b"banana";
+        const C: &[u8; 5] = b"apple";
+
+        const ORD1: Ordering = compare!(A, B);
+        const ORD2: Ordering = compare!(B, A);
+        const ORD3: Ordering = compare!(A, C);
+
+        assert_eq!(ORD1, Ordering::Less);
+        assert_eq!(ORD2, Ordering::Greater);
+        assert_eq!(ORD3, Ordering::Equal);
+    }
+
+    #[test]
+    fn test_compare_runtime() {
+        use super::*;
+
+        // Runtime tests for Compare with &str
+        let cmp_str = Compare("apple", "banana");
+        assert_eq!(cmp_str.const_eval(), Ordering::Less);
+
+        let cmp_str2 = Compare("zebra", "apple");
+        assert_eq!(cmp_str2.const_eval(), Ordering::Greater);
+
+        let cmp_str3 = Compare("test", "test");
+        assert_eq!(cmp_str3.const_eval(), Ordering::Equal);
+
+        // Runtime tests for Compare with bytes
+        let cmp_bytes = Compare(b"hello".as_slice(), b"world".as_slice());
+        assert_eq!(cmp_bytes.const_eval(), Ordering::Less);
+
+        // Runtime tests for Compare with byte arrays
+        let arr1: &[u8; 3] = b"abc";
+        let arr2: &[u8; 3] = b"xyz";
+        let cmp_arr = Compare(arr1, arr2);
+        assert_eq!(cmp_arr.const_eval(), Ordering::Less);
+    }
+}

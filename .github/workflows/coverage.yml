@@ -22,6 +22,7 @@ jobs:
       - name: Generate coverage
         run: cargo llvm-cov --all-features --lcov --output-path lcov.info
       - name: Upload coverage reports
+        if: ${{ github.repository == 'Nugine/const-str' && secrets.CODECOV_TOKEN != '' }}
         uses: codecov/codecov-action@v4
         with:
           files: lcov.info

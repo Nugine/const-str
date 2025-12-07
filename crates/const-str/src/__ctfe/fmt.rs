@@ -400,15 +400,40 @@ mod tests {
 
         let display_char = Display('A', spec);
         assert_eq!(display_char.output_len(), 1);
+        let buf_char: StrBuf<1> = display_char.const_eval();
+        assert_eq!(buf_char.as_str(), "A");
 
         let display_bool = Display(true, spec);
         assert_eq!(display_bool.output_len(), 4);
+        let buf_bool: StrBuf<4> = display_bool.const_eval();
+        assert_eq!(buf_bool.as_str(), "true");
 
         let display_u8 = Display(42u8, spec);
         assert_eq!(display_u8.output_len(), 2);
+        let buf_u8: StrBuf<2> = display_u8.const_eval();
+        assert_eq!(buf_u8.as_str(), "42");
 
         let display_i32 = Display(-123i32, spec);
         assert_eq!(display_i32.output_len(), 4);
+        let buf_i32: StrBuf<4> = display_i32.const_eval();
+        assert_eq!(buf_i32.as_str(), "-123");
+
+        // Test more integer types
+        let display_u16 = Display(999u16, spec);
+        let buf_u16: StrBuf<3> = display_u16.const_eval();
+        assert_eq!(buf_u16.as_str(), "999");
+
+        let display_i8 = Display(-99i8, spec);
+        let buf_i8: StrBuf<3> = display_i8.const_eval();
+        assert_eq!(buf_i8.as_str(), "-99");
+
+        let display_u64 = Display(123456u64, spec);
+        let buf_u64: StrBuf<6> = display_u64.const_eval();
+        assert_eq!(buf_u64.as_str(), "123456");
+
+        let display_i64 = Display(-999i64, spec);
+        let buf_i64: StrBuf<4> = display_i64.const_eval();
+        assert_eq!(buf_i64.as_str(), "-999");
     }
 
     #[test]

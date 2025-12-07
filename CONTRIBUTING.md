@@ -2,10 +2,11 @@
 
 ## Requirements
 
-|               Toolchain               | Version |
-| :-----------------------------------: | :-----: |
-|      [Rust](https://rustup.rs/)       | ^1.77.0 |
-| [just](https://github.com/casey/just) | ^1.36.0 |
+|                          Toolchain                          | Version |
+| :---------------------------------------------------------: | :-----: |
+|                 [Rust](https://rustup.rs/)                  | ^1.77.0 |
+|            [just](https://github.com/casey/just)            | ^1.36.0 |
+| [cargo-llvm-cov](https://github.com/taiki-e/cargo-llvm-cov) | ^0.6.21 |
 
 ## Workflow
 
@@ -27,6 +28,14 @@ just dev
 ```bash
 just doc
 ```
+
+### Generate test coverage
+
+```bash
+just coverage
+```
+
+This will generate an HTML coverage report in `target/llvm-cov/html/index.html`.
 
 ### Run CI checks locally
 

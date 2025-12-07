@@ -146,6 +146,8 @@ macro_rules! join {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn test_concat() {
         const PROMPT: &str = "The answer is";
@@ -173,6 +175,25 @@ mod tests {
     }
 
     #[test]
+    fn test_concat_runtime() {
+        // Runtime tests to improve coverage
+        let strs = &["hello", "world"];
+        let concat = Concat(strs);
+        assert_eq!(concat.output_len(), 10);
+
+        let buf: StrBuf<10> = concat.const_eval();
+        assert_eq!(buf.as_str(), "helloworld");
+
+        let empty: &[&str] = &[];
+        let concat_empty = Concat(empty);
+        assert_eq!(concat_empty.output_len(), 0);
+
+        let single = &["test"];
+        let concat_single = Concat(single);
+        assert_eq!(concat_single.output_len(), 4);
+    }
+
+    #[test]
     fn test_join() {
         const WORDS: &[&str] = &["hello", "world"];
         const MESSAGE1: &str = join!(WORDS, " ");
@@ -193,5 +214,28 @@ mod tests {
         const MULTI: &[&str] = &["a", "b", "c", "d"];
         const MESSAGE5: &str = join!(MULTI, "-");
         assert_eq!(MESSAGE5, "a-b-c-d");
+    }
+
+    #[test]
+    fn test_join_runtime() {
+        // Runtime tests to improve coverage
+        let strs = &["hello", "world"];
+        let join = Join(strs, " ");
+        assert_eq!(join.output_len(), 11);
+
+        let buf: StrBuf<11> = join.const_eval();
+        assert_eq!(buf.as_str(), "hello world");
+
+        let empty: &[&str] = &[];
+        let join_empty = Join(empty, ", ");
+        assert_eq!(join_empty.output_len(), 0);
+
+        let single = &["test"];
+        let join_single = Join(single, ", ");
+        assert_eq!(join_single.output_len(), 4);
+
+        let multi = &["a", "b", "c"];
+        let join_multi = Join(multi, "-");
+        assert_eq!(join_multi.output_len(), 5); // "a-b-c"
     }
 }

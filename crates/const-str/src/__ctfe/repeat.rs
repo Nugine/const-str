@@ -55,6 +55,8 @@ macro_rules! repeat {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn test_repeat() {
         const S1: &str = "abc";
@@ -76,5 +78,29 @@ mod tests {
         const S5: &str = "test";
         const R5: &str = repeat!(S5, 1);
         assert_eq!(R5, "test");
+    }
+
+    #[test]
+    fn test_repeat_runtime() {
+        // Runtime tests for Repeat
+        let repeat = Repeat("abc", 3);
+        let buf: StrBuf<9> = repeat.const_eval();
+        assert_eq!(buf.as_str(), "abcabcabc");
+
+        let repeat_single = Repeat("x", 10);
+        let buf2: StrBuf<10> = repeat_single.const_eval();
+        assert_eq!(buf2.as_str(), "xxxxxxxxxx");
+
+        let repeat_zero = Repeat("test", 0);
+        let buf3: StrBuf<0> = repeat_zero.const_eval();
+        assert_eq!(buf3.as_str(), "");
+
+        // Test bytes_repeat directly
+        let bytes = b"hi";
+        let result: [u8; 6] = bytes_repeat(bytes, 3);
+        assert_eq!(&result, b"hihihi");
+
+        let result2: [u8; 0] = bytes_repeat(b"x", 0);
+        assert_eq!(&result2, b"");
     }
 }

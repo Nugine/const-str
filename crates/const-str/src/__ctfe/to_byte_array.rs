@@ -34,6 +34,8 @@ macro_rules! to_byte_array {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn test_to_byte_array() {
         const S: &str = "hello";
@@ -51,5 +53,24 @@ mod tests {
         const BYTES: &[u8; 3] = b"abc";
         const R4: [u8; 3] = to_byte_array!(BYTES);
         assert_eq!(R4, [b'a', b'b', b'c']);
+    }
+
+    #[test]
+    fn test_to_byte_array_runtime() {
+        // Runtime tests for ToByteArray with &str
+        let to_arr_str = ToByteArray("test");
+        let result: [u8; 4] = to_arr_str.const_eval();
+        assert_eq!(result, [b't', b'e', b's', b't']);
+
+        // Runtime tests for ToByteArray with &[u8; N]
+        let arr: &[u8; 3] = b"xyz";
+        let to_arr_bytes = ToByteArray(arr);
+        let result2: [u8; 3] = to_arr_bytes.const_eval();
+        assert_eq!(result2, [b'x', b'y', b'z']);
+
+        // Test empty
+        let to_arr_empty = ToByteArray("");
+        let result3: [u8; 0] = to_arr_empty.const_eval();
+        assert_eq!(result3, []);
     }
 }

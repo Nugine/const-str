@@ -136,6 +136,8 @@ macro_rules! concat_bytes {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn test_concat_bytes() {
         const S1: &[u8; 7] = concat_bytes!(b'A', b"BC", [68, b'E', 70], "G");
@@ -155,5 +157,40 @@ mod tests {
         const ARR: [u8; 3] = [1, 2, 3];
         const S6: &[u8] = concat_bytes!(ARR, [4, 5]);
         assert_eq!(S6, &[1, 2, 3, 4, 5]);
+    }
+
+    #[test]
+    fn test_concat_bytes_runtime() {
+        // Runtime tests for ConcatBytesPart
+        let part_u8 = ConcatBytesPart(42u8);
+        assert_eq!(part_u8.output_len(), 1);
+        let buf: [u8; 1] = part_u8.const_eval();
+        assert_eq!(buf, [42]);
+
+        let arr: &[u8; 3] = b"abc";
+        let part_arr = ConcatBytesPart(arr);
+        assert_eq!(part_arr.output_len(), 3);
+
+        let slice: &[u8] = b"hello";
+        let part_slice = ConcatBytesPart(slice);
+        assert_eq!(part_slice.output_len(), 5);
+
+        let owned_arr: [u8; 2] = [1, 2];
+        let part_owned = ConcatBytesPart(owned_arr);
+        assert_eq!(part_owned.output_len(), 2);
+
+        let str_part = ConcatBytesPart("test");
+        assert_eq!(str_part.output_len(), 4);
+
+        // Runtime tests for ConcatBytes
+        let parts: &[&[u8]] = &[b"hello", b"world"];
+        let concat = ConcatBytes(parts);
+        assert_eq!(concat.output_len(), 10);
+        let buf: [u8; 10] = concat.const_eval();
+        assert_eq!(&buf, b"helloworld");
+
+        let empty_parts: &[&[u8]] = &[];
+        let concat_empty = ConcatBytes(empty_parts);
+        assert_eq!(concat_empty.output_len(), 0);
     }
 }

@@ -782,11 +782,23 @@ mod tests {
         let result2: [&str; 1] = split2.const_eval();
         assert_eq!(result2, ["hello"]);
 
+        // Test split with empty pattern (splits into chars)
+        let split_empty_pat = Split("ab", "");
+        assert_eq!(split_empty_pat.output_len(), 4); // "", "a", "b", ""
+        let result_empty: [&str; 4] = split_empty_pat.const_eval();
+        assert_eq!(result_empty, ["", "a", "b", ""]);
+
         // Runtime tests for SplitInclusive
         let split_inc = SplitInclusive("a,b,c", ",");
         assert_eq!(split_inc.output_len(), 3);
         let result_inc: [&str; 3] = split_inc.const_eval();
         assert_eq!(result_inc, ["a,", "b,", "c"]);
+
+        // Test split inclusive with empty pattern
+        let split_inc_empty = SplitInclusive("xy", "");
+        assert_eq!(split_inc_empty.output_len(), 4);
+        let result_inc_empty: [&str; 4] = split_inc_empty.const_eval();
+        assert_eq!(result_inc_empty, ["", "x", "y", ""]);
 
         // Runtime tests for SplitAsciiWhitespace
         let split_ws = SplitAsciiWhitespace("  hello  world  ");

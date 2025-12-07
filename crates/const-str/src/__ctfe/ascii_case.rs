@@ -503,4 +503,83 @@ mod tests {
             test_conv_ascii_case!(shouty_kebab, S, "FUTURES-CORE123");
         }
     }
+
+    #[test]
+    fn test_conv_ascii_case_runtime() {
+        use super::*;
+
+        // Test Lower case
+        let conv_lower = ConvAsciiCase("HELLO", AsciiCase::Lower);
+        let len_lower = conv_lower.output_len::<6>();
+        assert_eq!(len_lower, 5);
+        let result_lower: StrBuf<5> = conv_lower.const_eval::<6, 5>();
+        assert_eq!(result_lower.as_str(), "hello");
+
+        // Test Upper case
+        let conv_upper = ConvAsciiCase("hello", AsciiCase::Upper);
+        let len_upper = conv_upper.output_len::<6>();
+        assert_eq!(len_upper, 5);
+        let result_upper: StrBuf<5> = conv_upper.const_eval::<6, 5>();
+        assert_eq!(result_upper.as_str(), "HELLO");
+
+        // Test LowerCamel case
+        let conv_camel = ConvAsciiCase("hello_world", AsciiCase::LowerCamel);
+        let _len_camel = conv_camel.output_len::<12>();
+        let result_camel: StrBuf<10> = conv_camel.const_eval::<12, 10>();
+        assert_eq!(result_camel.as_str(), "helloWorld");
+
+        // Test UpperCamel case
+        let conv_upper_camel = ConvAsciiCase("hello_world", AsciiCase::UpperCamel);
+        let _len_upper_camel = conv_upper_camel.output_len::<12>();
+        let result_upper_camel: StrBuf<10> = conv_upper_camel.const_eval::<12, 10>();
+        assert_eq!(result_upper_camel.as_str(), "HelloWorld");
+
+        // Test Title case
+        let conv_title = ConvAsciiCase("hello_world", AsciiCase::Title);
+        let _len_title = conv_title.output_len::<12>();
+        let result_title: StrBuf<11> = conv_title.const_eval::<12, 11>();
+        assert_eq!(result_title.as_str(), "Hello World");
+
+        // Test Train case
+        let conv_train = ConvAsciiCase("hello_world", AsciiCase::Train);
+        let _len_train = conv_train.output_len::<12>();
+        let result_train: StrBuf<11> = conv_train.const_eval::<12, 11>();
+        assert_eq!(result_train.as_str(), "Hello-World");
+
+        // Test Snake case
+        let conv_snake = ConvAsciiCase("HelloWorld", AsciiCase::Snake);
+        let _len_snake = conv_snake.output_len::<11>();
+        let result_snake: StrBuf<11> = conv_snake.const_eval::<11, 11>();
+        assert_eq!(result_snake.as_str(), "hello_world");
+
+        // Test Kebab case
+        let conv_kebab = ConvAsciiCase("HelloWorld", AsciiCase::Kebab);
+        let _len_kebab = conv_kebab.output_len::<11>();
+        let result_kebab: StrBuf<11> = conv_kebab.const_eval::<11, 11>();
+        assert_eq!(result_kebab.as_str(), "hello-world");
+
+        // Test ShoutySnake case
+        let conv_shouty_snake = ConvAsciiCase("helloWorld", AsciiCase::ShoutySnake);
+        let _len_shouty_snake = conv_shouty_snake.output_len::<11>();
+        let result_shouty_snake: StrBuf<11> = conv_shouty_snake.const_eval::<11, 11>();
+        assert_eq!(result_shouty_snake.as_str(), "HELLO_WORLD");
+
+        // Test ShoutyKebab case
+        let conv_shouty_kebab = ConvAsciiCase("helloWorld", AsciiCase::ShoutyKebab);
+        let _len_shouty_kebab = conv_shouty_kebab.output_len::<11>();
+        let result_shouty_kebab: StrBuf<11> = conv_shouty_kebab.const_eval::<11, 11>();
+        assert_eq!(result_shouty_kebab.as_str(), "HELLO-WORLD");
+
+        // Test edge cases with numbers and dots
+        let conv_edge = ConvAsciiCase("1.2E3", AsciiCase::LowerCamel);
+        let _len_edge = conv_edge.output_len::<6>();
+        let result_edge: StrBuf<4> = conv_edge.const_eval::<6, 4>();
+        assert_eq!(result_edge.as_str(), "12e3");
+
+        // Test empty-ish strings
+        let conv_empty = ConvAsciiCase("___", AsciiCase::LowerCamel);
+        let _len_empty = conv_empty.output_len::<4>();
+        let result_empty: StrBuf<0> = conv_empty.const_eval::<4, 0>();
+        assert_eq!(result_empty.as_str(), "");
+    }
 }

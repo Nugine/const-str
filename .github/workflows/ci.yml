@@ -48,3 +48,18 @@ jobs:
       - uses: actions/checkout@v4
       - uses: taiki-e/install-action@cargo-audit
       - run: cargo audit -D warnings
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@nightly
+      - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@cargo-llvm-cov
+      - run: |
+          cargo llvm-cov --workspace --all-features --codecov --output-path target/codecov.json
+      - uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: target/codecov.json
+          fail_ci_if_error: true

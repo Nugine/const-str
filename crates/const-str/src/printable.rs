@@ -684,7 +684,7 @@ mod tests {
         // Test characters in BMP range (< 0x10000) that hit singleton checks
         // These are non-printable characters in the BMP
         assert!(!is_printable('\u{00ad}')); // Soft hyphen (singleton)
-        assert!(!is_printable('\u{0378}')); // Greek small letter
+        assert!(!is_printable('\u{0378}')); // Unassigned character in Greek block (singleton)
 
         // Test characters that should trigger the normal array check with high bit
         assert!(!is_printable('\u{200b}')); // Zero-width space

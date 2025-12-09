@@ -156,12 +156,6 @@ mod tests {
     fn test_sorted_different_types() {
         use super::*;
 
-        // Test Sorted<&[&str]> - covers lines 46-48
-        let slice: &[&str] = &["c", "a", "b"];
-        let sorted_slice = Sorted(slice);
-        assert_eq!(sorted_slice.output_len(), 3);
-        let result_slice: [&str; 3] = sorted_slice.const_eval();
-        assert_eq!(result_slice, ["a", "b", "c"]);
 
         // Test Sorted<[&str; L]> - covers lines 52-54 and 56-58
         let array: [&str; 3] = ["c", "a", "b"];

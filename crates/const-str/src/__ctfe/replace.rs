@@ -207,37 +207,37 @@ mod tests {
     fn test_replace_empty_pattern() {
         // Test replacing with empty "from" pattern
         // This inserts "to" between every character
-        
+
         // Empty string with empty pattern
         let r1 = Replace("", "", "");
         assert_eq!(r1.output_len(), 0);
         let buf1: StrBuf<0> = r1.const_eval();
         assert_eq!(buf1.as_str(), "");
-        
+
         // Empty string, empty pattern, non-empty replacement
         let r2 = Replace("", "", "x");
         assert_eq!(r2.output_len(), 1);
         let buf2: StrBuf<1> = r2.const_eval();
         assert_eq!(buf2.as_str(), "x");
-        
+
         // Single char with empty pattern
         let r3 = Replace("a", "", "x");
         assert_eq!(r3.output_len(), 3);
         let buf3: StrBuf<3> = r3.const_eval();
         assert_eq!(buf3.as_str(), "xax");
-        
+
         // Multiple chars with empty pattern
         let r4 = Replace("ab", "", "x");
         assert_eq!(r4.output_len(), 5);
         let buf4: StrBuf<5> = r4.const_eval();
         assert_eq!(buf4.as_str(), "xaxbx");
-        
+
         // Multi-byte UTF-8 character with empty pattern
         let r5 = Replace("我", "", "x");
         assert_eq!(r5.output_len(), 5);
         let buf5: StrBuf<5> = r5.const_eval();
         assert_eq!(buf5.as_str(), "x我x");
-        
+
         // Multiple multi-byte characters with empty pattern
         let r6 = Replace("我好", "", "x");
         assert_eq!(r6.output_len(), 9);

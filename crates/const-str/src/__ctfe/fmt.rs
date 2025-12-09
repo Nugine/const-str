@@ -467,7 +467,7 @@ mod tests {
         assert_eq!(debug_i32.output_len(), 2);
         let buf_i32: StrBuf<2> = debug_i32.const_eval();
         assert_eq!(buf_i32.as_str(), "-5");
-        
+
         let debug_bool = Debug(true, spec);
         assert_eq!(debug_bool.output_len(), 4);
         let buf_bool: StrBuf<4> = debug_bool.const_eval();
@@ -502,7 +502,7 @@ mod tests {
         assert_eq!(hex_i32.output_len(), 8);
         let buf_i32: StrBuf<8> = hex_i32.const_eval();
         assert_eq!(buf_i32.as_str(), "ffffffff");
-        
+
         // Test LowerHex for signed with alternate
         let hex_i32_alt = LowerHex(-1i32, spec_alt);
         assert_eq!(hex_i32_alt.output_len(), 10);

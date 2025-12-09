@@ -644,12 +644,12 @@ mod tests {
         assert!(!is_printable('\x00'));
         assert!(!is_printable('\x1F'));
         assert!(!is_printable('\n'));
-        
+
         // Test printable ASCII (32-126)
         assert!(is_printable(' '));
         assert!(is_printable('A'));
         assert!(is_printable('~'));
-        
+
         // Test DEL (127)
         assert!(!is_printable('\x7F'));
     }
@@ -659,7 +659,7 @@ mod tests {
         // Test characters in 0x10000-0x20000 range (uses SINGLETONS1U/SINGLETONS1L)
         assert!(is_printable('\u{10000}')); // Linear B Syllable B008 A
         assert!(is_printable('\u{1F600}')); // Emoji grinning face
-        
+
         // Test characters > 0x20000 that should be false
         // These ranges are explicitly checked in the code
         assert!(!is_printable('\u{2a6e0}')); // In range 0x2a6e0-0x2a700
@@ -672,7 +672,7 @@ mod tests {
         assert!(!is_printable('\u{3134b}')); // In range 0x3134b-0x31350
         assert!(!is_printable('\u{323b0}')); // In range 0x323b0-0xe0100
         assert!(!is_printable('\u{e01f0}')); // In range 0xe01f0-0x110000
-        
+
         // Test characters > 0x20000 that should be true
         assert!(is_printable('\u{20000}')); // CJK Unified Ideograph
         assert!(is_printable('\u{2a6df}')); // Just before false range
@@ -685,7 +685,7 @@ mod tests {
         // These are non-printable characters in the BMP
         assert!(!is_printable('\u{00ad}')); // Soft hyphen (singleton)
         assert!(!is_printable('\u{0378}')); // Greek small letter
-        
+
         // Test characters that should trigger the normal array check with high bit
         assert!(!is_printable('\u{200b}')); // Zero-width space
     }
@@ -694,7 +694,7 @@ mod tests {
     fn test_is_printable_edge_cases() {
         // Test character at boundary of 0x10000
         assert!(!is_printable('\u{ffff}')); // Not printable
-        
+
         // Test common printable characters
         assert!(is_printable('我')); // Chinese character
         assert!(is_printable('€')); // Euro sign

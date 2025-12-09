@@ -372,18 +372,18 @@ mod tests {
         test_ip_addr!(v6, "0:0:0:0:0:FFFF:129.144.52.38");
         test_ip_addr!(v6, invalid, "::::");
         test_ip_addr!(v6, invalid, "::00001");
-        
+
         // Additional tests for edge cases
         // IPv6 with full 8 groups (no ::) - covers line 187
         test_ip_addr!(v6, "2001:0db8:0000:0000:0000:0000:0000:0001");
-        
+
         // IPv6 with :: at the end and 7 groups - covers line 193
         test_ip_addr!(v6, "1:2:3:4:5:6:7::");
-        
+
         // IPv6 with :: followed by IPv4 - covers lines 210-216
         test_ip_addr!(v6, "::192.168.1.1");
         test_ip_addr!(v6, "::ffff:192.0.2.1");
-        
+
         // IPv6 with exactly 7 groups (left + right) - covers line 223
         test_ip_addr!(v6, "1::2:3:4:5:6:7");
     }

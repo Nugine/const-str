@@ -440,7 +440,7 @@ mod tests {
     fn test_debug_runtime() {
         let spec = FmtSpec { alternate: false };
 
-        // Test Debug for str - now with output_len
+        // Test Debug for str
         let debug_str = Debug("test", spec);
         assert_eq!(debug_str.output_len(), 6); // "test" with quotes
         let buf: StrBuf<6> = debug_str.const_eval();
@@ -456,7 +456,7 @@ mod tests {
         let debug_newline = Debug('\n', spec);
         assert!(debug_newline.output_len() > 2);
 
-        // Test Debug for numbers - now with const_eval
+        // Test Debug for numeric types
         let debug_u8 = Debug(42u8, spec);
         assert_eq!(debug_u8.output_len(), 2);
         let buf_u8: StrBuf<2> = debug_u8.const_eval();

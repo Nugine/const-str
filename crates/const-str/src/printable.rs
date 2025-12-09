@@ -633,3 +633,71 @@ const NORMAL1: &[u8] = &[
     0x09, 0x07,
     0x80, 0xfa, 0x84, 0x06,
 ];
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_is_printable_ascii() {
+        // Test ASCII control characters (< 32)
+        assert!(!is_printable('\x00'));
+        assert!(!is_printable('\x1F'));
+        assert!(!is_printable('\n'));
+
+        // Test printable ASCII (32-126)
+        assert!(is_printable(' '));
+        assert!(is_printable('A'));
+        assert!(is_printable('~'));
+
+        // Test DEL (127)
+        assert!(!is_printable('\x7F'));
+    }
+
+    #[test]
+    fn test_is_printable_unicode_ranges() {
+        // Test characters in 0x10000-0x20000 range (uses SINGLETONS1U/SINGLETONS1L)
+        assert!(is_printable('\u{10000}')); // Linear B Syllable B008 A
+        assert!(is_printable('\u{1F600}')); // Emoji grinning face
+
+        // Test characters > 0x20000 that should be false
+        // These ranges are explicitly checked in the code
+        assert!(!is_printable('\u{2a6e0}')); // In range 0x2a6e0-0x2a700
+        assert!(!is_printable('\u{2b73a}')); // In range 0x2b73a-0x2b740
+        assert!(!is_printable('\u{2b81e}')); // In range 0x2b81e-0x2b820
+        assert!(!is_printable('\u{2cea2}')); // In range 0x2cea2-0x2ceb0
+        assert!(!is_printable('\u{2ebe1}')); // In range 0x2ebe1-0x2ebf0
+        assert!(!is_printable('\u{2ee5e}')); // In range 0x2ee5e-0x2f800
+        assert!(!is_printable('\u{2fa1e}')); // In range 0x2fa1e-0x30000
+        assert!(!is_printable('\u{3134b}')); // In range 0x3134b-0x31350
+        assert!(!is_printable('\u{323b0}')); // In range 0x323b0-0xe0100
+        assert!(!is_printable('\u{e01f0}')); // In range 0xe01f0-0x110000
+
+        // Test characters > 0x20000 that should be true
+        assert!(is_printable('\u{20000}')); // CJK Unified Ideograph
+        assert!(is_printable('\u{2a6df}')); // Just before false range
+        assert!(is_printable('\u{2a700}')); // Just after false range
+    }
+
+    #[test]
+    fn test_is_printable_bmp_singletons() {
+        // Test characters in BMP range (< 0x10000) that hit singleton checks
+        // These are non-printable characters in the BMP
+        assert!(!is_printable('\u{00ad}')); // Soft hyphen (singleton)
+        assert!(!is_printable('\u{0378}')); // Unassigned character in Greek block (singleton)
+
+        // Test characters that should trigger the normal array check with high bit
+        assert!(!is_printable('\u{200b}')); // Zero-width space
+    }
+
+    #[test]
+    fn test_is_printable_edge_cases() {
+        // Test character at boundary of 0x10000
+        assert!(!is_printable('\u{ffff}')); // Not printable
+
+        // Test common printable characters
+        assert!(is_printable('我')); // Chinese character
+        assert!(is_printable('€')); // Euro sign
+        assert!(is_printable('😀')); // Emoji
+    }
+}

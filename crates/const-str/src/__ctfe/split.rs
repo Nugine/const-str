@@ -842,4 +842,34 @@ mod tests {
         let result_ws: [&str; 2] = split_ws.const_eval();
         assert_eq!(result_ws, ["hello", "world"]);
     }
+
+    #[test]
+    fn test_split_edge_cases() {
+        // Test Split with empty char slice - covers lines 147, 170-172
+        const EMPTY_CHARS: &[char] = &[];
+        let split_empty_chars = Split("hello", EMPTY_CHARS);
+        assert_eq!(split_empty_chars.output_len(), 1);
+        let result_empty_chars: [&str; 1] = split_empty_chars.const_eval();
+        assert_eq!(result_empty_chars, ["hello"]);
+
+        // Test SplitInclusive with empty input and char slice - covers lines 297, 345-347
+        const SPLIT_CHARS: &[char] = &[','];
+        let split_inc_empty_input = SplitInclusive("", SPLIT_CHARS);
+        assert_eq!(split_inc_empty_input.output_len(), 0);
+        let result_empty_input: [&str; 0] = split_inc_empty_input.const_eval();
+        assert_eq!(result_empty_input, [] as [&str; 0]);
+
+        // Test SplitInclusive with empty char slice - covers lines 304, 359-361
+        let split_inc_empty_chars = SplitInclusive("hello", EMPTY_CHARS);
+        assert_eq!(split_inc_empty_chars.output_len(), 1);
+        let result_inc_empty: [&str; 1] = split_inc_empty_chars.const_eval();
+        assert_eq!(result_inc_empty, ["hello"]);
+
+        // Test SplitInclusive with no splits found - covers line 317
+        const NO_MATCH_CHARS: &[char] = &['x', 'y', 'z'];
+        let split_inc_no_match = SplitInclusive("hello", NO_MATCH_CHARS);
+        assert_eq!(split_inc_no_match.output_len(), 1);
+        let result_no_match: [&str; 1] = split_inc_no_match.const_eval();
+        assert_eq!(result_no_match, ["hello"]);
+    }
 }

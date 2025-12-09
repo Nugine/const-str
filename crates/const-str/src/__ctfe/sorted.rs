@@ -151,4 +151,16 @@ mod tests {
         let result_dup: [&str; 3] = sorted_duplicates.const_eval();
         assert_eq!(result_dup, ["x", "x", "y"]);
     }
+
+    #[test]
+    fn test_sorted_different_types() {
+        use super::*;
+
+        // Test Sorted<[&str; L]> - covers lines 52-54 and 56-58
+        let array: [&str; 3] = ["c", "a", "b"];
+        let sorted_array = Sorted(array);
+        assert_eq!(sorted_array.output_len(), 3);
+        let result_array: [&str; 3] = sorted_array.const_eval();
+        assert_eq!(result_array, ["a", "b", "c"]);
+    }
 }

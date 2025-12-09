@@ -156,7 +156,6 @@ mod tests {
     fn test_sorted_different_types() {
         use super::*;
 
-
         // Test Sorted<[&str; L]> - covers lines 52-54 and 56-58
         let array: [&str; 3] = ["c", "a", "b"];
         let sorted_array = Sorted(array);

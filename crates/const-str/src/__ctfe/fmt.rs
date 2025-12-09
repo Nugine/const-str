@@ -440,8 +440,9 @@ mod tests {
     fn test_debug_runtime() {
         let spec = FmtSpec { alternate: false };
 
-        // Test Debug for str
+        // Test Debug for str - now with output_len
         let debug_str = Debug("test", spec);
+        assert_eq!(debug_str.output_len(), 6); // "test" with quotes
         let buf: StrBuf<6> = debug_str.const_eval();
         assert_eq!(buf.as_str(), "\"test\"");
 
@@ -455,14 +456,29 @@ mod tests {
         let debug_newline = Debug('\n', spec);
         assert!(debug_newline.output_len() > 2);
 
-        // Test Debug for numbers
+        // Test Debug for numbers - now with const_eval
         let debug_u8 = Debug(42u8, spec);
         assert_eq!(debug_u8.output_len(), 2);
+        let buf_u8: StrBuf<2> = debug_u8.const_eval();
+        assert_eq!(buf_u8.as_str(), "42");
+
+        // Test Debug for more integer types
+        let debug_i32 = Debug(-5i32, spec);
+        assert_eq!(debug_i32.output_len(), 2);
+        let buf_i32: StrBuf<2> = debug_i32.const_eval();
+        assert_eq!(buf_i32.as_str(), "-5");
+        
+        let debug_bool = Debug(true, spec);
+        assert_eq!(debug_bool.output_len(), 4);
+        let buf_bool: StrBuf<4> = debug_bool.const_eval();
+        assert_eq!(buf_bool.as_str(), "true");
 
         // Test Debug with alternate formatting
         let spec_alt = FmtSpec { alternate: true };
         let debug_alt = Debug(42u8, spec_alt);
         assert_eq!(debug_alt.output_len(), 2);
+        let buf_alt: StrBuf<2> = debug_alt.const_eval();
+        assert_eq!(buf_alt.as_str(), "42");
     }
 
     #[test]
@@ -470,18 +486,28 @@ mod tests {
         let spec = FmtSpec { alternate: false };
         let spec_alt = FmtSpec { alternate: true };
 
-        // Test LowerHex for unsigned
+        // Test LowerHex for unsigned - with output_len
         let hex_u8 = LowerHex(255u8, spec);
+        assert_eq!(hex_u8.output_len(), 2);
         let buf: StrBuf<2> = hex_u8.const_eval();
         assert_eq!(buf.as_str(), "ff");
 
         let hex_u8_alt = LowerHex(255u8, spec_alt);
+        assert_eq!(hex_u8_alt.output_len(), 4);
         let buf_alt: StrBuf<4> = hex_u8_alt.const_eval();
         assert_eq!(buf_alt.as_str(), "0xff");
 
-        // Test LowerHex for signed
+        // Test LowerHex for signed - now with const_eval
         let hex_i32 = LowerHex(-1i32, spec);
-        let _len = hex_i32.output_len();
+        assert_eq!(hex_i32.output_len(), 8);
+        let buf_i32: StrBuf<8> = hex_i32.const_eval();
+        assert_eq!(buf_i32.as_str(), "ffffffff");
+        
+        // Test LowerHex for signed with alternate
+        let hex_i32_alt = LowerHex(-1i32, spec_alt);
+        assert_eq!(hex_i32_alt.output_len(), 10);
+        let buf_i32_alt: StrBuf<10> = hex_i32_alt.const_eval();
+        assert_eq!(buf_i32_alt.as_str(), "0xffffffff");
     }
 
     #[test]
@@ -498,9 +524,11 @@ mod tests {
         let buf_alt: StrBuf<4> = hex_u8_alt.const_eval();
         assert_eq!(buf_alt.as_str(), "0xFF");
 
-        // Test UpperHex for signed
+        // Test UpperHex for signed - now with const_eval
         let hex_i32 = UpperHex(-1i32, spec);
-        let _len = hex_i32.output_len();
+        assert_eq!(hex_i32.output_len(), 8);
+        let buf_i32: StrBuf<8> = hex_i32.const_eval();
+        assert_eq!(buf_i32.as_str(), "FFFFFFFF");
 
         // Test more integer types
         let hex_u16 = UpperHex(0xABCDu16, spec);
@@ -525,9 +553,12 @@ mod tests {
         let buf_alt: StrBuf<5> = bin_u8_alt.const_eval();
         assert_eq!(buf_alt.as_str(), "0b101");
 
-        // Test Binary for signed
+        // Test Binary for signed - now with const_eval
         let bin_i32 = Binary(-1i32, spec);
-        let _len = bin_i32.output_len();
+        assert_eq!(bin_i32.output_len(), 32);
+        let buf_i32: StrBuf<32> = bin_i32.const_eval();
+        // -1 in binary is all 1s
+        assert_eq!(buf_i32.as_str(), "11111111111111111111111111111111");
 
         // Test more types
         let bin_u16 = Binary(7u16, spec);

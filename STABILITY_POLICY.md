@@ -29,11 +29,11 @@ The `const-str` crate follows [Semantic Versioning 2.0.0](https://semver.org/):
 #### 1. Public Macros
 All documented macros are stable and will not be removed or have breaking signature changes:
 
-- Core string operations: `concat!`, `join!`, `repeat!`, `replace!`, `split!`, etc.
-- Comparison & search: `equal!`, `compare!`, `contains!`, `starts_with!`, etc.
-- Conversion & encoding: `to_str!`, `to_byte_array!`, `parse!`, `hex!`, etc.
-- Format & case: `format!`, `convert_case!`, `convert_ascii_case!`, `cstr!`
-- Advanced features: `sorted!`, `ip_addr!`, `concat_bytes!`, feature-gated macros
+- Core string operations: `concat!`, `join!`, `repeat!`, `replace!`, `split!`, `split_inclusive!`, `split_ascii_whitespace!`, `split_lines!`, `squish!`, `trim_ascii!`, `trim_ascii_start!`, `trim_ascii_end!`, `from_utf8!`
+- Comparison & search: `equal!`, `compare!`, `contains!`, `starts_with!`, `ends_with!`, `strip_prefix!`, `strip_suffix!`, `eq_ignore_ascii_case!`, `is_ascii!`
+- Conversion & encoding: `to_str!`, `to_byte_array!`, `to_char_array!`, `encode!`, `encode_z!`, `hex!`, `parse!`, `unwrap!`
+- Format & case: `format!`, `convert_case!`, `convert_ascii_case!`, `cstr!`, `raw_cstr!`
+- Advanced features: `chain!`, `sorted!`, `ip_addr!`, `concat_bytes!`, `verified_header_name!`, `verified_regex!`, `regex_assert_match!`
 
 **Guarantee:** These macros will maintain backward compatibility. New parameters may be added as optional, but existing usage patterns will continue to work.
 
@@ -133,7 +133,7 @@ When we need to phase out functionality:
 
 ### Example Timeline
 
-```
+```text
 v1.0.0 - Feature X is stable
 v1.2.0 - Feature Y is added (better alternative to X)
 v1.3.0 - Feature X is deprecated

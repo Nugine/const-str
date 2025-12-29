@@ -8,7 +8,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: taiki-e/install-action@just
       - uses: dtolnay/rust-toolchain@nightly
       - run: cargo login ${{ secrets.CRATES_IO_API_TOKEN }}

@@ -25,6 +25,9 @@ unstable = []
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
+[dependencies]
+http = { version = "1.0.0", optional = true }
+
 [dependencies.const-str-proc-macro]
 version = "1.0.0"
 path = "../const-str-proc-macro"

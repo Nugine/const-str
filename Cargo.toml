@@ -1,3 +1,8 @@
 [workspace]
 members = ["crates/*"]
 resolver = "2"
+
+[workspace.dependencies]
+heck = "0.5.0"
+http = "1.4.0"
+regex = "1.12.2"

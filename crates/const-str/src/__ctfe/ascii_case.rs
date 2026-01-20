@@ -346,6 +346,7 @@ macro_rules! convert_ascii_case {
 
 #[cfg(test)]
 mod tests {
+    #[cfg(feature = "case")]
     #[test]
     fn test_conv_ascii_case() {
         macro_rules! test_conv_ascii_case {

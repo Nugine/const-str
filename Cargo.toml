@@ -2,6 +2,18 @@
 members = ["crates/*"]
 resolver = "2"
 
+[workspace.package]
+version = "1.0.0"
+authors = ["Nugine <nugine@foxmail.com>"]
+edition = "2021"
+description = "compile-time string operations"
+license = "MIT"
+repository = "https://github.com/Nugine/const-str"
+keywords = ["string", "const", "proc-macro"]
+categories = ["text-processing", "no-std"]
+readme = "README.md"
+rust-version = "1.77.0"
+
 [workspace.dependencies]
 heck = "0.5.0"
 http = "1.4.0"

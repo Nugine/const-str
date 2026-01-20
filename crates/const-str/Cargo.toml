@@ -17,7 +17,7 @@ std = []
 proc = ["dep:const-str-proc-macro"]
 regex = ["proc", "const-str-proc-macro?/regex", "dep:regex"]
 http = ["proc", "const-str-proc-macro?/http", "dep:http"]
-case = ["proc", "const-str-proc-macro?/heck"]
+case = ["proc", "const-str-proc-macro?/heck", "dep:heck"]
 all = ["std", "proc", "regex", "http", "case"]
 unstable = []
 
@@ -26,6 +26,7 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
+heck = { version = "0.5.0", optional = true }
 http = { version = "1.0.0", optional = true }
 regex = { version = "1.7.0", optional = true }
 
@@ -33,6 +34,3 @@ regex = { version = "1.7.0", optional = true }
 version = "1.0.0"
 path = "../const-str-proc-macro"
 optional = true
-
-[dev-dependencies]
-heck = "0.5.0"

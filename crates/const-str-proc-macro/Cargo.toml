@@ -1,15 +1,15 @@
 [package]
 name = "const-str-proc-macro"
-version = "1.0.0"
-authors = ["Nugine <nugine@foxmail.com>"]
-edition = "2021"
-description = "compile-time string operations"
-license = "MIT"
-repository = "https://github.com/Nugine/const-str"
-keywords = ["string", "const", "proc-macro"]
-categories = ["text-processing", "no-std"]
-readme = "README.md"
-rust-version = "1.65.0"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+description.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+readme.workspace = true
+rust-version.workspace = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

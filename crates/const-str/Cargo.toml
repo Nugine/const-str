@@ -1,15 +1,15 @@
 [package]
 name = "const-str"
-version = "1.0.0"
-authors = ["Nugine <nugine@foxmail.com>"]
-edition = "2021"
-description = "compile-time string operations"
-license = "MIT"
-repository = "https://github.com/Nugine/const-str"
-keywords = ["string", "const", "proc-macro"]
-categories = ["text-processing", "no-std"]
-readme = "README.md"
-rust-version = "1.77.0"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+description.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+readme.workspace = true
+rust-version.workspace = true
 
 [package.metadata.docs.rs]
 all-features = true

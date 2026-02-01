@@ -31,6 +31,6 @@ http = { workspace = true, optional = true }
 regex = { workspace = true, optional = true }
 
 [dependencies.const-str-proc-macro]
-version = "1.0.0"
+version = "1.1.0"
 path = "../const-str-proc-macro"
 optional = true

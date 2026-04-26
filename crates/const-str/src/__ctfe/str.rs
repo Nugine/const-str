@@ -74,7 +74,7 @@ mod tests {
         assert_eq!(buf_unicode.as_str(), "你好！");
 
         // Test new_unchecked
-        let raw_buf = [b'a', b'b', b'c'];
+        let raw_buf = *b"abc";
         let buf_unsafe: StrBuf<3> = unsafe { StrBuf::new_unchecked(raw_buf) };
         assert_eq!(buf_unsafe.as_str(), "abc");
     }

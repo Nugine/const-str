@@ -17,7 +17,7 @@ jobs:
   develop:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: taiki-e/install-action@just
       - uses: dtolnay/rust-toolchain@nightly
         with:
@@ -34,7 +34,7 @@ jobs:
           - 1.77.0 # MSRV
           - stable
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: taiki-e/install-action@just
       - uses: dtolnay/rust-toolchain@master
         with:
@@ -45,20 +45,20 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: taiki-e/install-action@cargo-audit
       - run: cargo audit -D warnings
 
   coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@nightly
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@cargo-llvm-cov
       - run: |
           cargo llvm-cov --workspace --all-features --codecov --output-path target/codecov.json
-      - uses: codecov/codecov-action@v6
+      - uses: codecov/codecov-action@v7
         with:
           files: target/codecov.json
           fail_ci_if_error: true

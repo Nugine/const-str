@@ -50,7 +50,7 @@ pub const fn strip_suffix<'s>(s: &'s str, suffix: &str) -> Option<&'s str> {
     }
 }
 
-pub const fn find<'h>(haystack: &'h str, needle: &str) -> Option<usize> {
+pub const fn find(haystack: &str, needle: &str) -> Option<usize> {
     if needle.len() > haystack.len() {
         return None;
     }

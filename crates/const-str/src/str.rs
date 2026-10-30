@@ -50,6 +50,17 @@ pub const fn strip_suffix<'s>(s: &'s str, suffix: &str) -> Option<&'s str> {
     }
 }
 
+pub const fn find<'h>(haystack: &'h str, needle: &str) -> Option<usize> {
+    if needle.len() > haystack.len() {
+        return None;
+    }
+
+    match next_match(haystack, needle) {
+        Some((i, _)) => Some(i),
+        None => None,
+    }
+}
+
 pub const fn next_match<'h>(haystack: &'h str, needle: &str) -> Option<(usize, &'h str)> {
     assert!(!needle.is_empty());
 

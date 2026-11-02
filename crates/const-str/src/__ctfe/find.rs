@@ -62,6 +62,52 @@ impl StartsWith<'_, char> {
     }
 }
 
+/// Returns the byte index of the first character of this string slice that
+/// matches the pattern.
+///
+/// Returns [`None`] if the pattern doesn't match.
+///
+/// The pattern type must be one of
+///
+/// + [`&str`]
+/// + [`char`]
+///
+/// This macro is [const-fn compatible](./index.html#const-fn-compatible).
+///
+/// # Examples
+///
+/// ```
+/// const S: &str = "Löwe 老虎 Léopard Gepardi";
+///
+/// const A: Option<usize> = const_str::find!(S, 'L');
+/// const B: Option<usize> = const_str::find!(S, 'é');
+/// const C: Option<usize> = const_str::find!(S, "pard");
+/// const D: Option<usize> = const_str::find!(S, 'c');
+/// assert_eq!([A, B, C, D], [Some(0), Some(14), Some(17), None]);
+/// ```
+///
+#[macro_export]
+macro_rules! find {
+    ($haystack: expr, $pattern: expr) => {{
+        $crate::__ctfe::Find($haystack, $pattern).const_eval()
+    }};
+}
+
+pub struct Find<'a, P>(pub &'a str, pub P);
+
+impl Find<'_, &str> {
+    pub const fn const_eval(&self) -> Option<usize> {
+        crate::str::find(self.0, self.1)
+    }
+}
+
+impl Find<'_, char> {
+    pub const fn const_eval(&self) -> Option<usize> {
+        let ch = CharEncodeUtf8::new(self.1);
+        crate::str::find(self.0, ch.as_str())
+    }
+}
+
 /// Returns [`true`] if the given pattern matches a prefix of this string slice.
 ///
 /// Returns [`false`] if it does not.

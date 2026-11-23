@@ -65,6 +65,8 @@ impl StartsWith<'_, char> {
 /// Returns the byte index of the first character of this string slice that
 /// matches the pattern.
 ///
+/// Returns `Some(0)` if the pattern is an empty string.
+///
 /// Returns [`None`] if the pattern doesn't match.
 ///
 /// The pattern type must be one of
@@ -247,6 +249,65 @@ macro_rules! strip_suffix {
 mod tests {
     use crate::unwrap;
 
+    #[test]
+    fn test_find() {
+        const S: &str = "Löwe 老虎 Léopard Gepardi";
+        const A: Option<usize> = find!(S, 'L');
+        const B: Option<usize> = find!(S, 'é');
+        const C: Option<usize> = find!(S, "pard");
+        const D: Option<usize> = find!(S, 'c');
+        assert_eq!([A, B, C, D], [Some(0), Some(14), Some(17), None]);
+
+        assert_eq!(find!("abc", "b"), Some(1));
+        assert_eq!(find!("abc", 'b'), Some(1));
+        assert_eq!(find!("abc", "x"), None);
+        assert_eq!(find!("abc", 'x'), None);
+
+        // Empty patterns match at position 0, like std::str::find.
+        assert_eq!(find!("abc", ""), Some(0));
+        assert_eq!(find!("", ""), Some(0));
+        assert_eq!(find!("", "a"), None);
+        assert_eq!(find!("", 'a'), None);
+    }
+
+    #[test]
+    fn test_find_matches_std() {
+        let haystacks = [
+            "",
+            "a",
+            "abc",
+            "Löwe 老虎 Léopard Gepardi",
+            "🙂x",
+            "aé",
+            "éa",
+            "bananas",
+        ];
+        let needles = [
+            "", "a", "b", "c", "ab", "bc", "pard", "老虎", "é", "🙂", "x", "z", "bananas",
+        ];
+
+        for haystack in haystacks {
+            for needle in needles {
+                assert_eq!(
+                    find!(haystack, needle),
+                    haystack.find(needle),
+                    "find!({:?}, {:?})",
+                    haystack,
+                    needle
+                );
+            }
+
+            for ch in ['a', 'é', '虎', '🙂', 'x', '\0', ' '] {
+                assert_eq!(
+                    find!(haystack, ch),
+                    haystack.find(ch),
+                    "find!({:?}, {:?})",
+                    haystack,
+                    ch
+                );
+            }
+        }
+    }
     #[test]
     fn test_contains() {
         const BANANAS: &str = "bananas";

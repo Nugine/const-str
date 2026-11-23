@@ -16,7 +16,7 @@ impl<'input> SplitImpl<'input, '_> {
         let pat = self.pattern;
 
         if pat.is_empty() {
-            crate::utf8::str_count_chars(input) + 2
+            crate::utf8::str_count_chars(input) + if self.inclusive { 1 } else { 2 }
         } else {
             let mut ans = 0;
             while let Some((_, remain)) = crate::str::next_match(input, pat) {
@@ -56,7 +56,7 @@ impl<'input> SplitImpl<'input, '_> {
                 input = advance(input, count);
             }
 
-            {
+            if !self.inclusive {
                 buf[pos] = unsafe { str::from_utf8_unchecked(subslice(input, 0..0)) };
                 pos += 1;
             }
@@ -633,6 +633,24 @@ mod tests {
     }
 
     #[test]
+    fn test_split_inclusive_empty_pattern() {
+        macro_rules! testcase {
+            ($input: expr) => {{
+                const OUTPUT: &[&str] = &$crate::split_inclusive!($input, "");
+
+                let ans = $input.split_inclusive("").collect::<Vec<_>>();
+                assert_eq!(OUTPUT, &*ans, "input = {:?}", $input);
+            }};
+        }
+
+        testcase!("");
+        testcase!("a");
+        testcase!("abc");
+        testcase!("é中");
+        testcase!("🙂x");
+    }
+
+    #[test]
     fn test_split_char_slice() {
         macro_rules! testcase_char_slice {
             ($input: expr, $chars: expr) => {{
@@ -818,11 +836,11 @@ mod tests {
         let result_inc: [&str; 3] = split_inc.const_eval();
         assert_eq!(result_inc, ["a,", "b,", "c"]);
 
-        // Test split inclusive with empty pattern
+        // Test split inclusive with empty pattern (same as std: no trailing empty)
         let split_inc_empty = SplitInclusive("xy", "");
-        assert_eq!(split_inc_empty.output_len(), 4);
-        let result_inc_empty: [&str; 4] = split_inc_empty.const_eval();
-        assert_eq!(result_inc_empty, ["", "x", "y", ""]);
+        assert_eq!(split_inc_empty.output_len(), 3);
+        let result_inc_empty: [&str; 3] = split_inc_empty.const_eval();
+        assert_eq!(result_inc_empty, ["", "x", "y"]);
 
         // Runtime tests for SplitInclusive with char pattern
         let split_inc_char = SplitInclusive("a,b,c", ',');

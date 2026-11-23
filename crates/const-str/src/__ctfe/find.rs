@@ -320,6 +320,8 @@ mod tests {
 
         let f = contains!("hello", "");
         assert!(f);
+
+        assert!(contains!("", ""));
     }
 
     #[test]

@@ -75,6 +75,10 @@ pub const fn reversed<const N: usize>(mut arr: [u8; N]) -> [u8; N] {
 }
 
 pub const fn contains(haystack: &[u8], needle: &[u8]) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+
     let haystack_len = haystack.len();
     let needle_len = needle.len();
 
@@ -183,6 +187,7 @@ mod tests {
         test_contains!(true, "asd", "");
         test_contains!(true, "asd", "a");
         test_contains!(true, "asdf", "sd");
+        test_contains!(true, "", "");
         test_contains!(false, "", "a");
         test_contains!(false, "asd", "abcd");
 

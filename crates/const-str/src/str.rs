@@ -227,6 +227,7 @@ mod tests {
     fn test_contains() {
         assert!(contains("hello", "ell"));
         assert!(contains("hello", ""));
+        assert!(contains("", ""));
         assert!(!contains("hello", "world"));
         assert!(!contains("", "a"));
     }

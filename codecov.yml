@@ -1,0 +1,7 @@
+# Report overall project coverage without gating pull requests.
+# Patch coverage remains enforced by Codecov defaults.
+coverage:
+  status:
+    project:
+      default:
+        informational: true

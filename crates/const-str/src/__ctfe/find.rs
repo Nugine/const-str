@@ -322,6 +322,7 @@ mod tests {
         assert!(f);
 
         assert!(contains!("", ""));
+        assert!(!contains!("", 'a'));
     }
 
     #[test]

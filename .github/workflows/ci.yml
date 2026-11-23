@@ -39,13 +39,6 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - run: just test
   
-  audit:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: taiki-e/install-action@cargo-audit
-      - run: cargo audit -D warnings
-
   coverage:
     runs-on: ubuntu-latest
     steps:

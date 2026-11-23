@@ -648,6 +648,40 @@ mod tests {
         testcase!("abc");
         testcase!("é中");
         testcase!("🙂x");
+        testcase!("é");
+        testcase!("🙂");
+    }
+
+    #[test]
+    fn test_split_lines() {
+        macro_rules! testcase {
+            ($input: expr) => {{
+                const OUTPUT: &[&str] = &$crate::split_lines!($input);
+
+                let ans = $input.lines().collect::<Vec<_>>();
+                assert_eq!(OUTPUT, &*ans, "input = {:?}", $input);
+            }};
+        }
+
+        testcase!("");
+        testcase!("a");
+        testcase!("a\n");
+        testcase!("a\r\n");
+        testcase!("a\r");
+        testcase!("a\nb\n\nc");
+        testcase!("foo\r\nbar\n\nbaz\r");
+        testcase!("é中\n🙂");
+    }
+
+    #[test]
+    fn test_map_lines() {
+        assert_eq!(
+            map_lines(["a\r\n", "b\n", "c\r", "d"]),
+            ["a", "b", "c\r", "d"]
+        );
+
+        let empty: [&str; 0] = map_lines([]);
+        assert!(empty.is_empty());
     }
 
     #[test]
@@ -720,6 +754,7 @@ mod tests {
         testcase_inclusive_char_slice!("a,b,c", &[',']);
         testcase_inclusive_char_slice!("hello", &[]);
         testcase_inclusive_char_slice!("", &[]);
+        testcase_inclusive_char_slice!("", &[',']);
 
         // More cases
         testcase_inclusive_char_slice!("hello,world;test", &[',', ';']);
@@ -786,6 +821,33 @@ mod tests {
     }
 
     #[test]
+    fn test_split_ascii_whitespace_runtime() {
+        let empty = SplitAsciiWhitespace("");
+        assert_eq!(empty.output_len(), 0);
+        let result: [&str; 0] = empty.const_eval();
+        assert!(result.is_empty());
+
+        let spaces = SplitAsciiWhitespace(" \t\n ");
+        assert_eq!(spaces.output_len(), 0);
+        let result: [&str; 0] = spaces.const_eval();
+        assert!(result.is_empty());
+
+        let single = SplitAsciiWhitespace("hello");
+        assert_eq!(single.output_len(), 1);
+        let result: [&str; 1] = single.const_eval();
+        assert_eq!(result, ["hello"]);
+
+        let two_words = SplitAsciiWhitespace("a b");
+        assert_eq!(two_words.output_len(), 2);
+        let result: [&str; 2] = two_words.const_eval();
+        assert_eq!(result, ["a", "b"]);
+
+        let padded = SplitAsciiWhitespace("  a  b  ");
+        assert_eq!(padded.output_len(), 2);
+        let result: [&str; 2] = padded.const_eval();
+        assert_eq!(result, ["a", "b"]);
+    }
+    #[test]
     fn test_split_runtime() {
         use super::*;
 
@@ -842,6 +904,12 @@ mod tests {
         let result_inc_empty: [&str; 3] = split_inc_empty.const_eval();
         assert_eq!(result_inc_empty, ["", "x", "y"]);
 
+        // Ending with the separator: inclusive must not add a trailing empty segment
+        let split_inc_trailing = SplitInclusive("a,b,", ",");
+        assert_eq!(split_inc_trailing.output_len(), 2);
+        let result_inc_trailing: [&str; 2] = split_inc_trailing.const_eval();
+        assert_eq!(result_inc_trailing, ["a,", "b,"]);
+
         // Runtime tests for SplitInclusive with char pattern
         let split_inc_char = SplitInclusive("a,b,c", ',');
         assert_eq!(split_inc_char.output_len(), 3);
@@ -889,5 +957,12 @@ mod tests {
         assert_eq!(split_inc_no_match.output_len(), 1);
         let result_no_match: [&str; 1] = split_inc_no_match.const_eval();
         assert_eq!(result_no_match, ["hello"]);
+
+        // Test SplitInclusive with a trailing separator so the last segment is kept
+        const TRAILING_CHARS: &[char] = &[',', ';'];
+        let split_inc_trailing = SplitInclusive("a,b;", TRAILING_CHARS);
+        assert_eq!(split_inc_trailing.output_len(), 2);
+        let result_trailing: [&str; 2] = split_inc_trailing.const_eval();
+        assert_eq!(result_trailing, ["a,", "b;"]);
     }
 }

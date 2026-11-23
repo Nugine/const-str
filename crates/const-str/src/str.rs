@@ -50,6 +50,21 @@ pub const fn strip_suffix<'s>(s: &'s str, suffix: &str) -> Option<&'s str> {
     }
 }
 
+pub const fn find(haystack: &str, needle: &str) -> Option<usize> {
+    if needle.is_empty() {
+        return Some(0);
+    }
+
+    if needle.len() > haystack.len() {
+        return None;
+    }
+
+    match next_match(haystack, needle) {
+        Some((i, _)) => Some(i),
+        None => None,
+    }
+}
+
 pub const fn next_match<'h>(haystack: &'h str, needle: &str) -> Option<(usize, &'h str)> {
     assert!(!needle.is_empty());
 
@@ -145,6 +160,20 @@ mod tests {
         assert_eq!(next_match("abc", "bc"), Some((1, "")));
         assert_eq!(next_match("abc", "c"), Some((2, "")));
         assert_eq!(next_match("abc", "d"), None);
+    }
+
+    #[test]
+    fn test_find() {
+        assert_eq!(find("abc", "ab"), Some(0));
+        assert_eq!(find("abc", "bc"), Some(1));
+        assert_eq!(find("abc", "c"), Some(2));
+        assert_eq!(find("abc", "d"), None);
+        assert_eq!(find("Löwe 老虎 Léopard", "老虎"), Some(6));
+
+        // Empty patterns match at position 0, like std::str::find.
+        assert_eq!(find("abc", ""), Some(0));
+        assert_eq!(find("", ""), Some(0));
+        assert_eq!(find("", "a"), None);
     }
 
     #[test]

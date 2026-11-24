@@ -24,6 +24,12 @@ unstable-test *ARGS:
 miri *ARGS:
     cargo +nightly miri test --all-features {{ARGS}}
 
+audit:
+    cargo audit -D warnings
+    cargo deny check bans
+    cargo deny check sources
+    cargo deny check licenses
+
 coverage *ARGS:
     cargo llvm-cov --all-features --html {{ARGS}}
 
@@ -36,6 +42,6 @@ ci:
     just test
     just miri
 
-sync-version:
-    cargo set-version -p const-str-proc-macro   '1.1.0'
-    cargo set-version -p const-str              '1.1.0'
+# Updates the inherited workspace version and const-str's internal dependency.
+sync-version VERSION:
+    cargo set-version -p const-str '{{VERSION}}'
